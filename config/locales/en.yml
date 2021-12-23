@@ -1,0 +1,11 @@
+en:
+  activemodel:
+    attributes:
+      locations:
+        locations: Locations
+  decidim:
+    locations:
+      form:
+        add_location: Add location
+        location: Location
+        remove: Remove

@@ -1,0 +1,14 @@
+<div class="grid-x">
+  <div class="cell auto">
+    <%= form.text_field :address, tabs_id: tabs_id %>
+  </div>
+  <div class="cell auto">
+    <%= form.number_field :latitude, tabs_id: tabs_id %>
+  </div>
+  <div class="cell auto">
+    <%= form.number_field :longitude, tabs_id: tabs_id %>
+  </div>
+</div>
+
+<%= form.hidden_field :id %>
+<%= form.hidden_field :deleted %>

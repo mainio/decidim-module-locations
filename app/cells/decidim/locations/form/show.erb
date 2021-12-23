@@ -1,0 +1,16 @@
+<div class="location-items">
+  <%= fields_for field_name(blank_location.to_param), blank_location do |single_form| %>
+    <script type="text/template" class="decidim-template">
+      <%= render partial: "decidim/locations/form/location", locals: { form: single_form, tabs_id: tabs_id_for_location(blank_location) } %>
+    </script>
+  <% end %>
+
+  <div class="location-items-list">
+    <% form.object.locations.each_with_index do |location, index| %>
+      <%= fields_for field_name, location do |single_form| %>
+        <%= render partial: "decidim/locations/form/location", locals: { form: single_form, tabs_id: tabs_id_for_location(location) } %>
+      <% end %>
+    <% end %>
+  </div>
+  <button type="button" class="button add-location-item"><%= t(".add_location") %></button>
+</div>

@@ -1,0 +1,11 @@
+fi:
+  activemodel:
+    attributes:
+      locations:
+        locations: Sijainnit
+  decidim:
+    locations:
+      form:
+        add_location: Lisää sijainti
+        location: Sijainti
+        remove: Poista
