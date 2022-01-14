@@ -9,3 +9,4 @@ fi:
         add_location: Lisää sijainti
         location: Sijainti
         remove: Poista
+        unexisting_locations: 'Virheellisiä sijainteja annettu tälle tietueelle: %{ids}'
