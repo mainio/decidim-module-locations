@@ -1,0 +1,12 @@
+<%
+# This is displayed within JS templates when the markers are updated
+# dynamically.
+%>
+
+var $map = $('#map');
+var mapController = $map.data("map-controller");
+if (mapController) {
+  var resultsData = JSON.parse('<%== escape_javascript markers_data_for_map.to_json %>');
+  mapController.clearMarkers();
+  mapController.addMarkers(resultsData);
+}

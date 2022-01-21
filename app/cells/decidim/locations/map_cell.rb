@@ -23,12 +23,17 @@ module Decidim
       # include Cell::ViewModel::Partial
       # include Decidim::TranslatableAttributes
       include Decidim::MapHelper
+      include ActionView::Helpers::JavaScriptHelper
 
       delegate :snippets, to: :controller
 
       def show
         return if model.none?
 
+        render
+      end
+
+      def dynamic_markers
         render
       end
 
