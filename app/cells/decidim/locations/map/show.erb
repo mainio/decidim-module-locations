@@ -1,0 +1,25 @@
+<%= locations_map do %>
+  <template id="marker-popup">
+    <div class="map-info__content">
+      <h3>${title}</h3>
+      <div id="bodyContent">
+        <p>{{html body}}</p>
+        <div class="map__date-adress">
+          <div class="address card__extra">
+            <div class="address__icon">{{html icon}}</div>
+            <div class="address__details">
+              <span>${address}</span><br>
+            </div>
+          </div>
+        </div>
+        <% if view_label %>
+          <div class="map-info__button">
+            <a href="${link}" class="button button--sc">
+              <%= view_label %>
+            </a>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </template>
+<% end %>
