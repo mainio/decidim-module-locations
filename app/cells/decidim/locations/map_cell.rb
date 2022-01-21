@@ -20,8 +20,6 @@ module Decidim
     #   5: Latitude of the record, e.g. 1.123
     #   6: Longitude of the record, e.g. 2.234
     class MapCell < Decidim::ViewModel
-      # include Cell::ViewModel::Partial
-      # include Decidim::TranslatableAttributes
       include Decidim::MapHelper
       include ActionView::Helpers::JavaScriptHelper
 
