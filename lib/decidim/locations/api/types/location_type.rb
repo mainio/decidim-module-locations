@@ -8,8 +8,8 @@ module Decidim
 
       field :id, !types.ID, "The internal ID for this status"
       field :address, types.String, "The address of the location."
-      field :latitude, !types.Float, "The latitude coordinate of the location."
-      field :longitude, !types.Float, "The longitude coordinate of the location."
+      field :latitude, types.Float, "The latitude coordinate of the location."
+      field :longitude, types.Float, "The longitude coordinate of the location."
     end
 
     # TODO: Update to 0.24
@@ -19,8 +19,8 @@ module Decidim
 
     #   field :id, GraphQL::Types::ID, null: false
     #   field :address, GraphQL::Types::String, "The address for this location", null: true
-    #   field :latitude, GraphQL::Types::Float, "The latitude coordinate for this location", null: false
-    #   field :longitude, GraphQL::Types::Float, "The longitude coordinate for this location", null: false
+    #   field :latitude, GraphQL::Types::Float, "The latitude coordinate for this location", null: true
+    #   field :longitude, GraphQL::Types::Float, "The longitude coordinate for this location", null: true
     # end
   end
 end
