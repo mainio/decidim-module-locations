@@ -9,8 +9,8 @@ module Decidim
       argument :id, ID, required: false
       argument :geocode, GraphQL::Types::Boolean, required: false, default_value: false
       argument :address, GraphQL::Types::String, required: false
-      argument :latitude, GraphQL::Types::Float, required: true
-      argument :longitude, GraphQL::Types::Float, required: true
+      argument :latitude, GraphQL::Types::Float, required: false
+      argument :longitude, GraphQL::Types::Float, required: false
     end
   end
 end
