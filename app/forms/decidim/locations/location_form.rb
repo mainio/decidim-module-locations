@@ -11,6 +11,9 @@ module Decidim
       attribute :latitude, Float
       attribute :longitude, Float
 
+      validates :address, presence: true, if: ->(form) { form.latitude.blank? || form.longitude.blank? }
+      validates :latitude, :longitude, presence: true, if: ->(form) { form.address.blank? }
+
       def to_param
         return id if id.present?
 
