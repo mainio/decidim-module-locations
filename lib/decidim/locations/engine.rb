@@ -9,10 +9,6 @@ module Decidim
       initializer "decidim_locations.add_cells_view_paths" do
         Cell::ViewModel.view_paths << File.expand_path("#{Decidim::Locations::Engine.root}/app/cells")
       end
-
-      initializer "decidim_locations.assets" do |app|
-        app.config.assets.precompile += %w(decidim_locations_manifest.js)
-      end
     end
   end
 end

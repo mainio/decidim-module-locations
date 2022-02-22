@@ -11,7 +11,7 @@ module Decidim
 
       def show
         unless snippets.any?(:locations)
-          snippets.add(:locations, javascript_include_tag("decidim/locations/locations_input"))
+          snippets.add(:locations, javascript_pack_tag("decidim_locations_admin"))
 
           # This will display the snippets in the <head> part of the page.
           snippets.add(:head, snippets.for(:locations))

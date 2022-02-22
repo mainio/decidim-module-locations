@@ -19,8 +19,6 @@ gem "bootsnap", "~> 1.4"
 gem "puma", ">= 5.0.0"
 gem "uglifier", "~> 4.1"
 
-gem "rails", ">= 5.2.4.4"
-
 group :development, :test do
   gem "byebug", "~> 11.0", platform: :mri
   gem "decidim-dev", DECIDIM_VERSION
