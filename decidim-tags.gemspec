@@ -7,7 +7,7 @@ require "decidim/locations/version"
 Gem::Specification.new do |spec|
   spec.name = "decidim-locations"
   spec.version = Decidim::Locations::VERSION
-  spec.required_ruby_version = ">= 2.6"
+  spec.required_ruby_version = ">= 2.7"
   spec.authors = ["Antti Hukkanen"]
   spec.email = ["antti.hukkanen@mainiotech.fi"]
 
