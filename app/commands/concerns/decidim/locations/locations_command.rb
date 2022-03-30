@@ -39,7 +39,6 @@ module Decidim
             Decidim::Locations::Location.new(attributes)
           end
         end.compact
-        return unless locations.any?
 
         locatable.update!(locations: locations)
       end
