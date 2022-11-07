@@ -61,8 +61,8 @@ Include this cell inside the record's editing form:
 <% end %>
 ```
 
-And finally, inside the commands that create and update the records, include the
-following:
+And finally, inside the commands that create and update the records, include
+the following:
 
 ```ruby
 class YourUpdateCommand < Rectify::Command
@@ -87,6 +87,81 @@ class YourUpdateCommand < Rectify::Command
 
     broadcast(:ok, @model)
   end
+end
+```
+
+If you want the locations to be also available through the GraphQL API, you will
+also need to add the following to the relevant GraphQL types:
+
+```ruby
+class YourModelType < Decidim::Api::Types::BaseObject
+  description "Your model"
+  # ...
+  implements Decidim::Locations::LocationsInterface
+  # ...
+end
+```
+
+After this, you will have the `locations` field available through the GraphQL
+API for your models.
+
+### Usage example: Proposals
+
+In order to apply what is explained above for the proposals component, you can
+do the following:
+
+#### 1. Add an initializer to apply the customizations to the classes
+
+In your Decidim application, create a new initializer file, e.g.
+`config/initializers/decidim_locations.rb`. Add the following contents to that
+file:
+
+```ruby
+Rails.application.config.to_prepare do
+  Decidim::Proposals::Proposal.include Decidim::Locations::Locatable
+  Decidim::Proposals::ProposalForm.include Decidim::Locations::LocatableForm
+  Decidim::Proposals::ProposalType.implements Decidim::Locations::LocationsInterface
+end
+```
+
+Now you have just applied most of the described changes except the user
+interface part to the proposals component.
+
+#### 2. Customize the views
+
+The next thing is to add the locations fields to your user interface. For the
+proposals component this can be done by editing
+`app/views/decidim/proposals/proposals/_edit_form_fields.html.erb`. In order to
+customize any views in Decidim, please refer to the official documentation about
+[customizing views](https://docs.decidim.org/en/develop/customize/views.html).
+
+In that view, in the appropriate place where you would normally display the
+address field, add the following code:
+
+```erb
+<%== cell("decidim/locations/form", form, label: t(".locations_label")) %>
+```
+
+#### 3. Customize the form
+
+After the user interface field is added, you still need to take it into account
+when you are updating the proposal records. This happens by customizing
+`app/commands/decidim/proposals/proposals/locations_command.rb` as described
+earlier in this documentation. To learn more about customizing any logic in
+Decidim, please refer to the
+[official documentation](https://docs.decidim.org/en/develop/customize/logic).
+
+The change you need to do in the command class is the following within the
+`call` method:
+
+```ruby
+def call
+  # ... normal stuff from the proposals module ...
+  # ADD THIS LINE:
+  update_locations(proposal, form)
+
+  # ... the rest from the proposals module ...
+  broadcast(:ok, proposal)
 end
 ```
 
