@@ -146,7 +146,7 @@ address field, add the following code:
 
 After the user interface field is added, you still need to take it into account
 when you are updating the proposal records. This happens by customizing
-`app/commands/decidim/proposals/proposals/locations_command.rb` as described
+`app/commands/decidim/proposals/update_proposal.rb` as described
 earlier in this documentation. To learn more about customizing any logic in
 Decidim, please refer to the
 [official documentation](https://docs.decidim.org/en/develop/customize/logic).
