@@ -10,8 +10,6 @@ module Decidim
         foreign_type: :decidim_locations_locatable_type,
         polymorphic: true
       )
-
-      validates :locatable, presence: true
     end
   end
 end

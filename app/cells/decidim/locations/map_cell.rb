@@ -60,7 +60,7 @@ module Decidim
       end
 
       def locations_map
-        map_options = { type: map_type, markers: markers_data_for_map }
+        map_options = { type: map_type, markers: markers_data_for_map, zoomControl: false }
         map_options[:center_coordinates] = center_coodrdinates if center_coodrdinates && center_coodrdinates.length > 1
 
         dynamic_map_for(map_options) do
