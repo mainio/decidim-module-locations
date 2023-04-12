@@ -10,3 +10,14 @@ en:
         location: Location
         remove: Remove
         unexisting_locations: 'Invalid locations provided for this record: %{ids}'
+  pick_locations: Pick locations
+  type_locations: Type locations
+  clear_markers: Clear markers
+  address: Address
+  proposal_hint: Press "Add" to place a location on the map.
+  edit_location: Edit location
+  delete_marker: Delete marker
+  save: Save
+  cancel: Cancel
+  placeholder:
+    address: 37 Homewood Drive Brownsburg, IN 46112

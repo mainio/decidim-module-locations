@@ -1,0 +1,69 @@
+.tabs.expanded{
+  @extend .menu;
+
+  .tabs-title{
+    float: none;
+  }
+}
+
+.autoComplete_wrapper > input.input-group-field{
+  border-radius: 0;
+}
+
+[data-location-picker]{
+  .google-map{
+    z-index: 0;
+  }
+
+  .tabs{
+    .dropdown.menu{
+      &,
+      li{
+        width: 100%;
+      }
+
+      li,
+      li.is-active{
+        a{
+          background: transparent;
+          color: $tab-color;
+        }
+      }
+
+      li a::after{
+        display: none;
+      }
+    }
+  }
+}
+
+
+// Changes taken from pull request #9460, decidim version 0.28, can be deleted
+// when decidim 0.28 in use
+
+$autocomplete-input-height: ($input-font-size * unitless-calc($input-line-height)) + (get-side($input-padding, 'top') + get-side($input-padding, 'bottom')) - rem-calc(1) !default;
+$autocomplete-input-line-height: $input-line-height !default;
+$autocomplete-input-padding: $input-padding !default;
+$autocomplete-multiselect-search-prompt-color: $dark-gray !default;
+
+.autoComplete_wrapper{
+  position: relative;
+
+  ul{
+    position: absolute;
+  }
+
+  span{
+    &.autocomplete__selected-item.sticky{
+      overflow: hidden;
+      height: $autocomplete-input-height;
+      line-height: $autocomplete-input-line-height;
+      padding: $autocomplete-input-padding;
+    }
+  }
+
+  .clear-sticky-selection{
+    height: $autocomplete-input-height;
+    line-height: $autocomplete-input-height;
+  }
+}

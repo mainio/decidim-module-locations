@@ -22,6 +22,7 @@ module Decidim
     class MapCell < Decidim::ViewModel
       include Decidim::MapHelper
       include ActionView::Helpers::JavaScriptHelper
+      include Decidim::Locations::LocationsHelper
 
       delegate :snippets, to: :controller
 
@@ -70,8 +71,8 @@ module Decidim
 
       def markers_center
         @markers_center ||= begin
-          latitudes = model.map { |data| data[5].to_f }
-          longitudes = model.map { |data| data[6].to_f }
+          latitudes = parse_map_locations(model).map { |data| data[5].to_f }
+          longitudes = parse_map_locations(model).map { |data| data[6].to_f }
 
           [
             latitudes.sum(0.0) / latitudes.size,
@@ -81,7 +82,7 @@ module Decidim
       end
 
       def markers_data_for_map
-        model.map do |data|
+        parse_map_locations(model).map do |data|
           body = data[2]
           if body.blank?
             doc = Nokogiri::HTML(data[3])
