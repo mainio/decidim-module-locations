@@ -14,7 +14,7 @@ en:
   type_locations: Type locations
   clear_markers: Clear markers
   address: Address
-  proposal_hint: Press "Add" to place a location on the map.
+  hint: Press "Add" to place a location on the map.
   edit_location: Edit location
   delete_marker: Delete marker
   save: Save

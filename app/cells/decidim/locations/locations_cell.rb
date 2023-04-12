@@ -7,6 +7,7 @@ module Decidim
       include Decidim::IconHelper
       include Decidim::Locations::LocationsHelper
       include Decidim::MapHelper
+      include Escaped
 
       delegate :snippets, to: :controller
 
@@ -24,6 +25,10 @@ module Decidim
 
       def classname
         model.class.name.split("::").last.downcase
+      end
+
+      def revealselector
+        escape!({ revealSelector: "#model_locations_reveal" }.to_json)
       end
     end
   end

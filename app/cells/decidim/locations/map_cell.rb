@@ -27,7 +27,7 @@ module Decidim
       delegate :snippets, to: :controller
 
       def show
-        return if model.none?
+        return if parse_map_locations(model).none?
 
         render
       end

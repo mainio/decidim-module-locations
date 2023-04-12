@@ -3,7 +3,7 @@ import getDistanceBetweenPoints from "./avg_coordinates.js"
 const initializeTabs = (wrapperEl) => {
   const mapEl = wrapperEl.querySelector("[data-decidim-map]");
   const ctrl = $(mapEl).data("map-controller");
-  const tabsEl = wrapperEl.querySelector('[data-map-container="#pick_proposal_locations_map"]');
+  const tabsEl = wrapperEl.querySelector('[data-map-container="#pick_model_locations_map"]');
   const typeLocWrapperEl = wrapperEl.querySelector(".type-locations-wrapper");
   const mainTabs = tabsEl.querySelectorAll(":scope > li");
   const moreTabs = tabsEl.querySelector("[data-more-tabs]").querySelectorAll(":scope > li")
@@ -139,14 +139,12 @@ export default () => {
     let lngAvg = longitudes.reduce((pv, cv) => pv + cv, 0);
     lngAvg /= longitudes.length;
 
-    document.querySelector(".proposal-latitude").value = latAvg;
-    document.querySelector(".proposal-longitude").value = lngAvg;
+    document.querySelector(".model-latitude").value = latAvg;
+    document.querySelector(".model-longitude").value = lngAvg;
   };
 
   document.querySelectorAll("[data-location-picker]").forEach((wrapperEl) => {
-    console.log(wrapperEl.dataset.locationPicker)
-    // const options = JSON.parse(wrapperEl.dataset.locationPicker);
-    const options = {}
+    const options = JSON.parse(wrapperEl.dataset.locationPicker);
     const mapEl = wrapperEl.querySelector("[data-decidim-map]");
     const ctrl = $(mapEl).data("map-controller");
     const editModalEl = document.querySelector(options.revealSelector);
@@ -157,15 +155,15 @@ export default () => {
     const typeLocInput = typeLocWrap.querySelector(".type-loc-field");
     const typeLocButton = typeLocWrap.querySelector(".type-loc-button");
     const locationCheckBox = document.getElementById("proposal_has_location");
-    const propLoc = document.getElementById("proposal_locations");
+    const modelLoc = document.getElementById("model_locations");
     const containerMarkerField = markerFieldContainer.querySelectorAll(".marker-field");
 
     const locationCheck = () => {
       if (locationCheckBox.checked) {
-        propLoc.classList.remove("hide");
+        modelLoc.classList.remove("hide");
         ctrl.map.invalidateSize();
       } else {
-        propLoc.classList.add("hide");
+        modelLoc.classList.add("hide");
       }
     };
 
@@ -282,7 +280,7 @@ export default () => {
       )
       const area = new L.LatLngBounds(bounds)
       ctrl.map.fitBounds(area);
-    };
+    }
 
     initializeTabs(wrapperEl);
   });

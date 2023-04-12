@@ -6,7 +6,7 @@ module Decidim
       extend ActiveSupport::Concern
 
       included do
-        def geocoding_options(current_organization)
+        def geocoding_options
           Decidim::Map.autocomplete(organization: current_organization).builder_options.transform_keys { |key| key.to_s.camelize(:lower) }
         end
 
