@@ -1,9 +1,11 @@
-<div class="field">
-  <%= form.check_box :has_location, checked: model_has_address?(model) %>
-</div>
+<% if checkbox %>
+  <div class="field">
+    <%= form.check_box :has_location, checked: model_has_address?(model), id: "model_has_location" %>
+  </div>
+<% end %>
 
-<input name="<%=classname%>[latitude]" class="model-latitude" autocomplete="off" type="hidden" >
-<input name="<%=classname%>[longitude]" class="model-longitude" autocomplete="off" type="hidden" >
+<input name="<%= classname %>[latitude]" class="model-latitude" autocomplete="off" type="hidden" >
+<input name="<%= classname %>[longitude]" class="model-longitude" autocomplete="off" type="hidden" >
 
 <div id="model_locations" class="hide" data-location-picker="<%= revealselector %>">
   <ul class="tabs mb-s expanded" data-map-container="#pick_model_locations_map">
@@ -22,14 +24,20 @@
   </ul>
 
   <div data-marker-field>
-    <% model.locations.each do |loc| %>
+    <% model.try(:locations).try(:each) do |loc| %>
       <div class="marker-field" data-marker-id=<%= loc.id %>>
-        <input name="<%=classname%>[locations][][address]" class="location-address" autocomplete="off" type="hidden" value="<%= loc.address %>">
-        <input name="<%=classname%>[locations][][latitude]" class="location-latitude" autocomplete="off" type="hidden" value=<%= loc.latitude %>>
-        <input name="<%=classname%>[locations][][longitude]" class="location-longitude" autocomplete="off" type="hidden" value=<%= loc.longitude %>>
+        <input name="<%= classname %>[locations][][address]" class="location-address" autocomplete="off" type="hidden" value="<%= loc.address %>">
+        <input name="<%= classname %>[locations][][latitude]" class="location-latitude" autocomplete="off" type="hidden" value=<%= loc.latitude %>>
+        <input name="<%= classname %>[locations][][longitude]" class="location-longitude" autocomplete="off" type="hidden" value=<%= loc.longitude %>>
       </div>
     <% end %>
   </div>
+
+  <template id="model_input_template">
+    <input name="<%= classname %>[locations][][address]" class="location-address" autocomplete="off" type="hidden">
+    <input name="<%= classname %>[locations][][latitude]" class="location-latitude" autocomplete="off" type="hidden">
+    <input name="<%= classname %>[locations][][longitude]" class="location-longitude" autocomplete="off" type="hidden">
+  </template>
 
   <div class="type-locations-wrapper hide">
     <label><%= t("address") %></label>
@@ -39,7 +47,7 @@
       </span>
       <%= form.geocoding_field :address, placeholder: t("placeholder.address"), label: false, class: "type-loc-field input-group-field" %>
       <div class="input-group-button">
-        <input type="button" class="type-loc-button hollow button" value="Add" disabled>
+        <button class="type-loc-button hollow button" disabled><%= t("add") %></button>
       </div>
     </div>
     <span class="hint form-input-extra-before hide" aria-hidden="true"><%= t("hint") %></span>

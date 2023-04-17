@@ -11,10 +11,10 @@ module Decidim
         end
 
         def model_has_address?(model)
-          model.locations.present?
+          model.try(:locations).present?
         end
 
-        def parse_map_locations(model)
+        def format_map_locations(model)
           query, tbl =
             if model.class.superclass == ActiveRecord::Relation
               [Decidim::Locations::Location.where(locatable: model), model.table_name]
@@ -26,10 +26,16 @@ module Decidim
             INNER JOIN #{Arel.sql(tbl)} AS locatable
               ON #{Arel.sql(Decidim::Locations::Location.table_name)}.decidim_locations_locatable_id = locatable.id
           QUERY
+          response =
+            if query.joins(join_sql).pluck(respond_to?("locatable.description"))
+              "locatable.description"
+            else
+              "locatable.body"
+            end
           query.joins(join_sql).pluck(
             "locatable.id",
             "locatable.title",
-            "locatable.body",
+            response,
             :address,
             :latitude,
             :longitude

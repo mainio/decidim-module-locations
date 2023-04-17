@@ -27,7 +27,7 @@ module Decidim
       delegate :snippets, to: :controller
 
       def show
-        return if parse_map_locations(model).none?
+        return if format_map_locations(model).none?
 
         render
       end
@@ -71,8 +71,8 @@ module Decidim
 
       def markers_center
         @markers_center ||= begin
-          latitudes = parse_map_locations(model).map { |data| data[5].to_f }
-          longitudes = parse_map_locations(model).map { |data| data[6].to_f }
+          latitudes = format_map_locations(model).map { |data| data[5].to_f }
+          longitudes = format_map_locations(model).map { |data| data[6].to_f }
 
           [
             latitudes.sum(0.0) / latitudes.size,
@@ -82,7 +82,7 @@ module Decidim
       end
 
       def markers_data_for_map
-        parse_map_locations(model).map do |data|
+        format_map_locations(model).map do |data|
           body = data[2]
           if body.blank?
             doc = Nokogiri::HTML(data[3])

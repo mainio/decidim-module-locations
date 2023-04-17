@@ -22,11 +22,16 @@
         width: 100%;
       }
 
-      li,
+      li{
+        a{
+          background: transparent;
+        }
+      }
+
       li.is-active{
         a{
           background: transparent;
-          color: $tab-color;
+          color: #f52727;
         }
       }
 
@@ -48,6 +53,7 @@ $autocomplete-multiselect-search-prompt-color: $dark-gray !default;
 
 .autoComplete_wrapper{
   position: relative;
+  margin-bottom: 0;
 
   ul{
     position: absolute;

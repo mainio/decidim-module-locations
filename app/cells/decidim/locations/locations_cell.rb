@@ -23,8 +23,12 @@ module Decidim
         options[:current_organization]
       end
 
+      def checkbox
+        options[:checkbox]
+      end
+
       def classname
-        model.class.name.split("::").last.downcase
+        options[:classname]
       end
 
       def revealselector

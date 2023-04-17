@@ -87,9 +87,9 @@ export default () => {
 
     const markerField = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
     if (markerField) {
-      const oldCoords = [markerField.querySelector(".location-latitude").value, markerField.querySelector(".location-longitude").value]
-      const newCoords = [lat, lng]
-      const markerRadius = getDistanceBetweenPoints(oldCoords, newCoords)
+      const oldCoords = [markerField.querySelector(".location-latitude").value, markerField.querySelector(".location-longitude").value];
+      const newCoords = [lat, lng];
+      const markerRadius = getDistanceBetweenPoints(oldCoords, newCoords);
 
       if (markerRadius < 200) {
         markerField.querySelector(".location-latitude").value = lat;
@@ -100,29 +100,19 @@ export default () => {
         markerField.querySelector(".location-longitude").value = lng;
       }
     } else {
-
-      const setAttributes = (el, attrs) => {
-        Object.keys(attrs).forEach((attr) => {
-          el.setAttribute(attr, attrs[attr])
-        })
-      }
-
       const container = document.createElement("div");
-      const inputFieldAdd = document.createElement("input");
-      const inputFieldLat = document.createElement("input");
-      const inputFieldLng = document.createElement("input");
-
       container.setAttribute("class", "marker-field");
       container.dataset.markerId = markerId;
 
-      setAttributes(inputFieldAdd, { "name": "proposal[locations][][address]", "class": "location-address", "autocomplete": "off", "type": "hidden", "value": address })
-      setAttributes(inputFieldLat, { "name": "proposal[locations][][latitude]", "class": "location-latitude", "autocomplete": "off", "type": "hidden", "value": lat })
-      setAttributes(inputFieldLng, { "name": "proposal[locations][][longitude]", "class": "location-longitude", "autocomplete": "off", "type": "hidden", "value": lng })
+      const template = document.querySelector("#model_input_template");
+      const clone = template.content.cloneNode(true);
+      let input = clone.querySelectorAll("input");
+      input[0].value = address;
+      input[1].value = lat;
+      input[2].value = lng;
 
+      container.appendChild(clone);
       markerFieldContainer.appendChild(container);
-      container.appendChild(inputFieldAdd);
-      container.appendChild(inputFieldLat);
-      container.appendChild(inputFieldLng);
     }
   };
 
@@ -154,12 +144,12 @@ export default () => {
     const typeLocWrap = wrapperEl.querySelector(".type-locations-wrapper");
     const typeLocInput = typeLocWrap.querySelector(".type-loc-field");
     const typeLocButton = typeLocWrap.querySelector(".type-loc-button");
-    const locationCheckBox = document.getElementById("proposal_has_location");
+    const locationCheckBox = document.getElementById("model_has_location");
     const modelLoc = document.getElementById("model_locations");
     const containerMarkerField = markerFieldContainer.querySelectorAll(".marker-field");
 
     const locationCheck = () => {
-      if (locationCheckBox.checked) {
+      if (locationCheckBox && locationCheckBox.checked) {
         modelLoc.classList.remove("hide");
         ctrl.map.invalidateSize();
       } else {
@@ -167,9 +157,15 @@ export default () => {
       }
     };
 
-    locationCheckBox.addEventListener("change", () => {
-      locationCheck();
-    });
+    if (locationCheckBox === null) {
+      modelLoc.classList.remove("hide")
+      ctrl.map.invalidateSize();
+    } else {
+      locationCheckBox.addEventListener("change", () => {
+        locationCheck();
+      });
+    }
+
     let displayList = true;
 
     typeLocInput.addEventListener("input", () => {
@@ -266,7 +262,9 @@ export default () => {
       })
     });
 
-    locationCheck();
+    if (locationCheckBox !== null) {
+      locationCheck();
+    }
 
     if (containerMarkerField.length > 0) {
       const bounds = [];
