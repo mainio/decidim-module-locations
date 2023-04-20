@@ -26,12 +26,14 @@ module Decidim
             INNER JOIN #{Arel.sql(tbl)} AS locatable
               ON #{Arel.sql(Decidim::Locations::Location.table_name)}.decidim_locations_locatable_id = locatable.id
           QUERY
+
           response =
-            if query.joins(join_sql).pluck(respond_to?("locatable.description"))
-              "locatable.description"
-            else
+            if model[0].instance_of?(Decidim::Proposals::Proposal) || model.instance_of?(Decidim::Proposals::Proposal)
               "locatable.body"
+            else
+              "locatable.description"
             end
+
           query.joins(join_sql).pluck(
             "locatable.id",
             "locatable.title",
