@@ -28,10 +28,10 @@ module Decidim
           QUERY
 
           response =
-            if model[0].instance_of?(Decidim::Proposals::Proposal) || model.instance_of?(Decidim::Proposals::Proposal)
-              "locatable.body"
-            else
+            if model.has_attribute?(:description)
               "locatable.description"
+            else
+              "locatable.body"
             end
 
           query.joins(join_sql).pluck(
@@ -51,7 +51,12 @@ module Decidim
             # 6: Longitude of the record, e.g. 2.234
             # [123, "Title of the record", "Summary of the record", "Body text of the record", "Foobar street 123", 1.123, 2.234]
             title = translated_attribute(JSON.parse(record[1]))
-            body = translated_attribute(JSON.parse(record[2]))
+            body =
+              begin
+                translated_attribute(JSON.parse(record[2]))
+              rescue JSON::ParserError
+                translated_attribute(record[2])
+              end
             [record[0], title, nil, body, record[3], record[4], record[5]]
           end
         end
