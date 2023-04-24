@@ -19,10 +19,6 @@ module Decidim
         options[:form]
       end
 
-      def current_organization
-        options[:current_organization]
-      end
-
       def checkbox
         options[:checkbox]
       end

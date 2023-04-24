@@ -7,7 +7,9 @@ module Decidim
 
       included do
         def geocoding_options
-          Decidim::Map.autocomplete(organization: current_organization).builder_options.transform_keys { |key| key.to_s.camelize(:lower) }
+          Decidim::Map.autocomplete(
+            organization: current_organization
+          ).builder_options.transform_keys { |key| key.to_s.camelize(:lower) }
         end
 
         def model_has_address?(model)
