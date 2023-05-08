@@ -4,8 +4,8 @@
   </div>
 <% end %>
 
-<input name="<%= classname %>[latitude]" class="model-latitude" autocomplete="off" type="hidden" >
-<input name="<%= classname %>[longitude]" class="model-longitude" autocomplete="off" type="hidden" >
+<%= form.hidden_field :latitude, class: "model-latitude", autocomplete: "off" %>
+<%= form.hidden_field :longitude, class: "model-longitude", autocomplete: "off" %>
 
 <div id="model_locations" class="hide" data-location-picker="<%= revealselector %>">
   <ul class="tabs mb-s expanded" data-map-container="#pick_model_locations_map">
@@ -24,19 +24,27 @@
   </ul>
 
   <div data-marker-field>
-    <% model.try(:locations).try(:each) do |loc| %>
+    <% form.object.locations.each do |loc| %>
       <div class="marker-field" data-marker-id=<%= loc.id %>>
-        <input name="<%= classname %>[locations][][address]" class="location-address" autocomplete="off" type="hidden" value="<%= loc.address %>">
-        <input name="<%= classname %>[locations][][latitude]" class="location-latitude" autocomplete="off" type="hidden" value=<%= loc.latitude %>>
-        <input name="<%= classname %>[locations][][longitude]" class="location-longitude" autocomplete="off" type="hidden" value=<%= loc.longitude %>>
+        <% form.fields_for :locations do |locations| %>
+          <% locations.fields_for "#{loc.id}" do |location| %>
+            <%= location.hidden_field :address, class: "location-address", autocomplete: "off", value: loc.address %>
+            <%= location.hidden_field :latitude, class: "location-latitude", autocomplete: "off", value: loc.latitude %>
+            <%= location.hidden_field :longitude, class: "location-longitude", autocomplete: "off", value: loc.longitude %>
+          <% end %>
+        <% end %>
       </div>
     <% end %>
   </div>
 
   <template id="model_input_template">
-    <input name="<%= classname %>[locations][][address]" class="location-address" autocomplete="off" type="hidden">
-    <input name="<%= classname %>[locations][][latitude]" class="location-latitude" autocomplete="off" type="hidden">
-    <input name="<%= classname %>[locations][][longitude]" class="location-longitude" autocomplete="off" type="hidden">
+    <% form.fields_for :locations do |locations| %>
+      <% locations.fields_for "%index%" do |location| %>
+        <%= location.hidden_field :address, class: "location-address", autocomplete: "off" %>
+        <%= location.hidden_field :latitude, class: "location-latitude", autocomplete: "off" %>
+        <%= location.hidden_field :longitude, class: "location-longitude", autocomplete: "off" %>
+      <% end %>
+    <% end %>
   </template>
 
   <div class="type-locations-wrapper hide">
@@ -77,7 +85,7 @@
   </div>
 
   <div id="pick_model_locations_map">
-    <%= dynamic_map_for({ type: "model_location" }, data: { decidim_revgeocoding: geocoding_options }) do %>
+    <%= dynamic_map_for({ type: "model_location" }, data: { decidim_revgeocoding: geocoding_options, map_config: map_config, lat: coords[0], lng: coords[1] }) do %>
       <%= javascript_pack_tag "decidim_locations_edit_map" %>
     <% end %>
   </div>

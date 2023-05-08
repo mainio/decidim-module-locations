@@ -29,10 +29,13 @@ describe "Map", type: :system do
     end
   end
   let(:template) { template_class.new(ActionView::LookupContext.new(ActionController::Base.view_paths), {}, controller) }
-  let(:markers) { [[123, "Title of the record", "Summary of the record", "Body text of the record", "Foobar street 123", 1.123, 2.234]] }
+  let(:dummy) { create(:dummy_resource, body: "Body text of the record") }
+  let(:location) { create(:location, locatable: dummy) }
+  let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
+  let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
 
   let(:html_document) do
-    cell_html = template.cell("decidim/locations/map", markers).to_s
+    cell_html = template.cell("decidim/locations/map", dummy, form).to_s
     template.instance_eval do
       <<~HTML.strip
         <!doctype html>

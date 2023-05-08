@@ -5,7 +5,7 @@ require "spec_helper"
 describe Decidim::Locations::LocationsCell, type: :cell do
   subject { my_cell.call }
 
-  let(:my_cell) { cell("decidim/locations/locations", dummy, form: form, current_organization: organization) }
+  let(:my_cell) { cell("decidim/locations/locations", dummy, form: form) }
   let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
   let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
   let!(:organization) { create(:organization) }

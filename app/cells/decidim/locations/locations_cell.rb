@@ -23,8 +23,12 @@ module Decidim
         options[:checkbox]
       end
 
-      def classname
-        options[:classname]
+      def coords
+        options[:coords]
+      end
+
+      def map_config
+        options[:map_config]
       end
 
       def revealselector

@@ -107,8 +107,11 @@ export default () => {
       const template = document.querySelector("#model_input_template");
       const clone = template.content.cloneNode(true);
       let input = clone.querySelectorAll("input");
+      input[0].name = input[0].name.replace("%index%", markerId)
       input[0].value = address;
+      input[1].name = input[1].name.replace("%index%", markerId);
       input[1].value = lat;
+      input[2].name = input[2].name.replace("%index%", markerId);
       input[2].value = lng;
 
       container.appendChild(clone);
@@ -129,6 +132,11 @@ export default () => {
     let lngAvg = longitudes.reduce((pv, cv) => pv + cv, 0);
     lngAvg /= longitudes.length;
 
+    if (isNaN(latAvg) && isNaN(lngAvg)) {
+      latAvg = null;
+      lngAvg = null;
+    }
+
     document.querySelector(".model-latitude").value = latAvg;
     document.querySelector(".model-longitude").value = lngAvg;
   };
@@ -147,6 +155,7 @@ export default () => {
     const locationCheckBox = document.getElementById("model_has_location");
     const modelLoc = document.getElementById("model_locations");
     const containerMarkerField = markerFieldContainer.querySelectorAll(".marker-field");
+    const mapConfig = mapEl.dataset.mapConfig
 
     const locationCheck = () => {
       if (locationCheckBox && locationCheckBox.checked) {
@@ -216,6 +225,7 @@ export default () => {
       const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
       ctrl.deleteMarker(markerId);
       inputDiv.remove();
+      coordAverage(markerFieldContainer);
       $(editModalEl).foundation("close");
     });
 
@@ -230,6 +240,13 @@ export default () => {
 
     ctrl.setEventHandler("markeradd", (marker, ev) => {
       const markerId = marker.options.id;
+      const oldMarker = markerFieldContainer.querySelector(".marker-field");
+
+      if (mapConfig && mapConfig === "single" && oldMarker) {
+        ctrl.deleteMarker(oldMarker.dataset.markerId);
+        markerFieldContainer.querySelector(`[data-marker-id="${oldMarker.dataset.markerId}"]`).remove();
+      }
+
       if (ev === "clickEv") {
         ctrl.bindPopUp(markerId);
         $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId }]);

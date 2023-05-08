@@ -12,9 +12,21 @@ export default class ModelLocMapController extends MapController {
 
   positionMap() {
     // Position the center of the map
-    const mapCenter = [60.150428, 24.887953];
-    const zoom = 14;
-    this.map.setView(mapCenter, zoom);
+    const mapEl = document.getElementById("map");
+    const lat = mapEl.dataset.lat;
+    const lng = mapEl.dataset.lng;
+
+    let defaultLat = 0;
+    let defaultLng = 0;
+    let zoom = 0;
+
+    if (lat !== defaultLat.toFixed(1) || lng !== defaultLng.toFixed(1)) {
+      defaultLat = lat;
+      defaultLng = lng;
+      zoom = 14;
+    }
+
+    this.map.setView([defaultLat, defaultLng], zoom);
   }
 
   addListeners() {
