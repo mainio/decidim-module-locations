@@ -141,171 +141,165 @@ export default () => {
     document.querySelector(".model-longitude").value = lngAvg;
   };
 
-  $(document).on("ready.decidim", () => {
-    document.querySelectorAll("[data-location-picker]").forEach((wrapperEl) => {
-      const options = JSON.parse(wrapperEl.dataset.locationPicker);
-      const mapEl = wrapperEl.querySelector("[data-decidim-map]");
-      const ctrl = $(mapEl).data("map-controller");
-      const editModalEl = document.querySelector(options.revealSelector);
-      const markerFieldContainer = wrapperEl.querySelector("[data-marker-field]");
-      const locFields = editModalEl.querySelector(".location-fields");
-      const modalButtons = editModalEl.querySelector("[data-modal-buttons]");
-      const typeLocWrap = wrapperEl.querySelector(".type-locations-wrapper");
-      const typeLocInput = typeLocWrap.querySelector(".type-loc-field");
-      const typeLocButton = typeLocWrap.querySelector(".type-loc-button");
-      const locationCheckBox = document.getElementById("model_has_location");
-      const modelLoc = document.getElementById("model_locations");
-      const containerMarkerField = markerFieldContainer.querySelectorAll(".marker-field");
-      const mapConfig = mapEl.dataset.mapConfig
-      const averageInput = document.querySelector(".model-longitude") && document.querySelector(".model-latitude")
+  document.querySelectorAll("[data-location-picker]").forEach((wrapperEl) => {
+    const options = JSON.parse(wrapperEl.dataset.locationPicker);
+    const mapEl = wrapperEl.querySelector("[data-decidim-map]");
+    const ctrl = $(mapEl).data("map-controller");
+    const editModalEl = document.querySelector(options.revealSelector);
+    const markerFieldContainer = wrapperEl.querySelector("[data-marker-field]");
+    const locFields = editModalEl.querySelector(".location-fields");
+    const modalButtons = editModalEl.querySelector("[data-modal-buttons]");
+    const typeLocWrap = wrapperEl.querySelector(".type-locations-wrapper");
+    const typeLocInput = typeLocWrap.querySelector(".type-loc-field");
+    const typeLocButton = typeLocWrap.querySelector(".type-loc-button");
+    const locationCheckBox = document.getElementById("model_has_location");
+    const modelLoc = document.getElementById("model_locations");
+    const containerMarkerField = markerFieldContainer.querySelectorAll(".marker-field");
+    const mapConfig = mapEl.dataset.mapConfig
+    const averageInput = document.querySelector(".model-longitude") && document.querySelector(".model-latitude")
 
-      const locationCheck = () => {
-        if (locationCheckBox && locationCheckBox.checked) {
-          modelLoc.classList.remove("hide");
-          ctrl.map.invalidateSize();
-        } else {
-          modelLoc.classList.add("hide");
-        }
-      };
-
-      if (locationCheckBox === null) {
-        modelLoc.classList.remove("hide")
+    const locationCheck = () => {
+      if (locationCheckBox && locationCheckBox.checked) {
+        modelLoc.classList.remove("hide");
         ctrl.map.invalidateSize();
       } else {
-        locationCheckBox.addEventListener("change", () => {
-          locationCheck();
-        });
+        modelLoc.classList.add("hide");
+      }
+    };
+
+    if (locationCheckBox === null) {
+      modelLoc.classList.remove("hide")
+      ctrl.map.invalidateSize();
+    } else {
+      locationCheckBox.addEventListener("change", () => {
+        locationCheck();
+      });
+    }
+
+    let displayList = true;
+
+    typeLocInput.addEventListener("input", () => {
+      if (typeLocInput.value === "") {
+        displayList = true;
+      }
+    })
+
+    $(typeLocInput).on("open", function () {
+      if (displayList === false) {
+        typeLocInput.ac.close();
+      }
+    });
+
+    let geocodingTimeout = null;
+    let typeLocCoords = null;
+
+    $(typeLocInput).on("geocoder-suggest-coordinates.decidim", (_ev, coordinates) => {
+      clearTimeout(geocodingTimeout);
+      geocodingTimeout = setTimeout(() => {
+        typeLocWrap.querySelector(".hint").classList.remove("hide");
+        ctrl.setView(coordinates);
+        typeLocCoords = coordinates;
+        typeLocButton.disabled = false;
+        displayList = false;
+      }, 300);
+    });
+
+    typeLocButton.addEventListener("click", () => {
+      const markerId = ctrl.addMarker(typeLocCoords, "typeEv");
+      const addressData = { address: typeLocInput.value, position: {lat: typeLocCoords[0], lng: typeLocCoords[1]}, markerId };
+      typeLocInput.value = "";
+      typeLocWrap.querySelector(".hint").classList.add("hide");
+      displayList = true;
+      typeLocButton.disabled = true;
+      addInputGroup(markerFieldContainer, addressData);
+      if (averageInput) {
+        coordAverage(markerFieldContainer);
+      }
+    });
+
+    $(mapEl).on("marker-address", (_ev, addressData) => {
+      ctrl.unbindPopUp(addressData.markerId);
+      addInputGroup(markerFieldContainer, addressData);
+      if (averageInput) {
+        coordAverage(markerFieldContainer);
+      }
+    });
+
+    editModalEl.querySelector("[data-delete-marker]").addEventListener("click", () => {
+      const markerId = editModalEl.dataset.markerId;
+      const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
+      ctrl.deleteMarker(markerId);
+      inputDiv.remove();
+      if (averageInput) {
+        coordAverage(markerFieldContainer);
+      }
+      $(editModalEl).foundation("close");
+    });
+
+    modalButtons.querySelector("[data-modal-save]").addEventListener("click", () => {
+      const markerId = editModalEl.dataset.markerId;
+      const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
+      const modalAddress = locFields.querySelector("[data-modal-address]").value;
+
+      inputDiv.querySelector(".location-address").value = modalAddress;
+      $(editModalEl).foundation("close");
+    });
+
+    ctrl.setEventHandler("markeradd", (marker, ev) => {
+      const markerId = marker.options.id;
+      const oldMarker = markerFieldContainer.querySelector(".marker-field");
+
+      if (mapConfig && mapConfig === "single" && oldMarker) {
+        ctrl.deleteMarker(oldMarker.dataset.markerId);
+        markerFieldContainer.querySelector(`[data-marker-id="${oldMarker.dataset.markerId}"]`).remove();
       }
 
-      let displayList = true;
+      if (ev === "clickEv") {
+        ctrl.bindPopUp(markerId);
+        $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId }]);
+      }
 
-      typeLocInput.addEventListener("input", () => {
-        if (typeLocInput.value === "") {
-          displayList = true;
+      marker.on("click", () => {
+        editModalEl.dataset.markerId = markerId;
+
+        const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
+        if (!inputDiv) {
+          // When the `inputDiv` has not yet been added, the reverse geocoding
+          // is not completed yet, so the user cannot edit the address yet.
+          return;
         }
+        editModalEl.querySelector(".location-fields input[name=address]").value = inputDiv.querySelector(".location-address").value;
+
+        // With Foundation we have to use jQuery
+        $(editModalEl).foundation("open");
+      });
+
+      marker.on("dragend", () => {
+        $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId }]);
+        setTimeout(() => {
+          ctrl.enablePlaceMarkers();
+        }, 100)
       })
 
-      $(typeLocInput).on("open", function () {
-        if (displayList === false) {
-          typeLocInput.ac.close();
-        }
-      });
-
-      let geocodingTimeout = null;
-      let typeLocCoords = null;
-
-      $(typeLocInput).on("geocoder-suggest-coordinates.decidim", (_ev, coordinates) => {
-        clearTimeout(geocodingTimeout);
-        geocodingTimeout = setTimeout(() => {
-          typeLocWrap.querySelector(".hint").classList.remove("hide");
-          ctrl.setView(coordinates);
-          typeLocCoords = coordinates;
-          typeLocButton.disabled = false;
-          displayList = false;
-        }, 300);
-      });
-
-      typeLocButton.addEventListener("click", () => {
-        const markerId = ctrl.addMarker(typeLocCoords, "typeEv");
-        const addressData = { address: typeLocInput.value, position: {lat: typeLocCoords[0], lng: typeLocCoords[1]}, markerId };
-        typeLocInput.value = "";
-        typeLocWrap.querySelector(".hint").classList.add("hide");
-        displayList = true;
-        typeLocButton.disabled = true;
-        addInputGroup(markerFieldContainer, addressData);
-        if (averageInput) {
-          coordAverage(markerFieldContainer);
-        }
-      });
-
-      $(mapEl).on("marker-address", (_ev, addressData) => {
-        ctrl.unbindPopUp(addressData.markerId);
-        addInputGroup(markerFieldContainer, addressData);
-        if (averageInput) {
-          coordAverage(markerFieldContainer);
-        }
-      });
-
-      editModalEl.querySelector("[data-delete-marker]").addEventListener("click", () => {
-        const markerId = editModalEl.dataset.markerId;
-        const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
-        ctrl.deleteMarker(markerId);
-        inputDiv.remove();
-        if (averageInput) {
-          coordAverage(markerFieldContainer);
-        }
-        $(editModalEl).foundation("close");
-      });
-
-      modalButtons.querySelector("[data-modal-save]").addEventListener("click", () => {
-        const markerId = editModalEl.dataset.markerId;
-        const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
-        const modalAddress = locFields.querySelector("[data-modal-address]").value;
-
-        inputDiv.querySelector(".location-address").value = modalAddress;
-        $(editModalEl).foundation("close");
-      });
-
-      ctrl.setEventHandler("markeradd", (marker, ev) => {
-        const markerId = marker.options.id;
-        const oldMarker = markerFieldContainer.querySelector(".marker-field");
-
-        if (mapConfig && mapConfig === "single" && oldMarker) {
-          ctrl.deleteMarker(oldMarker.dataset.markerId);
-          markerFieldContainer.querySelector(`[data-marker-id="${oldMarker.dataset.markerId}"]`).remove();
-        }
-
-        if (ev === "clickEv") {
-          ctrl.bindPopUp(markerId);
-          $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId }]);
-        }
-
-        marker.on("click", () => {
-          editModalEl.dataset.markerId = markerId;
-
-          const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
-          if (!inputDiv) {
-            // When the `inputDiv` has not yet been added, the reverse geocoding
-            // is not completed yet, so the user cannot edit the address yet.
-            return;
-          }
-          editModalEl.querySelector(".location-fields input[name=address]").value = inputDiv.querySelector(".location-address").value;
-
-          // With Foundation we have to use jQuery
-          $(editModalEl).foundation("open");
-        });
-
-        marker.on("dragend", () => {
-          $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId }]);
-          setTimeout(() => {
-            ctrl.enablePlaceMarkers();
-          }, 100)
-        })
-
-        marker.on("dragstart", () => {
-          ctrl.disablePlaceMarkers();
-        })
-      });
-
-      if (locationCheckBox !== null) {
-        locationCheck();
-      }
-
-      if (containerMarkerField.length > 0) {
-        const bounds = [];
-        containerMarkerField.forEach(
-          (locContainer) => {
-            let lat = parseFloat(locContainer.querySelector(".location-latitude").value);
-            let lng = parseFloat(locContainer.querySelector(".location-longitude").value);
-            ctrl.addMarker([lat, lng], "editEv", locContainer.dataset.markerId);
-            bounds.push([lat, lng]);
-          }
-        )
-        const area = new L.LatLngBounds(bounds)
-        ctrl.map.fitBounds(area);
-      }
-
-      initializeTabs(wrapperEl);
+      marker.on("dragstart", () => {
+        ctrl.disablePlaceMarkers();
+      })
     });
-  })
+
+    if (containerMarkerField.length > 0) {
+      const bounds = [];
+      containerMarkerField.forEach(
+        (locContainer) => {
+          let lat = parseFloat(locContainer.querySelector(".location-latitude").value);
+          let lng = parseFloat(locContainer.querySelector(".location-longitude").value);
+          ctrl.addMarker([lat, lng], "editEv", locContainer.dataset.markerId);
+          bounds.push([lat, lng]);
+        }
+      )
+      const area = new L.LatLngBounds(bounds)
+      ctrl.map.fitBounds(area);
+    }
+
+    initializeTabs(wrapperEl);
+  });
 };
