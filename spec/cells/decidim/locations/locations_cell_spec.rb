@@ -5,7 +5,7 @@ require "spec_helper"
 describe Decidim::Locations::LocationsCell, type: :cell do
   subject { my_cell.call }
 
-  let(:my_cell) { cell("decidim/locations/locations", dummy, form: form) }
+  let(:my_cell) { cell("decidim/locations/locations", dummy, form: form, map_config: "single", coords: [1, 2]) }
   let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
   let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
   let!(:organization) { create(:organization) }
@@ -18,7 +18,6 @@ describe Decidim::Locations::LocationsCell, type: :cell do
     end
   end
   let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
-  let!(:dummy_loc) { create(:location, locatable: dummy, address: "Original address", latitude: 12, longitude: 5) }
   let(:controller) do
     double.tap do |ctrl|
       snippets = double
@@ -30,10 +29,17 @@ describe Decidim::Locations::LocationsCell, type: :cell do
   let(:template) { template_class.new(ActionView::LookupContext.new(ActionController::Base.view_paths), {}, controller) }
 
   context "when cell called" do
+    before do
+      utility = Decidim::Map.autocomplete(organization: organization)
+      allow(Decidim::Map).to receive(:autocomplete).with(organization: organization).and_return(utility)
+      allow(utility).to receive(:builder_options).and_return(
+        api_key: "key1234"
+      )
+    end
+
     it "renders the view" do
-      expect(subject).to have_css("input[name=\"[locations][][address]\"]", visible: :hidden)
-      expect(subject).to have_css("input[name=\"[locations][][latitude]\"]", visible: :hidden)
-      expect(subject).to have_css("input[name=\"[locations][][longitude]\"]", visible: :hidden)
+      expect(subject).to have_css("input[name=\"dummy[address]\"]")
+      expect(subject).to have_selector("#map")
       expect(subject).to have_content(
         <<~TXT.squish
           The following element is a map which presents the items on this page as map points.

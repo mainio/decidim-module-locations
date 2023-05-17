@@ -1,11 +1,13 @@
-<% if checkbox %>
+<% if checkbox? %>
   <div class="field">
     <%= form.check_box :has_location, checked: model_has_address?(model), id: "model_has_location" %>
   </div>
 <% end %>
 
-<%= form.hidden_field :latitude, class: "model-latitude", autocomplete: "off" %>
-<%= form.hidden_field :longitude, class: "model-longitude", autocomplete: "off" %>
+<% if form.object.respond_to?(:latitude) && form.object.respond_to?(:longitude) %>
+  <%= form.hidden_field :latitude, class: "model-latitude", autocomplete: "off" %>
+  <%= form.hidden_field :longitude, class: "model-longitude", autocomplete: "off" %>
+<% end %>
 
 <div id="model_locations" class="hide" data-location-picker="<%= revealselector %>">
   <ul class="tabs mb-s expanded" data-map-container="#pick_model_locations_map">
@@ -86,7 +88,7 @@
 
   <div id="pick_model_locations_map">
     <%= dynamic_map_for({ type: "model_location" }, data: { decidim_revgeocoding: geocoding_options, map_config: map_config, lat: coords[0], lng: coords[1] }) do %>
-      <%= javascript_pack_tag "decidim_locations_edit_map" %>
+      <% add_snippets %>
     <% end %>
   </div>
 </div>
