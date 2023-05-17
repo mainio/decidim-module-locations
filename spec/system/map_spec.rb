@@ -446,6 +446,7 @@ describe "Map", type: :system do
 
       context "when picking locations" do
         it "adds markers" do
+          page.execute_script(revgeo)
           add_marker
           expect(page).to have_css(".leaflet-marker-draggable")
           sleep 1
