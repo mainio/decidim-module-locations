@@ -169,16 +169,12 @@ describe "Map", type: :system do
     let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
     let(:map_config) { "multiple" }
 
-    let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_config: map_config, coords: [12, 2]) }
-
-    let(:javascript) do
-      [
-        template.javascript_pack_tag("decidim_core", defer: false),
-        template.javascript_pack_tag("decidim_locations_edit_map", defer: false)
-      ].join
-    end
+    let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_config: map_config, coords: [12, 2], checkbox: false) }
 
     context "when geocoding" do
+      # Console.warn print tool
+      # puts page.driver.browser.manage.logs.get(:browser).map(&:message).join("\n")
+
       before do
         tile_content = File.read(Decidim::Dev.asset("icon.png"))
         final_html = html_document
