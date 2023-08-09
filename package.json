@@ -6,7 +6,7 @@
   "author": "Antti Hukkanen <antti.hukkanen@mainiotech.fi>",
   "license": "AGPL-3.0",
   "scripts": {
-    "lint": "eslint -c .eslintrc.json --ext .js,.js.es6 .",
+    "lint": "eslint -c .eslintrc.json --no-error-on-unmatched-pattern --ignore-pattern app/packs/vendor --ext .js app/packs",
     "stylelint": "stylelint app/packs/**/*.scss"
   },
   "devDependencies": {
