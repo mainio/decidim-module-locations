@@ -30,7 +30,6 @@ const initializeTabs = (wrapperEl) => {
       }
     }
   };
-
   const handleActionTab = (action) => {
     const wasActivated = activeTab === action;
 
@@ -240,7 +239,6 @@ export default () => {
       const markerId = editModalEl.dataset.markerId;
       const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
       const modalAddress = locFields.querySelector("[data-modal-address]").value;
-
       inputDiv.querySelector(".location-address").value = modalAddress;
       $(editModalEl).foundation("close");
     });
@@ -248,12 +246,10 @@ export default () => {
     ctrl.setEventHandler("markeradd", (marker, ev) => {
       const markerId = marker.options.id;
       const oldMarker = markerFieldContainer.querySelector(".marker-field");
-
       if (mapConfig && mapConfig === "single" && oldMarker) {
         ctrl.deleteMarker(oldMarker.dataset.markerId);
         markerFieldContainer.querySelector(`[data-marker-id="${oldMarker.dataset.markerId}"]`).remove();
       }
-
       if (ev === "clickEv") {
         ctrl.bindPopUp(markerId);
         $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId }]);
@@ -285,7 +281,6 @@ export default () => {
         ctrl.disablePlaceMarkers();
       })
     });
-
     if (containerMarkerField.length > 0) {
       const bounds = [];
       containerMarkerField.forEach(
@@ -299,7 +294,6 @@ export default () => {
       const area = new L.LatLngBounds(bounds)
       ctrl.map.fitBounds(area);
     }
-
     initializeTabs(wrapperEl);
   });
 };
