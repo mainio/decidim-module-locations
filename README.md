@@ -29,6 +29,7 @@ And then execute:
 ```bash
 $ bundle
 $ bundle exec rails decidim_locations:install:migrations
+$ bin/rails db:migrate
 ```
 
 ## Usage
