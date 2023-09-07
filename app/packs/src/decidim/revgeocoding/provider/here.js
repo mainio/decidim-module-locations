@@ -17,7 +17,7 @@ $(() => {
       "city",
       "county",
       "state",
-      "country"
+      "countryName"
     ];
     const language = $("html").attr("lang");
 
@@ -31,26 +31,23 @@ $(() => {
       const radius = 500;
       $.ajax({
         method: "GET",
-        url: "https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json",
+        url: "https://revgeocode.search.hereapi.com/v1/revgeocode",
         data: {
-          language,
+          lang: language,
           apiKey: config.apiKey,
-          prox: `${latlng.lat},${latlng.lng},${radius}`,
-          mode: "retrieveAddresses"
+          in: `circle:${latlng.lat},${latlng.lng};r=${radius}`,
+          types: "address"
         },
         dataType: "json"
       }).done((resp) => {
-        if (!resp.Response || !Array.isArray(resp.Response.View) ||
-          resp.Response.View.length < 1
-        ) {
-          return;
-        }
-        const view = resp.Response.View[0];
-        if (!Array.isArray(view.Result) || view.Result.length < 1) {
+        if (!resp.items || !Array.isArray(resp.items) || resp.items.length < 1) {
           return;
         }
 
-        const returnedAddress = view.Result[0].Location.Address;
+        const returnedAddress = resp.items[0].address;
+        if (!returnedAddress) {
+          return;
+        }
 
         const modifiedAddress = {};
 
