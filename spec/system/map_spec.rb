@@ -143,7 +143,7 @@ describe "Map", type: :system do
   context "when location added" do
     def add_marker
       marker_add = <<~JS
-        var map = $("#model_locations [data-decidim-map]").data("map");
+        var map = $(".picker-wrapper [data-decidim-map]").data("map");
         var loc = L.latLng(11.521, 5.521);
         map.fire("click", { latlng: loc });
         map.panTo(loc);
@@ -154,7 +154,7 @@ describe "Map", type: :system do
 
     def drag_marker
       marker_drag = <<~JS
-        var ctrl = $("#model_locations [data-decidim-map]").data("map-controller");
+        var ctrl = $(".picker-wrapper [data-decidim-map]").data("map-controller");
         var marker = ctrl.markers[Object.keys(ctrl.markers)[0]];
 
         marker.setLatLng(L.latLng(13.2, 11.4))
@@ -364,34 +364,26 @@ describe "Map", type: :system do
             // sent correctly.
             $.ajax = function(request) {
               let response = {};
-              if (request.url === "https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json") {
+              if (request.url === "https://revgeocode.search.hereapi.com/v1/revgeocode") {
                 response = {
-                  Response: {
-                    View: [
-                      {
-                        Result: [
-                          {
-                            Location:{
-                              Address: {
-                                Street: "Veneentekijantie",
-                                HouseNumber: 4,
-                                Country: "FI"
-                              },
-                              DisplayPosition: {
-                                Latitude: 11.521,
-                                Longitude: 5.521
-                              }
-                            }
-                          }
-                        ]
+                  items: [
+                    {
+                      address: {
+                        street: "Veneentekijäntie",
+                        houseNumber: 4,
+                        country: "FI"
+                      },
+                      position: {
+                        lat: 11.521,
+                        lng: 5.521
                       }
-                    ]
-                  }
+                    }
+                  ]
                 };
               }
 
               // This is a normal suggest call to:
-              // https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json
+              // https://revgeocode.search.hereapi.com/v1/revgeocode
               var deferred = $.Deferred().resolve(response);
               return deferred.promise();
             };
@@ -481,7 +473,7 @@ describe "Map", type: :system do
                 const response = {};
 
                   // This is a normal suggest call to:
-                  // https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json
+                  // https://revgeocode.search.hereapi.com/v1/revgeocode
                   var deferred = $.Deferred((def) => {
                     setTimeout(() => {
                       def.resolve(response)
