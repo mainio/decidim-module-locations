@@ -1,94 +1,96 @@
-<% if checkbox? %>
-  <div class="field">
-    <%= form.check_box :has_location, checked: model_has_address?(model), id: "model_has_location" %>
-  </div>
-<% end %>
+<div data-location-picker="<%= revealselector %>">
+  <% if checkbox? %>
+    <div class="field">
+      <%= form.check_box :has_location, checked: model_has_address?(model) %>
+    </div>
+  <% end %>
 
-<% if form.object.respond_to?(:latitude) && form.object.respond_to?(:longitude) %>
-  <%= form.hidden_field :latitude, class: "model-latitude", autocomplete: "off" %>
-  <%= form.hidden_field :longitude, class: "model-longitude", autocomplete: "off" %>
-<% end %>
+  <% if form.object.respond_to?(:latitude) && form.object.respond_to?(:longitude) %>
+    <%= form.hidden_field :latitude, class: "model-latitude", autocomplete: "off" %>
+    <%= form.hidden_field :longitude, class: "model-longitude", autocomplete: "off" %>
+  <% end %>
 
-<div id="model_locations" class="hide" data-location-picker="<%= revealselector %>">
-  <ul class="tabs mb-s expanded" data-map-container="#pick_model_locations_map">
-    <li class="tabs-title text-center" data-action="add-markers"><a href="#pick_loc" role="button"><%= t("pick_locations") %></a></li>
-    <li class="tabs-title text-center" data-action="type-loc"><a href="#type_loc" role="button"><%= t("type_locations") %></a></li>
-    <li class="tabs-title text-center" data-action="more">
-      <ul class="dropdown menu" data-dropdown-menu data-autoclose="false" data-disable-hover="true" data-click-open="true" data-close-on-click="true" role="menubar">
-        <li class="tabs-title" role="none">
-          <a id="model_locations_tabs_more" href="#" aria-haspopup="true" role="menuitem"><%= icon "ellipses", role: "img", aria_label: "More options" %></a>
-          <ul data-more-tabs class="menu" role="menu" aria-labelledby="model_locations_tabs_more">
-            <li role="none" data-action="clear-markers"><a href="#" role="menuitem"><%= t("clear_markers") %></a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-  </ul>
+  <div class="picker-wrapper hide">
+    <ul class="tabs mb-s expanded" data-map-container="#pick_model_locations_map">
+      <li class="tabs-title text-center" data-action="add-markers"><a href="#pick_loc" role="button"><%= t("pick_locations") %></a></li>
+      <li class="tabs-title text-center" data-action="type-loc"><a href="#type_loc" role="button"><%= t("type_locations") %></a></li>
+      <li class="tabs-title text-center" data-action="more">
+        <ul class="dropdown menu" data-dropdown-menu data-autoclose="false" data-disable-hover="true" data-click-open="true" data-close-on-click="true" role="menubar">
+          <li class="tabs-title" role="none">
+            <a id="model_locations_tabs_more" href="#" aria-haspopup="true" role="menuitem"><%= icon "ellipses", role: "img", aria_label: "More options" %></a>
+            <ul data-more-tabs class="menu" role="menu" aria-labelledby="model_locations_tabs_more">
+              <li role="none" data-action="clear-markers"><a href="#" role="menuitem"><%= t("clear_markers") %></a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
 
-  <div data-marker-field>
-    <% form.object.locations.each do |loc| %>
-      <div class="marker-field" data-marker-id=<%= loc.id %>>
-        <% form.fields_for :locations do |locations| %>
-          <% locations.fields_for "#{loc.id}" do |location| %>
-            <%= location.hidden_field :address, class: "location-address", autocomplete: "off", value: loc.address %>
-            <%= location.hidden_field :latitude, class: "location-latitude", autocomplete: "off", value: loc.latitude %>
-            <%= location.hidden_field :longitude, class: "location-longitude", autocomplete: "off", value: loc.longitude %>
+    <div data-marker-field>
+      <% form.object.locations.each do |loc| %>
+        <div class="marker-field" data-marker-id=<%= loc.id %>>
+          <% form.fields_for :locations do |locations| %>
+            <% locations.fields_for "#{loc.id}" do |location| %>
+              <%= location.hidden_field :address, class: "location-address", autocomplete: "off", value: loc.address %>
+              <%= location.hidden_field :latitude, class: "location-latitude", autocomplete: "off", value: loc.latitude %>
+              <%= location.hidden_field :longitude, class: "location-longitude", autocomplete: "off", value: loc.longitude %>
+            <% end %>
           <% end %>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
-
-  <template id="model_input_template">
-    <% form.fields_for :locations do |locations| %>
-      <% locations.fields_for "%index%" do |location| %>
-        <%= location.hidden_field :address, class: "location-address", autocomplete: "off" %>
-        <%= location.hidden_field :latitude, class: "location-latitude", autocomplete: "off" %>
-        <%= location.hidden_field :longitude, class: "location-longitude", autocomplete: "off" %>
+        </div>
       <% end %>
-    <% end %>
-  </template>
+    </div>
 
-  <div class="type-locations-wrapper hide">
-    <label><%= t("address") %></label>
-    <div class="input-group">
-      <span class="input-group-label">
-        <%= icon "map-marker", role: "img", "aria-hidden": true %>
-      </span>
-      <%= form.geocoding_field :address, placeholder: t("placeholder.address"), label: false, class: "type-loc-field input-group-field" %>
-      <div class="input-group-button">
-        <button class="type-loc-button hollow button" disabled><%= t("add") %></button>
+    <template id="model_input_template">
+      <% form.fields_for :locations do |locations| %>
+        <% locations.fields_for "%index%" do |location| %>
+          <%= location.hidden_field :address, class: "location-address", autocomplete: "off" %>
+          <%= location.hidden_field :latitude, class: "location-latitude", autocomplete: "off" %>
+          <%= location.hidden_field :longitude, class: "location-longitude", autocomplete: "off" %>
+        <% end %>
+      <% end %>
+    </template>
+
+    <div class="type-locations-wrapper hide">
+      <label><%= t("address") %></label>
+      <div class="input-group">
+        <span class="input-group-label">
+          <%= icon "map-marker", role: "img", "aria-hidden": true %>
+        </span>
+        <%= form.geocoding_field :address, placeholder: t("placeholder.address"), label: false, class: "type-loc-field input-group-field" %>
+        <div class="input-group-button">
+          <button class="type-loc-button hollow button" disabled><%= t("add") %></button>
+        </div>
+      </div>
+      <span class="hint form-input-extra-before hide" aria-hidden="true"><%= t("hint") %></span>
+    </div>
+
+    <div id="model_locations_reveal" class="reveal" data-reveal>
+      <div class="reveal__header">
+        <h3 id="budget-modal-info-label" class="reveal__title"><%= t("edit_location") %></h3>
+      </div>
+
+      <div class="location-fields">
+        <div class="text-right">
+          <button data-delete-marker type="button" class="button alert small"><%= t("delete_marker") %></button>
+        </div>
+        <label>
+          <%= t("address") %>
+          <input data-modal-address type="text" name="address">
+        </label>
+      </div>
+
+      <div data-modal-buttons class="text-center">
+        <button data-modal-save class="button primary"><%= t("save") %></button>
+        <button class="link" data-close aria-label="Close modal" type="button">
+          <span aria-hidden="true"><%= t("cancel") %></span>
+        </button>
       </div>
     </div>
-    <span class="hint form-input-extra-before hide" aria-hidden="true"><%= t("hint") %></span>
-  </div>
 
-  <div id="model_locations_reveal" class="reveal" data-reveal>
-    <div class="reveal__header">
-      <h3 id="budget-modal-info-label" class="reveal__title"><%= t("edit_location") %></h3>
+    <div id="pick_model_locations_map">
+      <%= dynamic_map_for({ type: "model_location" }, data: { decidim_revgeocoding: geocoding_options, map_config: map_config, lat: coords[0], lng: coords[1] }) do %>
+        <% add_snippets %>
+      <% end %>
     </div>
-
-    <div class="location-fields">
-      <div class="text-right">
-        <button data-delete-marker type="button" class="button alert small"><%= t("delete_marker") %></button>
-      </div>
-      <label>
-        <%= t("address") %>
-        <input data-modal-address type="text" name="address">
-      </label>
-    </div>
-
-    <div data-modal-buttons class="text-center">
-      <button data-modal-save class="button primary"><%= t("save") %></button>
-      <button class="link" data-close aria-label="Close modal" type="button">
-        <span aria-hidden="true"><%= t("cancel") %></span>
-      </button>
-    </div>
-  </div>
-
-  <div id="pick_model_locations_map">
-    <%= dynamic_map_for({ type: "model_location" }, data: { decidim_revgeocoding: geocoding_options, map_config: map_config, lat: coords[0], lng: coords[1] }) do %>
-      <% add_snippets %>
-    <% end %>
   </div>
 </div>

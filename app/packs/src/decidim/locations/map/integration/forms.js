@@ -151,11 +151,11 @@ export default () => {
     const typeLocWrap = wrapperEl.querySelector(".type-locations-wrapper");
     const typeLocInput = typeLocWrap.querySelector(".type-loc-field");
     const typeLocButton = typeLocWrap.querySelector(".type-loc-button");
-    const locationCheckBox = document.getElementById("model_has_location");
-    const modelLoc = document.getElementById("model_locations");
+    const locationCheckBox = wrapperEl.querySelector(["[has_location]", "has_location"].map((suffix) => `input[type="checkbox"][name$="${suffix}"]`));
+    const modelLoc = wrapperEl.querySelector(".picker-wrapper");
     const containerMarkerField = markerFieldContainer.querySelectorAll(".marker-field");
     const mapConfig = mapEl.dataset.mapConfig
-    const averageInput = document.querySelector(".model-longitude") && document.querySelector(".model-latitude")
+    const averageInput = wrapperEl.querySelector(".model-longitude") && wrapperEl.querySelector(".model-latitude")
 
     const locationCheck = () => {
       if (locationCheckBox && locationCheckBox.checked) {
