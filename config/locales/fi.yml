@@ -10,3 +10,15 @@ fi:
         location: Sijainti
         remove: Poista
         unexisting_locations: 'Virheellisiä sijainteja annettu tälle tietueelle: %{ids}'
+  add: Lisää
+  pick_locations: Valitse sijainti
+  type_locations: Kirjoita sijainti
+  clear_markers: Poista sijainnit
+  address: Osoite
+  hint: Paina "Lisää" lisätäksesi sijainti kartalle.
+  edit_location: Muuta sijaintia
+  delete_marker: Poista sijainti
+  save: Tallenna
+  cancel: Peruuta
+  placeholder:
+    address: Kuitinmäenkaari, Espoo
