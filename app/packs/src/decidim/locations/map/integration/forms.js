@@ -99,7 +99,6 @@ export default () => {
         markerField.querySelector(".location-longitude").value = lng;
       }
     } else {
-      console.log("nochild")
       const template = document.querySelector("#model_input_template");
       const clone = template.content.cloneNode(true);
       let input = clone.querySelectorAll("input");
