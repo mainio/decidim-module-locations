@@ -85,7 +85,7 @@ export default () => {
     const lng = addressData.position.lng;
 
     const markerField = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
-    if (markerField) {
+    if (markerField.hasChildNodes()) {
       const oldCoords = [markerField.querySelector(".location-latitude").value, markerField.querySelector(".location-longitude").value];
       const newCoords = [lat, lng];
       const markerRadius = getDistanceBetweenPoints(oldCoords, newCoords);
@@ -99,10 +99,7 @@ export default () => {
         markerField.querySelector(".location-longitude").value = lng;
       }
     } else {
-      const container = document.createElement("div");
-      container.setAttribute("class", "marker-field");
-      container.dataset.markerId = markerId;
-
+      console.log("nochild")
       const template = document.querySelector("#model_input_template");
       const clone = template.content.cloneNode(true);
       let input = clone.querySelectorAll("input");
@@ -113,9 +110,15 @@ export default () => {
       input[2].name = input[2].name.replace("%index%", markerId);
       input[2].value = lng;
 
-      container.appendChild(clone);
-      markerFieldContainer.appendChild(container);
+      markerField.appendChild(clone);
     }
+  };
+
+  const addMarkerField = (markerFieldContainer, markerId) => {
+    const container = document.createElement("div");
+    container.setAttribute("class", "marker-field");
+    container.dataset.markerId = markerId;
+    markerFieldContainer.appendChild(container);
   };
 
   const coordAverage = (markerFieldContainer) => {
@@ -250,6 +253,7 @@ export default () => {
         ctrl.deleteMarker(oldMarker.dataset.markerId);
         markerFieldContainer.querySelector(`[data-marker-id="${oldMarker.dataset.markerId}"]`).remove();
       }
+      addMarkerField(markerFieldContainer, markerId);
       if (ev === "clickEv") {
         ctrl.bindPopUp(markerId);
         $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId }]);
