@@ -1,4 +1,5 @@
-import getDistanceBetweenPoints from "./avg_coordinates.js"
+import getDistanceBetweenPoints from "./avg_coordinates.js";
+import addMarkerField from "./add_marker_field.js";
 
 const initializeTabs = (wrapperEl) => {
   const mapEl = wrapperEl.querySelector("[data-decidim-map]");
@@ -6,7 +7,7 @@ const initializeTabs = (wrapperEl) => {
   const tabsEl = wrapperEl.querySelector('[data-map-container="#pick_model_locations_map"]');
   const typeLocWrapperEl = wrapperEl.querySelector(".type-locations-wrapper");
   const mainTabs = tabsEl.querySelectorAll(":scope > li");
-  const moreTabs = tabsEl.querySelector("[data-more-tabs]").querySelectorAll(":scope > li")
+  const moreTabs = tabsEl.querySelector("[data-more-tabs]").querySelectorAll(":scope > li");
   const transparentActions = ["clear-markers"];
 
   let activeTab = null;
@@ -111,13 +112,6 @@ export default () => {
 
       markerField.appendChild(clone);
     }
-  };
-
-  const addMarkerField = (markerFieldContainer, markerId) => {
-    const container = document.createElement("div");
-    container.setAttribute("class", "marker-field");
-    container.dataset.markerId = markerId;
-    markerFieldContainer.appendChild(container);
   };
 
   const coordAverage = (markerFieldContainer) => {
@@ -262,8 +256,8 @@ export default () => {
         editModalEl.dataset.markerId = markerId;
 
         const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
-        if (!inputDiv) {
-          // When the `inputDiv` has not yet been added, the reverse geocoding
+        if (!inputDiv.hasChildNodes()) {
+          // When the `inputDiv`'s input fields have not been added yet, the reverse geocoding
           // is not completed yet, so the user cannot edit the address yet.
           return;
         }
