@@ -28,7 +28,7 @@ $(() => {
     // reverse geocoding
     $el.on("geocoder-reverse.decidim", (_ev, latlng, extraData) => {
       // radius in meters
-      const radius = 500;
+      const radius = 100000;
       $.ajax({
         method: "GET",
         url: "https://revgeocode.search.hereapi.com/v1/revgeocode",
