@@ -16,6 +16,7 @@ describe "Map", type: :system do
       end
     end
   end
+
   let(:controller) do
     Decidim::ApplicationController.new.tap do |ctrl|
       request = double.tap do |r|
@@ -28,6 +29,7 @@ describe "Map", type: :system do
       allow(ctrl).to receive(:request).and_return(request)
     end
   end
+
   let(:template) { template_class.new(ActionView::LookupContext.new(ActionController::Base.view_paths), {}, controller) }
   let(:markers) { [[123, "Title of the record", "Summary of the record", "Body text of the record", "Foobar street 123", 1.123, 2.234]] }
   let(:cell) { template.cell("decidim/locations/map", markers) }
@@ -514,6 +516,51 @@ describe "Map", type: :system do
           click_button "Delete marker"
           expect(page).to have_css(".leaflet-marker-draggable", count: 1, visible: :all)
         end
+      end
+    end
+  end
+
+  context "when cell has 'has location' -checkbox" do
+    let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
+    let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
+    let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
+    let(:map_config) { "multiple" }
+    let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_config: map_config, coords: [12, 2], checkbox: true) }
+
+    before do
+      tile_content = File.read(Decidim::Dev.asset("icon.png"))
+      final_html = html_document
+
+      Rails.application.routes.draw do
+        # Map tiles
+        get "/tiles/:z/:x/:y", to: ->(_) { [200, {}, [tile_content]] }
+
+        # The actual editor testing route for these specs
+        get "test_map", to: ->(_) { [200, {}, [final_html]] }
+      end
+
+      # Login needed for uploading the images
+      switch_to_host(organization.host)
+
+      visit "/test_map"
+    end
+
+    after do
+      expect_no_js_errors
+
+      # Reset the routes back to original
+      Rails.application.reload_routes!
+    end
+
+    it "checks the box if text is clicked" do
+      expect(page).to have_content("Has location")
+      find('label[for="dummy_has_location"]').click
+      expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
+
+      loop do
+        break if page.all("[data-decidim-map] .leaflet-map-pane img").all? { |img| img["complete"] == "true" }
+
+        sleep 0.1
       end
     end
   end
