@@ -2,15 +2,15 @@ import MapController from "src/decidim/map/controller"
 
 export default class ModelLocMapController extends MapController {
   start() {
-    this.positionMap();
+    this.initializeMap();
     this.addListeners();
     this.placeMarkers = false;
     this.markers = {};
   }
 
-  positionMap() {
+  initializeMap() {
+    const mapEl = this.map._container
     // Position the center of the map
-    const mapEl = document.getElementById("map");
     const lat = mapEl.dataset.lat;
     const lng = mapEl.dataset.lng;
 

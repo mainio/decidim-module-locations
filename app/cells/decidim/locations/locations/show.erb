@@ -17,7 +17,7 @@
       <li class="tabs-title text-center" data-action="more">
         <ul class="dropdown menu" data-dropdown-menu data-autoclose="false" data-disable-hover="true" data-click-open="true" data-close-on-click="true" role="menubar">
           <li class="tabs-title" role="none">
-            <a id="model_locations_tabs_more" href="#" aria-haspopup="true" role="menuitem"><%= icon "ellipses", role: "img", aria_label: "More options" %></a>
+            <a id="model_locations_tabs_more<%= random_id %>" href="#" aria-haspopup="true" role="menuitem"><%= icon "ellipses", role: "img", aria_label: "More options" %></a>
             <ul data-more-tabs class="menu" role="menu" aria-labelledby="model_locations_tabs_more">
               <li role="none" data-action="clear-markers"><a href="#" role="menuitem"><%= t("clear_markers") %></a></li>
             </ul>
@@ -40,7 +40,7 @@
       <% end %>
     </div>
 
-    <template id="model_input_template">
+    <template id="model_input_template<%= random_id %>">
       <% form.fields_for :locations do |locations| %>
         <% locations.fields_for "%index%" do |location| %>
           <%= location.hidden_field :address, class: "location-address", autocomplete: "off" %>
@@ -64,9 +64,9 @@
       <span class="hint form-input-extra-before hide" aria-hidden="true"><%= t("hint") %></span>
     </div>
 
-    <div id="model_locations_reveal" class="reveal" data-reveal>
+    <div id="model_locations_reveal<%= random_id %>" class="reveal" data-reveal>
       <div class="reveal__header">
-        <h3 id="budget-modal-info-label" class="reveal__title"><%= t("edit_location") %></h3>
+        <h3 id="budget-modal-info-label<%= random_id %>" class="reveal__title"><%= t("edit_location") %></h3>
       </div>
 
       <div class="location-fields">
@@ -87,8 +87,8 @@
       </div>
     </div>
 
-    <div id="pick_model_locations_map">
-      <%= dynamic_map_for({ type: "model_location" }, data: { decidim_revgeocoding: geocoding_options, map_config: map_config, lat: coords[0], lng: coords[1] }) do %>
+    <div id="pick_model_locations_map<%= random_id %>">
+      <%= dynamic_map_for({ type: "model_location"}, { id: random_id, data: { decidim_revgeocoding: geocoding_options, map_config: map_config, lat: coords[0], lng: coords[1] }}) do %>
         <% add_snippets %>
       <% end %>
     </div>

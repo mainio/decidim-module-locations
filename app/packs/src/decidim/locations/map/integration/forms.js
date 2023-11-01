@@ -31,6 +31,7 @@ const initializeTabs = (wrapperEl) => {
       }
     }
   };
+
   const handleActionTab = (action) => {
     const wasActivated = activeTab === action;
 
@@ -79,7 +80,7 @@ const initializeTabs = (wrapperEl) => {
 };
 
 export default () => {
-  const addInputGroup = (markerFieldContainer, addressData) => {
+  const addInputGroup = (markerFieldContainer, addressData, wrapperEl) => {
     const markerId = addressData.markerId;
     const address = addressData.address;
     const lat = addressData.position.lat;
@@ -100,7 +101,7 @@ export default () => {
         markerField.querySelector(".location-longitude").value = lng;
       }
     } else {
-      const template = document.querySelector("#model_input_template");
+      const template = wrapperEl.querySelector(`#model_input_template${wrapperEl.querySelector("[data-decidim-map]").id}`);
       const clone = template.content.cloneNode(true);
       let input = clone.querySelectorAll("input");
       input[0].name = input[0].name.replace("%index%", markerId)
@@ -206,7 +207,7 @@ export default () => {
       typeLocWrap.querySelector(".hint").classList.add("hide");
       displayList = true;
       typeLocButton.disabled = true;
-      addInputGroup(markerFieldContainer, addressData);
+      addInputGroup(markerFieldContainer, addressData, wrapperEl);
       if (averageInput) {
         coordAverage(markerFieldContainer);
       }
@@ -214,7 +215,7 @@ export default () => {
 
     $(mapEl).on("marker-address", (_ev, addressData) => {
       ctrl.unbindPopUp(addressData.markerId);
-      addInputGroup(markerFieldContainer, addressData);
+      addInputGroup(markerFieldContainer, addressData, wrapperEl);
       if (averageInput) {
         coordAverage(markerFieldContainer);
       }

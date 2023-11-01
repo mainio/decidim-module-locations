@@ -35,11 +35,12 @@ describe Decidim::Locations::LocationsCell, type: :cell do
       allow(utility).to receive(:builder_options).and_return(
         api_key: "key1234"
       )
+      allow(my_cell).to receive(:random_id).and_return("example")
     end
 
     it "renders the view" do
       expect(subject).to have_css("input[name=\"dummy[address]\"]")
-      expect(subject).to have_selector("#map")
+      expect(subject).to have_selector("#example")
       expect(subject).to have_content(
         <<~TXT.squish
           The following element is a map which presents the items on this page as map points.
