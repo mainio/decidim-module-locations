@@ -151,7 +151,7 @@ export default () => {
     const locationCheckBox = wrapperEl.querySelector(["[has_location]", "has_location"].map((suffix) => `input[type="checkbox"][name$="${suffix}"]`));
     const modelLoc = wrapperEl.querySelector(".picker-wrapper");
     const containerMarkerField = markerFieldContainer.querySelectorAll(".marker-field");
-    const mapConfig = mapEl.dataset.mapConfig
+    const mapConfig = mapEl.dataset.mapConfiguration
     const averageInput = wrapperEl.querySelector(".model-longitude") && wrapperEl.querySelector(".model-latitude")
 
     const locationCheck = () => {
