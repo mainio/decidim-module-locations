@@ -203,9 +203,9 @@ describe "Map", type: :system do
     let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
     let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
     let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
-    let(:map_config) { "multiple" }
+    let(:map_configuration) { "multiple" }
 
-    let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_config: map_config, coords: [12, 2], checkbox: false) }
+    let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: map_configuration, coords: [12, 2], checkbox: false) }
 
     context "when geocoding" do
       # Console.warn print tool
@@ -346,7 +346,7 @@ describe "Map", type: :system do
       end
 
       context "when adding multiple locations and configuration limits it" do
-        let(:map_config) { "single" }
+        let(:map_configuration) { "single" }
 
         it "adds a single location" do
           click_link "Type locations"
@@ -524,8 +524,8 @@ describe "Map", type: :system do
     let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
     let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
     let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
-    let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_config: "single", coords: [12, 2], checkbox: false) }
-    let(:cell_two) { template.cell("decidim/locations/locations", dummy, form: form, map_config: "multiple", coords: [12, 2], checkbox: false) }
+    let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "single", coords: [12, 2], checkbox: false) }
+    let(:cell_two) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "multiple", coords: [12, 2], checkbox: false) }
 
     let(:html_document) do
       cell_html = cell.to_s
@@ -632,8 +632,8 @@ describe "Map", type: :system do
     let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
     let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
     let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
-    let(:map_config) { "multiple" }
-    let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_config: map_config, coords: [12, 2], checkbox: true) }
+    let(:map_configuration) { "multiple" }
+    let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: map_configuration, coords: [12, 2], checkbox: true) }
 
     before do
       tile_content = File.read(Decidim::Dev.asset("icon.png"))

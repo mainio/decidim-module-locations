@@ -27,8 +27,8 @@ module Decidim
         options[:coords]
       end
 
-      def map_config
-        options[:map_config]
+      def map_configuration
+        options[:map_configuration]
       end
 
       def revealselector
