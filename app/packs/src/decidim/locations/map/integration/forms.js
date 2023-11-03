@@ -221,6 +221,10 @@ export default () => {
       }
     });
 
+    $(mapEl).on("no-address", () => {
+      ctrl.unbindPopUp(addressData.markerId);
+    });
+
     editModalEl.querySelector("[data-delete-marker]").addEventListener("click", () => {
       const markerId = editModalEl.dataset.markerId;
       const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
@@ -228,7 +232,7 @@ export default () => {
       inputDiv.remove();
       if (averageInput) {
         coordAverage(markerFieldContainer);
-      }
+      };
       $(editModalEl).foundation("close");
     });
 
@@ -239,7 +243,6 @@ export default () => {
       inputDiv.querySelector(".location-address").value = modalAddress;
       $(editModalEl).foundation("close");
     });
-
     ctrl.setEventHandler("markeradd", (marker, ev) => {
       const markerId = marker.options.id;
       const oldMarker = markerFieldContainer.querySelector(".marker-field");
@@ -252,7 +255,6 @@ export default () => {
         ctrl.bindPopUp(markerId);
         $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId }]);
       }
-
       marker.on("click", () => {
         editModalEl.dataset.markerId = markerId;
 
