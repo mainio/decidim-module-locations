@@ -221,15 +221,18 @@ export default () => {
       }
     });
 
-    $(mapEl).on("no-address", () => {
+    $(mapEl).on("no-address", (_ev, addressData) => {
       ctrl.unbindPopUp(addressData.markerId);
+      markerFieldContainer.querySelector(`[data-marker-id="${addressData.markerId}"]`).remove();
     });
 
     editModalEl.querySelector("[data-delete-marker]").addEventListener("click", () => {
       const markerId = editModalEl.dataset.markerId;
       const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
       ctrl.deleteMarker(markerId);
-      inputDiv.remove();
+      if (inputDiv) {
+        inputDiv.remove();
+      };
       if (averageInput) {
         coordAverage(markerFieldContainer);
       };
@@ -239,8 +242,10 @@ export default () => {
     modalButtons.querySelector("[data-modal-save]").addEventListener("click", () => {
       const markerId = editModalEl.dataset.markerId;
       const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
-      const modalAddress = locFields.querySelector("[data-modal-address]").value;
-      inputDiv.querySelector(".location-address").value = modalAddress;
+      const modalAddress = locFields.querySelector("[data-modal-address]");
+      if (inputDiv) {
+        inputDiv.querySelector(".location-address").value = modalAddress.value;
+      };
       $(editModalEl).foundation("close");
     });
     ctrl.setEventHandler("markeradd", (marker, ev) => {
@@ -259,12 +264,16 @@ export default () => {
         editModalEl.dataset.markerId = markerId;
 
         const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
-        if (!inputDiv.hasChildNodes()) {
+        if (inputDiv && !inputDiv.hasChildNodes()) {
           // When the `inputDiv`'s input fields have not been added yet, the reverse geocoding
           // is not completed yet, so the user cannot edit the address yet.
           return;
-        }
-        editModalEl.querySelector(".location-fields input[name=address]").value = inputDiv.querySelector(".location-address").value;
+        } else if (inputDiv && inputDiv.hasChildNodes()){
+          editModalEl.querySelector(".location-fields input[name=address]").value = inputDiv.querySelector(".location-address").value;
+        } else {
+          locFields.querySelector("[data-modal-address]").setAttribute("disabled", true);
+          modalButtons.querySelector("[data-modal-save]").setAttribute("disabled", true);
+        };
 
         // With Foundation we have to use jQuery
         $(editModalEl).foundation("open");
