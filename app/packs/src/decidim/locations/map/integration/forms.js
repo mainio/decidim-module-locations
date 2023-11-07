@@ -222,7 +222,7 @@ export default () => {
     });
 
     $(mapEl).on("no-address", (_ev, addressData) => {
-      ctrl.unbindPopUp(addressData.markerId);
+      ctrl.deleteMarker(addressData.markerId);
       markerFieldContainer.querySelector(`[data-marker-id="${addressData.markerId}"]`).remove();
     });
 
