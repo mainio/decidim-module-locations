@@ -15,6 +15,10 @@ module Decidim
         render
       end
 
+      def existent_locations
+        form.object.locations
+      end
+
       def form
         options[:form]
       end
@@ -33,6 +37,11 @@ module Decidim
 
       def revealselector
         escape!({ revealSelector: "#model_locations_reveal#{random_id}" }.to_json)
+      end
+
+      def randomize_loc
+        charset = ("a".."z").to_a + ("0".."9").to_a
+        Array.new(7) { charset.sample }.join
       end
 
       def random_id

@@ -38,7 +38,7 @@ export default () => {
     }
   };
 
-  const coordAverage = (markerFieldContainer) => {
+  const coordAverage = (markerFieldContainer, wrapperEl) => {
     const latArr = Array.from(markerFieldContainer.querySelectorAll(".location-latitude"));
     const latitudes = [];
     latArr.map((val) => latitudes.push(parseFloat(val.value)));
@@ -56,8 +56,8 @@ export default () => {
       lngAvg = null;
     }
 
-    document.querySelector(".model-latitude").value = latAvg;
-    document.querySelector(".model-longitude").value = lngAvg;
+    wrapperEl.querySelector(".model-latitude").value = latAvg;
+    wrapperEl.querySelector(".model-longitude").value = lngAvg;
   };
 
   document.querySelectorAll("[data-location-picker]").forEach((wrapperEl) => {
@@ -132,7 +132,7 @@ export default () => {
       typeLocButton.disabled = true;
       addInputGroup(markerFieldContainer, addressData, wrapperEl);
       if (averageInput) {
-        coordAverage(markerFieldContainer);
+        coordAverage(markerFieldContainer, wrapperEl);
       }
     });
 
@@ -140,7 +140,7 @@ export default () => {
       ctrl.unbindPopUp(addressData.markerId);
       addInputGroup(markerFieldContainer, addressData, wrapperEl);
       if (averageInput) {
-        coordAverage(markerFieldContainer);
+        coordAverage(markerFieldContainer, wrapperEl);
       }
     });
 
@@ -157,7 +157,7 @@ export default () => {
         inputDiv.remove();
       };
       if (averageInput) {
-        coordAverage(markerFieldContainer);
+        coordAverage(markerFieldContainer, wrapperEl);
       };
       $(editModalEl).foundation("close");
     });
@@ -174,7 +174,7 @@ export default () => {
     ctrl.setEventHandler("markeradd", (marker, ev) => {
       const markerId = marker.options.id;
       const oldMarker = markerFieldContainer.querySelector(".marker-field");
-      if (mapConfig && mapConfig === "single" && oldMarker) {
+      if (mapConfig && mapConfig === "single" && oldMarker && ev == "clickEv") {
         ctrl.deleteMarker(oldMarker.dataset.markerId);
         markerFieldContainer.querySelector(`[data-marker-id="${oldMarker.dataset.markerId}"]`).remove();
       }

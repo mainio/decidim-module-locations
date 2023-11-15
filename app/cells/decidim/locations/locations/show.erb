@@ -27,10 +27,11 @@
     </ul>
 
     <div data-marker-field>
-      <% form.object.locations.each do |loc| %>
-        <div class="marker-field" data-marker-id=<%= loc.id %>>
+      <% existent_locations.each do |loc| %>
+        <% new_id = randomize_loc %>
+        <div class="marker-field" data-marker-id=<%= loc.id ||= new_id %>>
           <% form.fields_for :locations do |locations| %>
-            <% locations.fields_for "#{loc.id}" do |location| %>
+            <% locations.fields_for "#{ loc.id ||= new_id }" do |location| %>
               <%= location.hidden_field :address, class: "location-address", autocomplete: "off", value: loc.address %>
               <%= location.hidden_field :latitude, class: "location-latitude", autocomplete: "off", value: loc.latitude %>
               <%= location.hidden_field :longitude, class: "location-longitude", autocomplete: "off", value: loc.longitude %>
