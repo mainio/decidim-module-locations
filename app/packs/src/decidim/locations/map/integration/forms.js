@@ -90,6 +90,7 @@ export default () => {
       modelLoc.classList.remove("hide")
       ctrl.map.invalidateSize();
     } else {
+      locationCheck();
       locationCheckBox.addEventListener("change", () => {
         locationCheck();
       });
