@@ -87,8 +87,8 @@ export default class ModelLocMapController extends MapController {
       })
     }
     this.markers[markerId] = marker;
-    this.triggerEvent("markeradd", [marker, ev]);
     marker.addTo(this.map);
+    this.triggerEvent("markeradd", [marker, ev]);
 
     return markerId;
   }

@@ -124,7 +124,8 @@ export default () => {
       }, 300);
     });
 
-    typeLocButton.addEventListener("click", () => {
+    typeLocButton.addEventListener("click", (event) => {
+      event.preventDefault()
       const markerId = ctrl.addMarker(typeLocCoords, "typeEv");
       const addressData = { address: typeLocInput.value, position: {lat: typeLocCoords[0], lng: typeLocCoords[1]}, markerId };
       typeLocInput.value = "";
@@ -174,16 +175,20 @@ export default () => {
     });
     ctrl.setEventHandler("markeradd", (marker, ev) => {
       const markerId = marker.options.id;
-      const oldMarker = markerFieldContainer.querySelector(".marker-field");
-      if (mapConfig && mapConfig === "single" && oldMarker && ev === "clickEv") {
-        ctrl.deleteMarker(oldMarker.dataset.markerId);
-        markerFieldContainer.querySelector(`[data-marker-id="${oldMarker.dataset.markerId}"]`).remove();
-      }
+
+      if (mapConfig && mapConfig === "single" && (ev === "typeEv" || ev === "clickEv")) {
+        const oldMarker = markerFieldContainer.querySelector(".marker-field");
+        if (oldMarker) {
+          ctrl.deleteMarker(oldMarker.dataset.markerId);
+          markerFieldContainer.querySelector(`[data-marker-id="${oldMarker.dataset.markerId}"]`).remove();
+        };
+      };
       addMarkerField(markerFieldContainer, markerId);
       if (ev === "clickEv") {
         ctrl.bindPopUp(markerId);
         $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId }]);
-      }
+      };
+
       marker.on("click", () => {
         editModalEl.dataset.markerId = markerId;
 
