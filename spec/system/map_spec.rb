@@ -366,9 +366,8 @@ describe "Map", type: :system do
           )
           find("#autoComplete_result_1").click
           click_button "Add"
-          expect(page).to have_css(".leaflet-marker-draggable")
           expect(page).to have_field("dummy_locations__index__address", type: :hidden, with: "Veneentekijäntie 6, Finland")
-          expect(page).not_to have_field("dummy_locations__index__address", type: :hidden, with: "Veneentekijäntie 4, Finland")
+          expect(page).to have_css(".leaflet-marker-draggable", count: 1)
         end
       end
 
