@@ -175,7 +175,7 @@ export default () => {
     ctrl.setEventHandler("markeradd", (marker, ev) => {
       const markerId = marker.options.id;
       const oldMarker = markerFieldContainer.querySelector(".marker-field");
-      if (mapConfig && mapConfig === "single" && oldMarker && ev == "clickEv") {
+      if (mapConfig && mapConfig === "single" && oldMarker && ev === "clickEv") {
         ctrl.deleteMarker(oldMarker.dataset.markerId);
         markerFieldContainer.querySelector(`[data-marker-id="${oldMarker.dataset.markerId}"]`).remove();
       }
