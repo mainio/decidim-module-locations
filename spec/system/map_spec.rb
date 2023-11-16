@@ -346,7 +346,7 @@ describe "Map", type: :system do
       end
 
       context "when adding multiple locations and configuration limits it" do
-        let(:map_configuration) { "single" }
+        let!(:map_configuration) { "single" }
 
         it "adds a single location" do
           click_link "Type locations"
