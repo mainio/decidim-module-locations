@@ -176,17 +176,19 @@ export default () => {
     ctrl.setEventHandler("markeradd", (marker, ev) => {
       const markerId = marker.options.id;
 
-      if (mapConfig && mapConfig === "single" && (ev === "typeEv" || ev === "clickEv")) {
-        const oldMarker = markerFieldContainer.querySelector(".marker-field");
-        if (oldMarker) {
-          ctrl.deleteMarker(oldMarker.dataset.markerId);
-          markerFieldContainer.querySelector(`[data-marker-id="${oldMarker.dataset.markerId}"]`).remove();
+      if (ev !== "editEv") {
+        if (mapConfig && mapConfig === "single" && (ev === "typeEv" || ev === "clickEv")) {
+          const oldMarker = markerFieldContainer.querySelector(".marker-field");
+          if (oldMarker) {
+            ctrl.deleteMarker(oldMarker.dataset.markerId);
+            markerFieldContainer.querySelector(`[data-marker-id="${oldMarker.dataset.markerId}"]`).remove();
+          };
         };
-      };
-      addMarkerField(markerFieldContainer, markerId);
-      if (ev === "clickEv") {
-        ctrl.bindPopUp(markerId);
-        $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId }]);
+        addMarkerField(markerFieldContainer, markerId);
+        if (ev === "clickEv") {
+          ctrl.bindPopUp(markerId);
+          $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId }]);
+        };
       };
 
       marker.on("click", () => {
