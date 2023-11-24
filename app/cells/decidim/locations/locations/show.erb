@@ -11,21 +11,6 @@
   <% end %>
 
   <div class="picker-wrapper hide">
-    <ul class="tabs mb-s expanded" data-map-container="#pick_model_locations_map">
-      <li class="tabs-title text-center" data-action="add-markers"><a href="#pick_loc" role="button"><%= t("pick_locations") %></a></li>
-      <li class="tabs-title text-center" data-action="type-loc"><a href="#type_loc" role="button"><%= t("type_locations") %></a></li>
-      <li class="tabs-title text-center" data-action="more">
-        <ul class="dropdown menu" data-dropdown-menu data-autoclose="false" data-disable-hover="true" data-click-open="true" data-close-on-click="true" role="menubar">
-          <li class="tabs-title" role="none">
-            <a id="model_locations_tabs_more<%= random_id %>" href="#" aria-haspopup="true" role="menuitem"><%= icon "ellipses", role: "img", aria_label: "More options" %></a>
-            <ul data-more-tabs class="menu" role="menu" aria-labelledby="model_locations_tabs_more">
-              <li role="none" data-action="clear-markers"><a href="#" role="menuitem"><%= t("clear_markers") %></a></li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-    </ul>
-
     <div data-marker-field>
       <% existent_locations.each do |loc| %>
         <% new_id = randomize_loc %>
@@ -51,7 +36,7 @@
       <% end %>
     </template>
 
-    <div class="type-locations-wrapper hide">
+    <div class="type-locations-wrapper">
       <label><%= t("address") %></label>
       <div class="input-group">
         <span class="input-group-label">
@@ -64,6 +49,19 @@
       </div>
       <span class="hint form-input-extra-before hide" aria-hidden="true"><%= t("hint") %></span>
     </div>
+
+    <ul class="tabs mb-s expanded" data-map-container="#pick_model_locations_map">
+      <li class="tabs-title text-center" data-action="more">
+        <ul class="dropdown menu" data-dropdown-menu data-autoclose="false" data-disable-hover="true" data-click-open="true" data-close-on-click="true" role="menubar">
+          <li class="tabs-title" role="none">
+            <a id="model_locations_tabs_more<%= random_id %>" href="#" aria-haspopup="true" role="menuitem"><%= icon "ellipses", role: "img", aria_label: "More options" %></a>
+            <ul data-more-tabs class="menu" role="menu" aria-labelledby="model_locations_tabs_more">
+              <li role="none" data-action="clear-markers"><a href="#" role="menuitem"><%= t("clear_markers") %></a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
 
     <div id="model_locations_reveal<%= random_id %>" class="reveal" data-reveal>
       <div class="reveal__header">

@@ -1,15 +1,22 @@
-import MapController from "src/decidim/map/controller"
+import MapController from "src/decidim/map/controller";
 
 export default class ModelLocMapController extends MapController {
   start() {
     this.initializeMap();
-    this.addListeners();
     this.placeMarkers = false;
     this.markers = {};
   }
 
   initializeMap() {
-    const mapEl = this.map._container
+    delete L.Icon.Default.prototype._getIconUrl;
+
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+      iconUrl: require('leaflet/dist/images/marker-icon.png'),
+      shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+    });
+
+    const mapEl = this.map._container;
     // Position the center of the map
     const lat = mapEl.dataset.lat;
     const lng = mapEl.dataset.lng;
@@ -25,17 +32,26 @@ export default class ModelLocMapController extends MapController {
     }
 
     this.map.setView([defaultLat, defaultLng], zoom);
-  }
 
-  addListeners() {
-    // Add listener for the map
-    this.map.on("click", (ev) => {
-      if (!this.placeMarkers) {
-        return;
+    L.PM.reInitLayer(this.map)
+
+    this.map.pm.addControls({
+      position: "topleft",
+      drawCircleMarker: false,
+      drawRectangle: false,
+      drawCircle: false,
+      drawText: false,
+      cutPolygon: false,
+      rotateMode: false
+    });
+    console.log(this.map)
+
+    this.map.pm.setPathOptions(
+      { color: "orange" },
+      {
+        ignoreShapes: ["Polyline", "Rectangle"]
       }
-
-      this.addMarker(ev, "clickEv");
-    })
+    );
   }
 
   clearMarkers() {
@@ -75,13 +91,11 @@ export default class ModelLocMapController extends MapController {
     let marker = null;
     if (typeof data === "object" && data !== null && !Array.isArray(data)) {
       marker = L.marker(data.latlng, {
-        icon: this.createIcon(),
         draggable: true,
         id: markerId
       })
     } else {
       marker = L.marker(data, {
-        icon: this.createIcon(),
         draggable: true,
         id: markerId
       })

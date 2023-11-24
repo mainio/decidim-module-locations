@@ -1,6 +1,6 @@
 import getDistanceBetweenPoints from "./avg_coordinates.js";
 import addMarkerField from "./add_marker_field.js";
-import initializeTabs from "./initialize_tabs.js";
+import ModelLocMapController from "../controller/location.js";
 
 export default () => {
   const addInputGroup = (markerFieldContainer, addressData, wrapperEl) => {
@@ -173,11 +173,24 @@ export default () => {
       };
       $(editModalEl).foundation("close");
     });
+
+    ctrl.map.on("pm:create", (event) => {
+      const markerId = Math.random().toString(36).slice(2, 9);
+      console.log(event.layer._latlng)
+      if (mapConfig && mapConfig === "single") {
+        const oldMarker = markerFieldContainer.querySelector(".marker-field");
+        if (oldMarker) {
+          ctrl.deleteMarker(oldMarker.dataset.markerId);
+          markerFieldContainer.querySelector(`[data-marker-id="${oldMarker.dataset.markerId}"]`).remove();
+        };
+      }
+    })
+
     ctrl.setEventHandler("markeradd", (marker, ev) => {
       const markerId = marker.options.id;
 
       if (ev !== "editEv") {
-        if (mapConfig && mapConfig === "single" && (ev === "typeEv" || ev === "clickEv")) {
+        if (mapConfig && mapConfig === "single" && (ev === "typeEv")) {
           const oldMarker = markerFieldContainer.querySelector(".marker-field");
           if (oldMarker) {
             ctrl.deleteMarker(oldMarker.dataset.markerId);
@@ -221,6 +234,7 @@ export default () => {
         ctrl.disablePlaceMarkers();
       })
     });
+
     if (containerMarkerField.length > 0) {
       const bounds = [];
       containerMarkerField.forEach(
@@ -234,6 +248,5 @@ export default () => {
       const area = new L.LatLngBounds(bounds)
       ctrl.map.fitBounds(area);
     }
-    initializeTabs(wrapperEl);
   });
 };
