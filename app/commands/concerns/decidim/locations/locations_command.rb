@@ -28,7 +28,9 @@ module Decidim
           attributes = {
             address: location.address,
             latitude: location.latitude,
-            longitude: location.longitude
+            longitude: location.longitude,
+            shape: location.shape,
+            geojson: location.geojson
           }
 
           if location.id.present?

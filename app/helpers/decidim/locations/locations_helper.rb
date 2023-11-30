@@ -44,7 +44,9 @@ module Decidim
             response,
             :address,
             :latitude,
-            :longitude
+            :longitude,
+            :shape,
+            :geojson
           ).map do |record|
             # 0: ID of the record
             # 1: Title of the record
@@ -53,7 +55,9 @@ module Decidim
             # 4: Address text of the record, e.g. "Foobar street 123"
             # 5: Latitude of the record, e.g. 1.123
             # 6: Longitude of the record, e.g. 2.234
-            # [123, "Title of the record", "Summary of the record", "Body text of the record", "Foobar street 123", 1.123, 2.234]
+            # 7: Shape of the record, e.g. "Polygon"
+            # 8: Geojson of the record, e.g. [[[30.0, 10.0], [12.2, 7.3]]]
+            # [123, "Title of the record", "Summary of the record", "Body text of the record", "Foobar street 123", 1.123, 2.234, "Shape of the record", "Geojson of the record"]
             title = translated_attribute(JSON.parse(record[1]))
             body =
               begin
@@ -61,7 +65,7 @@ module Decidim
               rescue JSON::ParserError
                 translated_attribute(record[2])
               end
-            [record[0], title, nil, body, record[3], record[4], record[5]]
+            [record[0], title, nil, body, record[3], record[4], record[5], record[6], record[7]]
           end
         end
       end

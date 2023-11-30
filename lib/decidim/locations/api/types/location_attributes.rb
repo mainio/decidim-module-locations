@@ -11,6 +11,8 @@ module Decidim
       argument :address, GraphQL::Types::String, required: false
       argument :latitude, GraphQL::Types::Float, required: false
       argument :longitude, GraphQL::Types::Float, required: false
+      argument :shape, GraphQL::Types::String, required: false
+      argument :geojson, GraphQL::Types::JSON, required: false
     end
   end
 end

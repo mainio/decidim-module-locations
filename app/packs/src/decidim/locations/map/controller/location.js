@@ -42,9 +42,9 @@ export default class ModelLocMapController extends MapController {
       drawCircle: false,
       drawText: false,
       cutPolygon: false,
-      rotateMode: false
+      rotateMode: false,
+      editMode: false
     });
-    console.log(this.map)
 
     this.map.pm.setPathOptions(
       { color: "orange" },
@@ -58,16 +58,6 @@ export default class ModelLocMapController extends MapController {
     Object.keys(this.markers).forEach((markerIdKey) => {
       this.deleteMarker(markerIdKey)
     })
-  }
-
-  enablePlaceMarkers() {
-    this.map.doubleClickZoom.disable();
-    this.placeMarkers = true;
-  }
-
-  disablePlaceMarkers() {
-    this.map.doubleClickZoom.enable();
-    this.placeMarkers = false;
   }
 
   deleteMarker(markerId) {

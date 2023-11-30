@@ -42,7 +42,7 @@ $(() => {
       }).done((resp) => {
         if (!resp.items || !Array.isArray(resp.items) || resp.items.length < 1) {
           $el.trigger("no-address",
-            { ...extraData }
+            { position: latlng, ...extraData }
           );
           return;
         }
@@ -50,7 +50,7 @@ $(() => {
         const returnedAddress = resp.items[0].address;
         if (!returnedAddress) {
           $el.trigger("no-address",
-            { ...extraData }
+            { position: latlng, ...extraData }
           );
           return;
         }

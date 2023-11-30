@@ -1,65 +1,9 @@
-import getDistanceBetweenPoints from "./avg_coordinates.js";
 import addMarkerField from "./add_marker_field.js";
-import ModelLocMapController from "../controller/location.js";
+import addInputGroup from "./add_input_group.js";
+import coordAverage from "./coord_average.js";
+import centerShape from "./center_shape.js";
 
 export default () => {
-  const addInputGroup = (markerFieldContainer, addressData, wrapperEl) => {
-    const markerId = addressData.markerId;
-    const address = addressData.address;
-    const lat = addressData.position.lat;
-    const lng = addressData.position.lng;
-
-    const markerField = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
-    if (markerField.hasChildNodes()) {
-      const oldCoords = [markerField.querySelector(".location-latitude").value, markerField.querySelector(".location-longitude").value];
-      const newCoords = [lat, lng];
-      const markerRadius = getDistanceBetweenPoints(oldCoords, newCoords);
-
-      if (markerRadius < 200) {
-        markerField.querySelector(".location-latitude").value = lat;
-        markerField.querySelector(".location-longitude").value = lng;
-      } else {
-        markerField.querySelector(".location-address").value = address;
-        markerField.querySelector(".location-latitude").value = lat;
-        markerField.querySelector(".location-longitude").value = lng;
-      }
-    } else {
-      const template = wrapperEl.querySelector(`#model_input_template${wrapperEl.querySelector("[data-decidim-map]").id}`);
-      const clone = template.content.cloneNode(true);
-      let input = clone.querySelectorAll("input");
-      input[0].name = input[0].name.replace("%index%", markerId)
-      input[0].value = address;
-      input[1].name = input[1].name.replace("%index%", markerId);
-      input[1].value = lat;
-      input[2].name = input[2].name.replace("%index%", markerId);
-      input[2].value = lng;
-
-      markerField.appendChild(clone);
-    }
-  };
-
-  const coordAverage = (markerFieldContainer, wrapperEl) => {
-    const latArr = Array.from(markerFieldContainer.querySelectorAll(".location-latitude"));
-    const latitudes = [];
-    latArr.map((val) => latitudes.push(parseFloat(val.value)));
-    let latAvg = latitudes.reduce((pv, cv) => pv + cv, 0);
-    latAvg /= latitudes.length;
-
-    const lngArr = Array.from(markerFieldContainer.querySelectorAll(".location-longitude"));
-    const longitudes = [];
-    lngArr.map((val) => longitudes.push(parseFloat(val.value)));
-    let lngAvg = longitudes.reduce((pv, cv) => pv + cv, 0);
-    lngAvg /= longitudes.length;
-
-    if (isNaN(latAvg) && isNaN(lngAvg)) {
-      latAvg = null;
-      lngAvg = null;
-    }
-
-    wrapperEl.querySelector(".model-latitude").value = latAvg;
-    wrapperEl.querySelector(".model-longitude").value = lngAvg;
-  };
-
   document.querySelectorAll("[data-location-picker]").forEach((wrapperEl) => {
     const options = JSON.parse(wrapperEl.dataset.locationPicker);
     const mapEl = wrapperEl.querySelector("[data-decidim-map]");
@@ -139,7 +83,10 @@ export default () => {
     });
 
     $(mapEl).on("marker-address", (_ev, addressData) => {
-      ctrl.unbindPopUp(addressData.markerId);
+      if (addressData.shape === "Marker") {
+        ctrl.unbindPopUp(addressData.markerId);
+      };
+
       addInputGroup(markerFieldContainer, addressData, wrapperEl);
       if (averageInput) {
         coordAverage(markerFieldContainer, wrapperEl);
@@ -147,8 +94,14 @@ export default () => {
     });
 
     $(mapEl).on("no-address", (_ev, addressData) => {
-      ctrl.deleteMarker(addressData.markerId);
-      markerFieldContainer.querySelector(`[data-marker-id="${addressData.markerId}"]`).remove();
+      if (addressData.shape === "Marker") {
+        ctrl.unbindPopUp(addressData.markerId);
+      };
+
+      addInputGroup(markerFieldContainer, addressData, wrapperEl);
+      if (averageInput) {
+        coordAverage(markerFieldContainer, wrapperEl);
+      };
     });
 
     editModalEl.querySelector("[data-delete-marker]").addEventListener("click", () => {
@@ -175,22 +128,46 @@ export default () => {
     });
 
     ctrl.map.on("pm:create", (event) => {
-      const markerId = Math.random().toString(36).slice(2, 9);
-      console.log(event.layer._latlng)
-      if (mapConfig && mapConfig === "single") {
-        const oldMarker = markerFieldContainer.querySelector(".marker-field");
-        if (oldMarker) {
-          ctrl.deleteMarker(oldMarker.dataset.markerId);
-          markerFieldContainer.querySelector(`[data-marker-id="${oldMarker.dataset.markerId}"]`).remove();
-        };
-      }
-    })
+      event.marker.options.id = Math.random().toString(36).slice(2, 9);
+      if (event.marker.pm._shape === "Marker") {
+        ctrl.markers[event.marker.options.id] = event.marker;
+      };
+      ctrl.triggerEvent("markeradd", [event.marker, "clickEv"])
+    });
+
+    ctrl.map.on("pm:remove", (event) => {
+      markerFieldContainer.querySelector(`[data-marker-id="${event.layer.options.id}"]`).remove();
+    });
+
+    let removalMode = false;
+    let drawMode = false;
+    let dragMode = false;
+    let editMode = false;
+
+    ctrl.map.on("pm:globalremovalmodetoggled", (event) => {
+      removalMode = event.enabled;
+    });
+
+    ctrl.map.on("pm:globaldrawmodetoggled", (event) => {
+      drawMode = event.enabled;
+    });
+
+    ctrl.map.on("pm:globaldragmodetoggled", (event) => {
+      dragMode = event.enabled;
+    });
+
+    ctrl.map.on("pm:globaleditmodetoggled", (event) => {
+      editMode = event.enabled;
+    });
 
     ctrl.setEventHandler("markeradd", (marker, ev) => {
       const markerId = marker.options.id;
+      const shape = marker.pm._shape;
+      let coordinates = null;
+      let shapeCoordinates = null;
 
       if (ev !== "editEv") {
-        if (mapConfig && mapConfig === "single" && (ev === "typeEv")) {
+        if (mapConfig && mapConfig === "single" && (ev === "typeEv" || ev === "clickEv")) {
           const oldMarker = markerFieldContainer.querySelector(".marker-field");
           if (oldMarker) {
             ctrl.deleteMarker(oldMarker.dataset.markerId);
@@ -199,39 +176,46 @@ export default () => {
         };
         addMarkerField(markerFieldContainer, markerId);
         if (ev === "clickEv") {
-          ctrl.bindPopUp(markerId);
-          $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId }]);
+          if (shape === "Marker") {
+            ctrl.bindPopUp(markerId);
+            coordinates = marker.getLatLng();
+          } else if (shape === "Line" || shape === "Polygon") {
+            shapeCoordinates = marker._latlngs;
+            coordinates = centerShape(marker._latlngs, shape);
+          };
+
+          $(mapEl).trigger("geocoder-reverse.decidim", [coordinates, { markerId, shape, shapeCoordinates }]);
         };
       };
 
-      marker.on("click", () => {
-        editModalEl.dataset.markerId = markerId;
+      if (shape === "Marker") {
+        marker.on("click", () => {
+          editModalEl.dataset.markerId = markerId;
 
-        const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
-        if (inputDiv && !inputDiv.hasChildNodes()) {
-          // When the `inputDiv`'s input fields have not been added yet, the reverse geocoding
-          // is not completed yet, so the user cannot edit the address yet.
-          return;
-        } else if (inputDiv && inputDiv.hasChildNodes()) {
-          editModalEl.querySelector(".location-fields input[name=address]").value = inputDiv.querySelector(".location-address").value;
-        } else {
-          locFields.querySelector("[data-modal-address]").setAttribute("disabled", true);
-          modalButtons.querySelector("[data-modal-save]").setAttribute("disabled", true);
+          const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
+          if (inputDiv && !inputDiv.hasChildNodes()) {
+            // When the `inputDiv`'s input fields have not been added yet, the reverse geocoding
+            // is not completed yet, so the user cannot edit the address yet.
+            return;
+          } else if (inputDiv && inputDiv.hasChildNodes()) {
+            editModalEl.querySelector(".location-fields input[name=address]").value = inputDiv.querySelector(".location-address").value;
+          } else {
+            locFields.querySelector("[data-modal-address]").setAttribute("disabled", true);
+            modalButtons.querySelector("[data-modal-save]").setAttribute("disabled", true);
+          };
+          if (!removalMode && !drawMode && !dragMode && !editMode) {
+          // With Foundation we have to use jQuery
+            $(editModalEl).foundation("open");
+          };
+        });
+      };
+
+      marker.on("pm:dragend", () => {
+        if (shape === "Marker") {
+          $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId, shape }]);
+        } else if (shape === ("Line" || "Polygon")) {
+          $(mapEl).trigger("geocoder-reverse.decidim", [centerShape(marker._latlngs, shape), { markerId, shape, shapeCoordinates }]);
         };
-
-        // With Foundation we have to use jQuery
-        $(editModalEl).foundation("open");
-      });
-
-      marker.on("dragend", () => {
-        $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId }]);
-        setTimeout(() => {
-          ctrl.enablePlaceMarkers();
-        }, 100)
-      })
-
-      marker.on("dragstart", () => {
-        ctrl.disablePlaceMarkers();
       })
     });
 

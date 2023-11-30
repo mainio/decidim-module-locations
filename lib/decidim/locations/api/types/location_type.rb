@@ -10,6 +10,8 @@ module Decidim
       field :address, GraphQL::Types::String, "The address for this location", null: true
       field :latitude, GraphQL::Types::Float, "The latitude coordinate for this location", null: true
       field :longitude, GraphQL::Types::Float, "The longitude coordinate for this location", null: true
+      field :shape, GraphQL::Types::String, "The shape for this location", null: true
+      field :geojson, GraphQL::Types::JSON, "The geojson for this location", null: true
     end
   end
 end

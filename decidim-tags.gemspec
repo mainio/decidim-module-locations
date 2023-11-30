@@ -29,5 +29,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "decidim-dev", Decidim::Locations::DECIDIM_VERSION
 
+  spec.add_dependency "rgeo-geojson", "~> 2.1", ">= 2.1.1"
+
   spec.metadata["rubygems_mfa_required"] = "true"
 end
