@@ -62,7 +62,7 @@ $(() => {
         });
         const label = generateAddressLabel(modifiedAddress, addressFormat);
 
-        $el.trigger("marker-address", [
+        $el.trigger("shape-address", [
           { address: label, position: latlng, ...extraData }
         ]);
       });

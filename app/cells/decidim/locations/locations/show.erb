@@ -11,10 +11,10 @@
   <% end %>
 
   <div class="picker-wrapper hide">
-    <div data-marker-field>
+    <div data-shape-field>
       <% existent_locations.each do |loc| %>
         <% new_id = randomize_loc %>
-        <div class="marker-field" data-marker-id=<%= loc.id ||= new_id %>>
+        <div class="shape-field" data-shape-id=<%= loc.id ||= new_id %>>
           <% form.fields_for :locations do |locations| %>
             <% locations.fields_for "#{ loc.id ||= new_id }" do |location| %>
               <%= location.hidden_field :address, class: "location-address", autocomplete: "off", value: loc.address %>
@@ -60,7 +60,7 @@
           <li class="tabs-title" role="none">
             <a id="model_locations_tabs_more-<%= random_id %>" href="#" aria-haspopup="true" role="menuitem"><%= icon "ellipses", role: "img", aria_label: "More options" %></a>
             <ul data-more-tabs class="menu" role="menu" aria-labelledby="model_locations_tabs_more">
-              <li role="none" data-action="clear-markers"><a href="#" role="menuitem"><%= t("clear_markers") %></a></li>
+              <li role="none" data-action="clear-shapes"><a href="#" role="menuitem"><%= t("clear_shapes") %></a></li>
             </ul>
           </li>
         </ul>
@@ -74,7 +74,7 @@
 
       <div class="location-fields">
         <div class="text-right">
-          <button data-delete-marker type="button" class="button alert small"><%= t("delete_marker") %></button>
+          <button data-delete-shape type="button" class="button alert small"><%= t("delete_shape") %></button>
         </div>
         <label>
           <%= t("address") %>

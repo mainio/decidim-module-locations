@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "rgeo"
+require "rgeo/geo_json"
+
 module Decidim
   module Locations
     # A form object to be represent a location.
@@ -15,7 +18,7 @@ module Decidim
 
       validates :address, presence: true, if: ->(form) { !form.deleted && (form.latitude.blank? || form.longitude.blank?) }
       validates :latitude, :longitude, presence: true, if: ->(form) { !form.deleted && form.address.blank? }
-      validate :json_validation, if: ->(form) { !form.deleted }
+      # validate :json_validation, if: ->(form) { form.geojson.present? && !form.deleted }
 
       def to_param
         return id if id.present?
@@ -23,13 +26,18 @@ module Decidim
         "location-id"
       end
 
-      private
+      # private
 
-      def json_validation
-        return if RGeo::GeoJson.encode(RGeo::GeoJSON.decode(form.geojson)) == geojson
-
-        errors.add(:geojson, :invalid)
-      end
+      # def json_validation
+      #   case shape
+      #   when "Marker"
+      #     marker = "{\"type\":\"Point\", \"coordinates\":[#{geojson["lat"], geojson["lng"]}]}"
+      #   when "Line"
+      #     line = "{\"type\":\"LineString\", \"coordinates\":[#{geojson["lat"], geojson["lng"]}]}"
+      #   when "Polygon"
+      #     polygon = "{\"type\":\"Polygon\", \"coordinates\":[#{geojson["lat"], geojson["lng"]}]}"
+      #   end
+      # end
     end
   end
 end

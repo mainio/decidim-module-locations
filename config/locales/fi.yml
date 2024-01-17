@@ -13,11 +13,11 @@ fi:
   add: Lisää
   pick_locations: Valitse sijainti
   type_locations: Kirjoita sijainti
-  clear_markers: Poista sijainnit
+  clear_shapes: Poista sijainnit
   address: Osoite
   hint: Paina "Lisää" lisätäksesi sijainti kartalle.
   edit_location: Muuta sijaintia
-  delete_marker: Poista sijainti
+  delete_shape: Poista sijainti
   save: Tallenna
   cancel: Peruuta
   placeholder:

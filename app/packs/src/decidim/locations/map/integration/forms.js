@@ -1,4 +1,4 @@
-import addMarkerField from "./add_marker_field.js";
+import addShapeField from "./add_shape_field.js";
 import addInputGroup from "./add_input_group.js";
 import coordAverage from "./coord_average.js";
 import centerShape from "./center_shape.js";
@@ -9,7 +9,7 @@ export default () => {
     const mapEl = wrapperEl.querySelector("[data-decidim-map]");
     const ctrl = $(mapEl).data("map-controller");
     const editModalEl = document.querySelector(options.revealSelector);
-    const markerFieldContainer = wrapperEl.querySelector("[data-marker-field]");
+    const shapeFieldContainer = wrapperEl.querySelector("[data-shape-field]");
     const locFields = editModalEl.querySelector(".location-fields");
     const modalButtons = editModalEl.querySelector("[data-modal-buttons]");
     const typeLocWrap = wrapperEl.querySelector(".type-locations-wrapper");
@@ -17,9 +17,10 @@ export default () => {
     const typeLocButton = typeLocWrap.querySelector(".type-loc-button");
     const locationCheckBox = wrapperEl.querySelector(["[has_location]", "has_location"].map((suffix) => `input[type="checkbox"][name$="${suffix}"]`));
     const modelLoc = wrapperEl.querySelector(".picker-wrapper");
-    const containerMarkerField = markerFieldContainer.querySelectorAll(".marker-field");
+    const containerShapeField = shapeFieldContainer.querySelectorAll(".shape-field");
     const mapConfig = mapEl.dataset.mapConfiguration
     const averageInput = wrapperEl.querySelector(".model-longitude") && wrapperEl.querySelector(".model-latitude")
+    const clear = wrapperEl.querySelector('[data-action="clear-shapes"]')
 
     const locationCheck = () => {
       if (locationCheckBox && locationCheckBox.checked) {
@@ -68,58 +69,60 @@ export default () => {
       }, 300);
     });
 
+    clear.addEventListener("click", (event) => {
+      event.preventDefault();
+      ctrl.clearShapes();
+    })
+
     typeLocButton.addEventListener("click", (event) => {
-      event.preventDefault()
-      const markerId = ctrl.addMarker(typeLocCoords, "typeEv");
-      const addressData = { address: typeLocInput.value, position: {lat: typeLocCoords[0], lng: typeLocCoords[1]}, markerId };
+      event.preventDefault();
+      const shapeId = ctrl.addMarker(typeLocCoords, "typeEv");
+      const addressData = { address: typeLocInput.value, position: {lat: typeLocCoords[0], lng: typeLocCoords[1]}, shapeId };
       typeLocInput.value = "";
       typeLocWrap.querySelector(".hint").classList.add("hide");
       displayList = true;
       typeLocButton.disabled = true;
-      addInputGroup(markerFieldContainer, addressData, wrapperEl);
+      addInputGroup(shapeFieldContainer, addressData, wrapperEl);
       if (averageInput) {
-        coordAverage(markerFieldContainer, wrapperEl);
+        coordAverage(shapeFieldContainer, wrapperEl);
       }
     });
 
-    $(mapEl).on("marker-address", (_ev, addressData) => {
-      if (addressData.shape === "Marker") {
-        ctrl.unbindPopUp(addressData.markerId);
-      };
-
-      addInputGroup(markerFieldContainer, addressData, wrapperEl);
+    $(mapEl).on("shape-address", (_ev, addressData) => {
+      ctrl.unbindPopup(addressData.shapeId);
+      addInputGroup(shapeFieldContainer, addressData, wrapperEl);
       if (averageInput) {
-        coordAverage(markerFieldContainer, wrapperEl);
+        coordAverage(shapeFieldContainer, wrapperEl);
       }
     });
 
     $(mapEl).on("no-address", (_ev, addressData) => {
-      if (addressData.shape === "Marker") {
-        ctrl.unbindPopUp(addressData.markerId);
-      };
-
-      addInputGroup(markerFieldContainer, addressData, wrapperEl);
+      ctrl.unbindPopup(addressData.shapeId);
+      ctrl.bindNoDataPopup(addressData.shapeId);
+      addInputGroup(shapeFieldContainer, addressData, wrapperEl);
       if (averageInput) {
-        coordAverage(markerFieldContainer, wrapperEl);
+        coordAverage(shapeFieldContainer, wrapperEl);
       };
+      shapeFieldContainer.querySelector(`[data-shape-id="${addressData.shapeId}"]`).querySelector(
+        ".location-address").value = "No address found";
     });
 
-    editModalEl.querySelector("[data-delete-marker]").addEventListener("click", () => {
-      const markerId = editModalEl.dataset.markerId;
-      const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
-      ctrl.deleteMarker(markerId);
+    editModalEl.querySelector("[data-delete-shape]").addEventListener("click", () => {
+      const shapeId = editModalEl.dataset.shapeId;
+      const inputDiv = shapeFieldContainer.querySelector(`[data-shape-id="${shapeId}"]`);
+      ctrl.deleteShape(shapeId);
       if (inputDiv) {
         inputDiv.remove();
       };
       if (averageInput) {
-        coordAverage(markerFieldContainer, wrapperEl);
+        coordAverage(shapeFieldContainer, wrapperEl);
       };
       $(editModalEl).foundation("close");
     });
 
     modalButtons.querySelector("[data-modal-save]").addEventListener("click", () => {
-      const markerId = editModalEl.dataset.markerId;
-      const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
+      const shapeId = editModalEl.dataset.shapeId;
+      const inputDiv = shapeFieldContainer.querySelector(`[data-shape-id="${shapeId}"]`);
       const modalAddress = locFields.querySelector("[data-modal-address]");
       if (inputDiv) {
         inputDiv.querySelector(".location-address").value = modalAddress.value;
@@ -129,14 +132,12 @@ export default () => {
 
     ctrl.map.on("pm:create", (event) => {
       event.marker.options.id = Math.random().toString(36).slice(2, 9);
-      if (event.marker.pm._shape === "Marker") {
-        ctrl.markers[event.marker.options.id] = event.marker;
-      };
-      ctrl.triggerEvent("markeradd", [event.marker, "clickEv"])
+      ctrl.shapes[event.marker.options.id] = event.marker;
+      ctrl.triggerEvent("shapeadd", [event.marker, "clickEv"])
     });
 
     ctrl.map.on("pm:remove", (event) => {
-      markerFieldContainer.querySelector(`[data-marker-id="${event.layer.options.id}"]`).remove();
+      shapeFieldContainer.querySelector(`[data-shape-id="${event.layer.options.id}"]`).remove();
     });
 
     let removalMode = false;
@@ -160,75 +161,86 @@ export default () => {
       editMode = event.enabled;
     });
 
-    ctrl.setEventHandler("markeradd", (marker, ev) => {
-      const markerId = marker.options.id;
-      const shape = marker.pm._shape;
+    ctrl.setEventHandler("shapeadd", (shape, ev) => {
+      const shapeId = shape.options.id;
+      const objectShape = shape.pm._shape;
       let coordinates = null;
-      let shapeCoordinates = null;
 
       if (ev !== "editEv") {
         if (mapConfig && mapConfig === "single" && (ev === "typeEv" || ev === "clickEv")) {
-          const oldMarker = markerFieldContainer.querySelector(".marker-field");
-          if (oldMarker) {
-            ctrl.deleteMarker(oldMarker.dataset.markerId);
-            markerFieldContainer.querySelector(`[data-marker-id="${oldMarker.dataset.markerId}"]`).remove();
+          const oldShape = shapeFieldContainer.querySelector(".shape-field");
+          if (oldShape) {
+            ctrl.deleteShape(oldShape.dataset.shapeId);
+            shapeFieldContainer.querySelector(`[data-shape-id="${oldShape.dataset.shapeId}"]`).remove();
           };
         };
-        addMarkerField(markerFieldContainer, markerId);
+        addShapeField(shapeFieldContainer, shapeId);
         if (ev === "clickEv") {
-          if (shape === "Marker") {
-            ctrl.bindPopUp(markerId);
-            coordinates = marker.getLatLng();
-          } else if (shape === "Line" || shape === "Polygon") {
-            shapeCoordinates = marker._latlngs;
-            coordinates = centerShape(marker._latlngs, shape);
+          if (objectShape === "Marker") {
+            coordinates = shape.getLatLng();
+          } else if (objectShape === "Line" || objectShape === "Polygon") {
+            coordinates = shape._latlngs;
           };
-
-          $(mapEl).trigger("geocoder-reverse.decidim", [coordinates, { markerId, shape, shapeCoordinates }]);
+          ctrl.bindFetchPopup(shapeId);
+          $(mapEl).trigger("geocoder-reverse.decidim", [centerShape(coordinates, objectShape), { shapeId, objectShape, coordinates }]);
         };
       };
 
-      if (shape === "Marker") {
-        marker.on("click", () => {
-          editModalEl.dataset.markerId = markerId;
+      shape.on("click", () => {
+        editModalEl.dataset.shapeId = shapeId;
 
-          const inputDiv = markerFieldContainer.querySelector(`[data-marker-id="${markerId}"]`);
-          if (inputDiv && !inputDiv.hasChildNodes()) {
-            // When the `inputDiv`'s input fields have not been added yet, the reverse geocoding
-            // is not completed yet, so the user cannot edit the address yet.
-            return;
-          } else if (inputDiv && inputDiv.hasChildNodes()) {
-            editModalEl.querySelector(".location-fields input[name=address]").value = inputDiv.querySelector(".location-address").value;
-          } else {
-            locFields.querySelector("[data-modal-address]").setAttribute("disabled", true);
-            modalButtons.querySelector("[data-modal-save]").setAttribute("disabled", true);
-          };
-          if (!removalMode && !drawMode && !dragMode && !editMode) {
-          // With Foundation we have to use jQuery
-            $(editModalEl).foundation("open");
-          };
-        });
-      };
+        const inputDiv = shapeFieldContainer.querySelector(`[data-shape-id="${shapeId}"]`);
+        if (inputDiv && !inputDiv.hasChildNodes()) {
+          // When the `inputDiv`'s input fields have not been added yet, the reverse geocoding
+          // is not completed yet, so the user cannot edit the address yet.
+          return;
+        } else if (inputDiv && inputDiv.hasChildNodes()) {
+          console.log(inputDiv.querySelector(".location-address").value)
+          editModalEl.querySelector(".location-fields input[name=address]").value = inputDiv.querySelector(".location-address").value;
+        } else {
+          locFields.querySelector("[data-modal-address]").setAttribute("disabled", true);
+          modalButtons.querySelector("[data-modal-save]").setAttribute("disabled", true);
+        };
+        if (!removalMode && !drawMode && !dragMode && !editMode) {
+        // With Foundation we have to use jQuery
+          $(editModalEl).foundation("open");
+        };
+      });
 
-      marker.on("pm:dragend", () => {
-        if (shape === "Marker") {
-          $(mapEl).trigger("geocoder-reverse.decidim", [marker.getLatLng(), { markerId, shape }]);
-        } else if (shape === ("Line" || "Polygon")) {
-          $(mapEl).trigger("geocoder-reverse.decidim", [centerShape(marker._latlngs, shape), { markerId, shape, shapeCoordinates }]);
+      shape.on("pm:dragend", () => {
+        if (objectShape === "Marker") {
+          $(mapEl).trigger("geocoder-reverse.decidim", [shape.getLatLng(), { shapeId, objectShape }]);
+        } else if (objectShape === "Polygon" || objectShape === "Line") {
+          coordinates = shape._latlngs;
+          $(mapEl).trigger("geocoder-reverse.decidim", [centerShape(shape._latlngs, objectShape), { shapeId, objectShape, coordinates }]);
         };
       })
     });
 
-    if (containerMarkerField.length > 0) {
+    if (containerShapeField.length > 0) {
       const bounds = [];
-      containerMarkerField.forEach(
+      containerShapeField.forEach(
         (locContainer) => {
-          let lat = parseFloat(locContainer.querySelector(".location-latitude").value);
-          let lng = parseFloat(locContainer.querySelector(".location-longitude").value);
-          ctrl.addMarker([lat, lng], "editEv", locContainer.dataset.markerId);
-          bounds.push([lat, lng]);
+          const objectShape = locContainer.querySelector(".location-shape").value;
+          const geojson = locContainer.querySelector(".location-geojson").value;
+          const lat = parseFloat(locContainer.querySelector(".location-latitude").value);
+          const lng = parseFloat(locContainer.querySelector(".location-longitude").value);
+          if (objectShape === "Marker") {
+            ctrl.addMarker([lat, lng], "editEv", locContainer.dataset.shapeId);
+            bounds.push([lat, lng]);
+          } else if (objectShape === "Line") {
+            const lineGeoJson = JSON.parse(geojson).map((coords) => [coords.lat, coords.lng]);
+            ctrl.addLine(lineGeoJson, "editEv", locContainer.dataset.shapeId);
+            bounds.push(lineGeoJson);
+          } else if (objectShape === "Polygon") {
+            const polygonGeoJson = JSON.parse(geojson).map(
+              (coord) => coord.map(
+                (coords) => [coords.lat, coords.lng]));
+            ctrl.addPolygon(polygonGeoJson, "editEv", locContainer.dataset.shapeId);
+            bounds.push(polygonGeoJson);
+          };
         }
-      )
+      );
       const area = new L.LatLngBounds(bounds)
       ctrl.map.fitBounds(area);
     }

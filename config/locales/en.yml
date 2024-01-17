@@ -13,11 +13,11 @@ en:
   add: Add
   pick_locations: Pick locations
   type_locations: Type locations
-  clear_markers: Clear markers
+  clear_shapes: Clear shapes
   address: Address
   hint: Press "Add" to place a location on the map.
   edit_location: Edit location
-  delete_marker: Delete marker
+  delete_shape: Delete shape
   save: Save
   cancel: Cancel
   placeholder:

@@ -4,7 +4,7 @@ export default class ModelLocMapController extends MapController {
   start() {
     this.initializeMap();
     this.placeMarkers = false;
-    this.markers = {};
+    this.shapes = {};
   }
 
   initializeMap() {
@@ -49,67 +49,106 @@ export default class ModelLocMapController extends MapController {
     this.map.pm.setPathOptions(
       { color: "orange" },
       {
-        ignoreShapes: ["Polyline", "Rectangle"]
+        ignoreShapes: ["Rectangle"]
       }
     );
   }
 
-  clearMarkers() {
-    Object.keys(this.markers).forEach((markerIdKey) => {
-      this.deleteMarker(markerIdKey)
+  clearShapes() {
+    Object.keys(this.shapes).forEach((shapeIdKey) => {
+      this.deleteShape(shapeIdKey)
     })
   }
 
-  deleteMarker(markerId) {
-    const marker = this.markers[markerId];
-    if (!marker) {
+  deleteShape(shapeId) {
+    const shape = this.shapes[shapeId];
+    if (!shape) {
       return;
     }
 
-    Reflect.deleteProperty(this.markers, markerId);
-    this.map.removeLayer(marker);
+    Reflect.deleteProperty(this.shapes, shapeId);
+    this.map.removeLayer(shape);
   }
 
   addMarker(data, ev, id) {
     // Add a marker to the map
-    let markerId = null;
+    let shapeId = null;
     if (ev === "editEv") {
-      markerId = id;
+      shapeId = id;
     } else {
-      markerId = Math.random().toString(36).slice(2, 9);
+      shapeId = Math.random().toString(36).slice(2, 9);
     }
-    let marker = null;
-    if (typeof data === "object" && data !== null && !Array.isArray(data)) {
-      marker = L.marker(data.latlng, {
-        draggable: true,
-        id: markerId
-      })
-    } else {
-      marker = L.marker(data, {
-        draggable: true,
-        id: markerId
-      })
-    }
-    this.markers[markerId] = marker;
+    const marker = L.marker(data, {
+      draggable: true,
+      id: shapeId
+    })
+    this.shapes[shapeId] = marker;
     marker.addTo(this.map);
-    this.triggerEvent("markeradd", [marker, ev]);
+    this.triggerEvent("shapeadd", [marker, ev]);
 
-    return markerId;
+    return shapeId;
   }
 
-  bindPopUp(markerId) {
-    const marker = this.markers[markerId];
-    if (!marker) {
+  addLine(data, ev, id) {
+    // Add a line to the map
+    let shapeId = null;
+    if (ev === "editEv") {
+      shapeId = id;
+    } else {
+      shapeId = Math.random().toString(36).slice(2, 9);
+    }
+    const line = L.polyline(data,
+      {
+        draggable: true,
+        id: shapeId
+      })
+    this.shapes[shapeId] = line;
+    line.addTo(this.map);
+    this.triggerEvent("shapeadd", [line, ev]);
+    return shapeId;
+  }
+
+  addPolygon(data, ev, id) {
+    // Add a polygon to the map
+    let shapeId = null;
+    if (ev === "editEv") {
+      shapeId = id;
+    } else {
+      shapeId = Math.random().toString(36).slice(2, 9);
+    }
+    const polygon = L.polygon(data,
+      {
+        draggable: true,
+        id: shapeId
+      })
+    this.shapes[shapeId] = polygon;
+    polygon.addTo(this.map);
+    this.triggerEvent("shapeadd", [polygon, ev]);
+    return shapeId;
+  }
+
+  bindFetchPopup(shapeId) {
+    const shape = this.shapes[shapeId];
+    if (!shape) {
       return;
     }
 
-    marker.bindPopup("Fetching address for this marker");
+    shape.bindPopup("Fetching address for this shape").openPopup();
   }
 
-  unbindPopUp(markerId) {
-    const marker = this.markers[markerId];
-    marker.closePopup();
-    marker.unbindPopup();
+  bindNoDataPopup(shapeId) {
+    const shape = this.shapes[shapeId];
+    if (!shape) {
+      return;
+    }
+
+    shape.bindPopup("No address found for this shape").openPopup();
+  }
+
+  unbindPopup(shapeId) {
+    const shape = this.shapes[shapeId];
+    shape.closePopup();
+    shape.unbindPopup();
   }
 
   setView(coordinates) {
