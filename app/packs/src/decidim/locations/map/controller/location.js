@@ -1,4 +1,7 @@
 import MapController from "src/decidim/map/controller";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png"
+import markerIcon from "leaflet/dist/images/marker-icon.png"
+import markerShadow from "leaflet/dist/images/marker-shadow.png"
 
 export default class ModelLocMapController extends MapController {
   start() {
@@ -8,12 +11,13 @@ export default class ModelLocMapController extends MapController {
   }
 
   initializeMap() {
+    // eslint-disable-next-line
     delete L.Icon.Default.prototype._getIconUrl;
 
     L.Icon.Default.mergeOptions({
-      iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-      iconUrl: require('leaflet/dist/images/marker-icon.png'),
-      shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+      iconRetinaUrl: markerIcon2x,
+      iconUrl: markerIcon,
+      shadowUrl: markerShadow
     });
 
     const mapEl = this.map._container;
@@ -47,9 +51,8 @@ export default class ModelLocMapController extends MapController {
     });
 
     this.map.pm.setPathOptions(
-      { color: "orange" },
       {
-        ignoreShapes: ["Rectangle"]
+        ignoreShapes: ["Circle", "Rectangle"]
       }
     );
   }

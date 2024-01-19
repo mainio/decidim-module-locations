@@ -98,6 +98,8 @@ module Decidim
             address: data[4],
             latitude: data[5],
             longitude: data[6],
+            shape: data[7],
+            geojson: data[8],
             link: path_for(data[0])
           }
         end

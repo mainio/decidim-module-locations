@@ -188,6 +188,7 @@ export default () => {
 
       shape.on("click", () => {
         editModalEl.dataset.shapeId = shapeId;
+        ctrl.unbindPopup(shapeId);
 
         const inputDiv = shapeFieldContainer.querySelector(`[data-shape-id="${shapeId}"]`);
         if (inputDiv && !inputDiv.hasChildNodes()) {
@@ -208,6 +209,8 @@ export default () => {
       });
 
       shape.on("pm:dragend", () => {
+        ctrl.bindFetchPopup(shapeId);
+
         if (objectShape === "Marker") {
           $(mapEl).trigger("geocoder-reverse.decidim", [shape.getLatLng(), { shapeId, objectShape }]);
         } else if (objectShape === "Polygon" || objectShape === "Line") {
