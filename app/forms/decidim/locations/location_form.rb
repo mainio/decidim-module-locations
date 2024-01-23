@@ -28,6 +28,8 @@ module Decidim
 
       # private
 
+      # DO VALIDATION HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
       # def json_validation
       #   case shape
       #   when "Marker"

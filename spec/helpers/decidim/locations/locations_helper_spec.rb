@@ -8,8 +8,8 @@ module Decidim
       let!(:organization) { create(:organization) }
       let!(:dummy1) { create(:dummy_resource, body: "A reasonable body") }
       let!(:dummy2) { create(:dummy_resource, body: "Another reasonable body") }
-      let!(:loc1) { create(:location, locatable: dummy1, address: "Speed street", latitude: 50.231241, longitude: 39.394056) }
-      let!(:loc2) { create(:location, locatable: dummy2, address: "Brain boulevard", latitude: 14.284756, longitude: 43.182746) }
+      let!(:loc1) { create(:location, locatable: dummy1, address: "Speed street", latitude: 50.231241, longitude: 39.394056, shape: "Marker", geojson: { "lat" => 50.231241, "lng" => 39.394056 }) }
+      let!(:loc2) { create(:location, locatable: dummy2, address: "Brain boulevard", latitude: 14.284756, longitude: 43.182746, shape: "Marker", geojson: { "lat" => 14.284756, "lng" => 43.182746 }) }
       let(:helper) do
         Class.new(ActionView::Base) do
           include TranslatableAttributes
@@ -21,7 +21,7 @@ module Decidim
         subject { helper.format_map_locations(dummy1) }
 
         it "returns an array of a single model locations" do
-          expect(subject).to eq([[dummy1.id, dummy1.title["en"], nil, dummy1.body, loc1.address, loc1.latitude, loc1.longitude]])
+          expect(subject).to eq([[dummy1.id, dummy1.title["en"], nil, dummy1.body, loc1.address, loc1.latitude, loc1.longitude, "Marker", { "lat" => 50.231241, "lng" => 39.394056 }]])
         end
       end
 
@@ -32,8 +32,8 @@ module Decidim
 
         it "returns an array of multiple model locations" do
           expect(subject).to include(
-            [dummy1.id, dummy1.title["en"], nil, dummy1.body, loc1.address, loc1.latitude, loc1.longitude],
-            [dummy2.id, dummy2.title["en"], nil, dummy2.body, loc2.address, loc2.latitude, loc2.longitude]
+            [dummy1.id, dummy1.title["en"], nil, dummy1.body, loc1.address, loc1.latitude, loc1.longitude, "Marker", { "lat" => 50.231241, "lng" => 39.394056 }],
+            [dummy2.id, dummy2.title["en"], nil, dummy2.body, loc2.address, loc2.latitude, loc2.longitude, "Marker", { "lat" => 14.284756, "lng" => 43.182746 }]
           )
         end
       end

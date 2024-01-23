@@ -31,8 +31,51 @@ describe "Map", type: :system do
   end
 
   let(:template) { template_class.new(ActionView::LookupContext.new(ActionController::Base.view_paths), {}, controller) }
-  let(:markers) { [[123, "Title of the record", "Summary of the record", "Body text of the record", "Foobar street 123", 1.123, 2.234]] }
-  let(:cell) { template.cell("decidim/locations/map", markers) }
+  let(:marker) do
+    [[
+      123, "Title of the marker", "Summary of the record", "Body text of the record", "Foobar street 123",
+      60.25013831397032, 25.11058330535889, "Marker", { "lat" => 60.25013831397032, "lng" => 25.11058330535889 }
+    ]]
+  end
+
+  let(:line) do
+    [[
+      123, "Title of the line", "Summary of the record", "Body text of the record", "Foobar street 123",
+      60.241787524015265, 25.11521816253662, "Line", '[{ "lat": 60.24240524264389, "lng": 25.10809421539307 },
+      { "lat": 60.24116980538663, "lng": 25.122342109680176 }]'
+    ]]
+  end
+
+  let(:polygon) do
+    [[
+      123, "Title of the polygon", "Summary of the record", "Body text of the record", "Foobar street 123",
+      60.2455574969813, 25.109066963195804, "Polygon", '[[{ "lat": 60.24721874334426, "lng": 25.109295845031742 },
+      { "lat": 60.24381102836454, "lng": 25.114445686340336 },
+      { "lat": 60.2456427192351, "lng": 25.103459358215336 }]]'
+    ]]
+  end
+
+  let(:all_shapes) do
+    [
+      [
+        123, "Title of the marker", "Summary of the record", "Body text of the record", "Foobar street 123",
+        60.25013831397032, 25.11058330535889, "Marker", { "lat" => 60.25013831397032, "lng" => 25.11058330535889 }
+      ],
+      [
+        123, "Title of the line", "Summary of the record", "Body text of the record", "Foobar street 123",
+        60.241787524015265, 25.11521816253662, "Line", '[{ "lat": 60.24240524264389, "lng": 25.10809421539307 },
+        { "lat": 60.24116980538663, "lng": 25.122342109680176 }]'
+      ],
+      [
+        123, "Title of the polygon", "Summary of the record", "Body text of the record", "Foobar street 123",
+        60.2455574969813, 25.109066963195804, "Polygon", '[[{ "lat": 60.24721874334426, "lng": 25.109295845031742 },
+        { "lat": 60.24381102836454, "lng": 25.114445686340336 },
+        { "lat": 60.2456427192351, "lng": 25.103459358215336 }]]'
+      ]
+    ]
+  end
+
+  let(:cell) { template.cell("decidim/locations/map", shapes) }
   let(:javascript) { template.javascript_pack_tag("decidim_core", defer: false) }
 
   let(:html_document) do
@@ -100,6 +143,7 @@ describe "Map", type: :system do
       # context.
       tile_content = File.read(Decidim::Dev.asset("icon.png"))
       final_html = html_document
+
       Rails.application.routes.draw do
         # Map tiles
         get "/tiles/:z/:x/:y", to: ->(_) { [200, {}, [tile_content]] }
@@ -132,72 +176,182 @@ describe "Map", type: :system do
     end
 
     context "when cell called" do
+      let(:shapes) { marker }
+
       it "renders the map" do
         expect(page).to have_css("[data-decidim-map]")
       end
     end
 
     context "when cell called with 1 location" do
-      it "renders the map with 1 marker" do
-        expect(page).to have_css(".leaflet-marker-icon")
+      context "when marker" do
+        let(:shapes) { marker }
+
+        it "renders the map with 1 marker" do
+          expect(page).to have_css(".leaflet-marker-icon")
+        end
+      end
+
+      context "when line" do
+        let(:shapes) { line }
+
+        it "renders the map with 1 line" do
+          expect(page).to have_css("path.leaflet-interactive")
+        end
+      end
+
+      context "when polygon" do
+        let(:shapes) { polygon }
+
+        it "renders the map with 1 polygon" do
+          expect(page).to have_css("path.leaflet-interactive")
+        end
       end
     end
 
-    context "when marker popup clicked" do
-      it "shows the marker's popup" do
-        page.find(".leaflet-marker-icon").click
-        expect(page).to have_content("Title of the record")
-        expect(page).to have_content("Foobar street 123")
+    context "when popup clicked" do
+      context "when marker" do
+        let(:shapes) { marker }
+
+        it "shows the marker's popup" do
+          page.find(".leaflet-marker-icon").click
+          expect(page).to have_content("Title of the marker")
+          expect(page).to have_content("Foobar street 123")
+        end
+      end
+
+      context "when line" do
+        let(:shapes) { line }
+
+        it "shows the line's popup" do
+          page.find("path.leaflet-interactive").click
+          expect(page).to have_content("Title of the line")
+          expect(page).to have_content("Foobar street 123")
+        end
+      end
+
+      context "when polygon" do
+        let(:shapes) { polygon }
+
+        it "shows the polygon's popup" do
+          page.find("path.leaflet-interactive").click
+          expect(page).to have_content("Title of the polygon")
+          expect(page).to have_content("Foobar street 123")
+        end
       end
     end
 
     context "when cell called with 3 locations" do
-      let(:markers) do
-        [
-          [111, "Title of the first record", "Sum of the first", "Body of the first", "Foobar street 123", 1.123, 2.234],
-          [222, "Title of the second record", "Sum of the second", "Body of the second", "Test street", 1.126, 2.237],
-          [333, "Title of the third record", "Sum of the third", "Body of the third", "Temporal street", 1.129, 2.240]
-        ]
-      end
+      let(:shapes) { all_shapes }
 
-      it "renders the map with 3 markers" do
-        expect(page).to have_css(".leaflet-marker-icon", count: 3)
-        expect(page).to have_selector('div[title="Title of the first record"]')
-        expect(page).to have_selector('div[title="Title of the second record"]')
-        expect(page).to have_selector('div[title="Title of the third record"]')
+      it "renders the map with 3 shapes" do
+        expect(page).to have_css(".leaflet-marker-icon", count: 1)
+        expect(page).to have_selector('img[title="Title of the marker"]')
+        expect(page).to have_css("path.leaflet-interactive", count: 2)
       end
 
       context "when a certain marker is clicked" do
         it "opens the correct modal" do
-          page.find('div[title="Title of the third record"]').click
-          expect(page).to have_content("Title of the third record")
+          # Since the DOM "path" -elements for the lines and polygons themselves
+          # don't have any specific attributes to be tied to a certain location
+          # we use the predictivity of the test environment to our advantage because
+          # the order is going to be the same everytime
+          page.find("path.leaflet-interactive", match: :first).click
+          expect(page).to have_content("Title of the line")
         end
       end
     end
   end
 
   context "when location added" do
-    def add_marker
+    def add_marker(latitude: 11.521, longitude: 5.521)
+      find('div[title="Draw Marker"] a').click
       marker_add = <<~JS
         var map = $(".picker-wrapper [data-decidim-map]").data("map");
-        var loc = L.latLng(11.521, 5.521);
+        var loc = L.latLng(#{latitude}, #{longitude});
         map.fire("click", { latlng: loc });
         map.panTo(loc);
       JS
       sleep 1
       page.execute_script(marker_add)
+      find("div.leaflet-pm-actions-container a.leaflet-pm-action.action-cancel").click
+    end
+
+    def add_line(latitude: [60.24240524264389, 60.24116980538663], longitude: [25.10809421539307, 25.122342109680176])
+      find('div[title="Draw Polyline"] a').click
+      line_add = <<~JS
+        var map = $(".picker-wrapper [data-decidim-map]").data("map");
+        var first = L.latLng(#{latitude}[0], #{longitude}[0]);
+        var second = L.latLng(#{latitude}[1], #{longitude}[1]);
+        map.fire("click", { latlng: first });
+        map.fire("click", { latlng: second });
+      JS
+      sleep 1
+      page.execute_script(line_add)
+      find("div.leaflet-pm-actions-container a.leaflet-pm-action.action-finish").click
+    end
+
+    def add_polygon(latitude: [8.231, 7.123, 10.341, 8.231], longitude: [5.343, 4.674, 7.231, 5.343])
+      find('div[title="Draw Polygons"] a').click
+      polygon_add = <<~JS
+        var map = $(".picker-wrapper [data-decidim-map]").data("map");
+        var first = L.latLng(#{latitude}[0], #{longitude}[0]);
+        var second = L.latLng(#{latitude}[1], #{longitude}[1]);
+        var third = L.latLng(#{latitude}[2], #{longitude}[2]);
+        var fourth = L.latLng(#{latitude}[3], #{longitude}[3]);
+        map.fire("click", { latlng: first });
+        map.fire("click", { latlng: second });
+        map.fire("click", { latlng: third });
+        map.fire("click", { latlng: fourth });
+      JS
+      sleep 1
+      page.execute_script(polygon_add)
     end
 
     def drag_marker
+      find('div[title="Drag Layers"] a').click
       marker_drag = <<~JS
         var ctrl = $(".picker-wrapper [data-decidim-map]").data("map-controller");
-        var marker = ctrl.markers[Object.keys(ctrl.markers)[0]];
+        var marker = ctrl.shapes[Object.keys(ctrl.shapes)[0]];
 
-        marker.setLatLng(L.latLng(13.2, 11.4))
-        marker.fire("dragend");
+        marker.setLatLng(L.latLng(13.2, 11.4));
+        marker.fire("pm:dragend");
       JS
       sleep 1
       page.execute_script(marker_drag)
+    end
+
+    def drag_line
+      find('div[title="Drag Layers"] a').click
+      line_drag = <<~JS
+        var ctrl = $(".picker-wrapper [data-decidim-map]").data("map-controller");
+        var line = ctrl.shapes[Object.keys(ctrl.shapes)[0]];
+
+        line.setLatLngs([
+          [11.5, 5],
+          [12, 5.5]
+        ]);
+        line.fire("pm:dragend");
+      JS
+      sleep 1
+      page.execute_script(line_drag)
+    end
+
+    def drag_polygon
+      find('div[title="Drag Layers"] a').click
+      polygon_drag = <<~JS
+        var ctrl = $(".picker-wrapper [data-decidim-map]").data("map-controller");
+        var polygon = ctrl.shapes[Object.keys(ctrl.shapes)[0]];
+
+        polygon.setLatLngs([
+          [11.5, 5],
+          [12, 5.5],
+          [12.5, 6]
+        ]);
+        polygon.fire("pm:dragend");
+      JS
+      sleep 1
+      page.execute_script(polygon_drag)
     end
 
     let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
@@ -307,7 +461,6 @@ describe "Map", type: :system do
 
       context "when typing locations" do
         it "adds marker" do
-          click_link "Type locations"
           expect(page).to have_css(".type-loc-field")
           sleep 1
           find("#dummy_address").set("veneen")
@@ -322,7 +475,6 @@ describe "Map", type: :system do
 
       context "when adding multiple locations" do
         it "adds multiple if configured accordingly" do
-          click_link "Type locations"
           expect(page).to have_css(".type-loc-field")
           sleep 1
           find("#dummy_address").set("veneen")
@@ -349,7 +501,6 @@ describe "Map", type: :system do
         let(:map_configuration) { "single" }
 
         it "adds a single location" do
-          click_link "Type locations"
           expect(page).to have_css(".type-loc-field")
           find("#dummy_address").set("veneen")
           expect(page).to have_content(
@@ -357,7 +508,7 @@ describe "Map", type: :system do
           )
           find("#autoComplete_result_0").click
           click_button "Add"
-          expect(page).to have_css(".marker-field")
+          expect(page).to have_css(".shape-field")
           expect(page).to have_css(".leaflet-marker-draggable", count: 1)
           expect(page).to have_field("dummy_locations__index__address", type: :hidden, with: "Veneentekijäntie 4, Finland")
           find("#dummy_address").set("veneen")
@@ -373,7 +524,6 @@ describe "Map", type: :system do
 
       context "when adding a location and changing its address from the modal" do
         it "changes the address field to the form" do
-          click_link "Type locations"
           expect(page).to have_css(".type-loc-field")
           sleep 1
           find("#dummy_address").set("veneen")
@@ -434,36 +584,108 @@ describe "Map", type: :system do
       end
 
       context "when picking locations" do
-        it "adds markers" do
-          page.execute_script(revgeo)
-          add_marker
-          expect(page).to have_css(".leaflet-marker-draggable")
-          sleep 1
+        context "when marker" do
+          it "adds markers" do
+            page.execute_script(revgeo)
+            find('div[title="Draw Marker"] a').click
+            find("[data-decidim-map]").click(x: 20, y: 10)
+            find("div.leaflet-pm-actions-container a.leaflet-pm-action.action-cancel").click
+            expect(page).to have_css(".leaflet-marker-icon")
+          end
+        end
+
+        context "when line" do
+          it "adds lines" do
+            page.execute_script(revgeo)
+            find('div[title="Draw Polyline"] a').click
+            find("[data-decidim-map]").click(x: 20, y: 10)
+            find("[data-decidim-map]").click(x: 5, y: 2)
+            find("div.leaflet-pm-actions-container a.leaflet-pm-action.action-finish").click
+            expect(page).to have_css(".leaflet-interactive")
+          end
+        end
+
+        context "when polygon" do
+          it "adds polygons" do
+            page.execute_script(revgeo)
+            find('div[title="Draw Polygons"] a').click
+            find("[data-decidim-map]").click(x: 1, y: 2)
+            find("[data-decidim-map]").click(x: 6, y: 7)
+            find("[data-decidim-map]").click(x: 20, y: 21)
+            find("[data-decidim-map]").click(x: 1, y: 2)
+            expect(page).to have_css(".leaflet-interactive")
+          end
         end
       end
 
-      context "when marker added and clicked" do
-        it "opens a modal that shows the marker's address" do
-          page.execute_script(revgeo)
-          add_marker
+      context "when shape added and clicked" do
+        context "when marker" do
+          it "opens a modal that shows the marker's address" do
+            page.execute_script(revgeo)
+            add_marker
+            expect(page).to have_css(".location-address", visible: :hidden)
+            find(".leaflet-marker-icon").click
+            expect(page).to have_field("address", with: "Veneentekijäntie 4")
+            expect(page).to have_content("Save")
+          end
+        end
 
-          expect(page).to have_css(".location-address", visible: :hidden)
-          find(".leaflet-marker-draggable").click
-          expect(page).to have_content("Save")
+        context "when line" do
+          it "opens a modal that shows the line's address" do
+            page.execute_script(revgeo)
+            add_line
+            expect(page).to have_css(".location-address", visible: :hidden)
+            find(".leaflet-interactive").click
+            expect(page).to have_field("address", with: "Veneentekijäntie 4")
+            expect(page).to have_content("Save")
+          end
+        end
+
+        context "when polygon" do
+          it "opens a modal that shows the polygon's address" do
+            page.execute_script(revgeo)
+            add_polygon
+            expect(page).to have_css(".location-address", visible: :hidden)
+            find(".leaflet-interactive").click
+            expect(page).to have_field("address", with: "Veneentekijäntie 4")
+            expect(page).to have_content("Save")
+          end
         end
       end
 
-      context "when marker dragged" do
-        it "updates marker's coordinates" do
-          page.execute_script(revgeo)
-          add_marker
-          drag_marker
-          expect(find(".location-latitude", visible: :hidden).value).to eq("13.2")
-          expect(find(".location-longitude", visible: :hidden).value).to eq("11.4")
+      context "when shape dragged" do
+        context "when marker" do
+          it "updates marker's coordinates" do
+            page.execute_script(revgeo)
+            add_marker
+            drag_marker
+            expect(find(".location-latitude", visible: :hidden).value).to eq("13.2")
+            expect(find(".location-longitude", visible: :hidden).value).to eq("11.4")
+          end
+        end
+
+        context "when line" do
+          it "updates line's coordinates" do
+            page.execute_script(revgeo)
+            add_line
+            drag_line
+            expect(find(".location-latitude", visible: :hidden).value).to eq("11.75")
+            expect(find(".location-longitude", visible: :hidden).value).to eq("5.25")
+          end
+        end
+
+        context "when polygon" do
+          it "updates polygon's coordinates" do
+            page.execute_script(revgeo)
+            add_polygon
+            drag_polygon
+            expect(find(".location-latitude", visible: :hidden).value).to eq("12")
+            expect(find(".location-longitude", visible: :hidden).value).to eq("5.5")
+          end
         end
       end
 
-      context "when marker added and clicked too fast" do
+      context "when marker added and it's fetching the address" do
         let(:revgeo) do
           <<~JS
             $(function() {
@@ -488,32 +710,134 @@ describe "Map", type: :system do
 
         it "opens a popup that tells the user the address is being fetched" do
           page.execute_script(revgeo)
-          add_marker
-          find(".leaflet-marker-draggable").click
-          expect(page).to have_content("Fetching address for this marker")
+          find('div[title="Draw Marker"] a').click
+          find("[data-decidim-map]").click(x: 20, y: 10)
+          expect(page).to have_content("Fetching address for this shape")
+        end
+
+        context "when marker added and it doesn't find an address" do
+          let(:revgeo) do
+            <<~JS
+              $(function() {
+                // Override jQuery AJAX in order to check the request is
+                // sent correctly.
+                $.ajax = function(request) {
+
+                  const response = {};
+
+                    // This is a normal suggest call to:
+                    // https://revgeocode.search.hereapi.com/v1/revgeocode
+                    var deferred = $.Deferred((def) => {
+                      def.resolve(response)
+                    });
+                    return deferred.promise();
+                };
+              });
+            JS
+          end
+
+          it "opens a popup that tells the user that the address was not found" do
+            page.execute_script(revgeo)
+            find('div[title="Draw Marker"] a').click
+            find("[data-decidim-map]").click(x: 20, y: 10)
+            expect(page).to have_content("No address found for this shape")
+          end
         end
       end
 
-      context "when marker deleted" do
-        it "deletes the marker from the map" do
-          page.execute_script(revgeo)
-          add_marker
-          expect(page).to have_css(".leaflet-marker-draggable")
-          find(".leaflet-marker-draggable").click
-          click_button "Delete marker"
-          expect(page).not_to have_css(".leaflet-marker-draggable")
+      context "when shape deleted from modal" do
+        context "when marker" do
+          it "deletes the marker from the map" do
+            page.execute_script(revgeo)
+            add_marker
+            expect(page).to have_css(".leaflet-marker-icon")
+            find(".leaflet-marker-icon").click
+            click_button "Delete shape"
+            expect(page).not_to have_css(".leaflet-marker-icon")
+          end
+        end
+
+        context "when line" do
+          it "deletes the line from the map" do
+            page.execute_script(revgeo)
+            add_line
+            expect(page).to have_css(".leaflet-interactive")
+            find(".leaflet-interactive").click
+            click_button "Delete shape"
+            expect(page).not_to have_css(".leaflet-interactive")
+          end
+        end
+
+        context "when polygon" do
+          it "deletes the polygon from the map" do
+            page.execute_script(revgeo)
+            add_polygon
+            expect(page).to have_css(".leaflet-interactive")
+            find(".leaflet-interactive").click
+            click_button "Delete shape"
+            expect(page).not_to have_css(".leaflet-interactive")
+          end
         end
       end
 
-      context "when multiple markers and other one deleted" do
-        it "deletes only one" do
-          page.execute_script(revgeo)
-          add_marker
-          add_marker
-          expect(page).to have_css(".leaflet-marker-draggable", count: 2, visible: :all)
-          all(".leaflet-marker-draggable")[1].click
-          click_button "Delete marker"
-          expect(page).to have_css(".leaflet-marker-draggable", count: 1, visible: :all)
+      context "when shape deleted from control panel" do
+        context "when marker" do
+          it "deletes the marker from the map" do
+            page.execute_script(revgeo)
+            add_marker
+            expect(page).to have_css(".leaflet-marker-icon")
+            find('div[title="Remove Layers"] a').click
+            find(".leaflet-marker-icon").click
+            expect(page).not_to have_css(".leaflet-marker-icon")
+          end
+        end
+
+        context "when line" do
+          it "deletes the line from the map" do
+            page.execute_script(revgeo)
+            add_line
+            expect(page).to have_css(".leaflet-interactive")
+            find('div[title="Remove Layers"] a').click
+            find(".leaflet-interactive").click
+            expect(page).not_to have_css(".leaflet-interactive")
+          end
+        end
+
+        context "when polygon" do
+          it "deletes the polygon from the map" do
+            page.execute_script(revgeo)
+            add_polygon
+            expect(page).to have_css(".leaflet-interactive")
+            find('div[title="Remove Layers"] a').click
+            find(".leaflet-interactive").click
+            expect(page).not_to have_css(".leaflet-interactive")
+          end
+        end
+      end
+
+      context "when multiple shapes and one deleted" do
+        context "when markers" do
+          it "deletes only one" do
+            page.execute_script(revgeo)
+            add_marker
+            add_marker(latitude: 11.523, longitude: 5.523)
+            expect(page).to have_css(".leaflet-marker-icon", count: 2, visible: :all)
+            find(".leaflet-marker-icon", match: :first).click
+            click_button "Delete shape"
+            expect(page).to have_css(".leaflet-marker-icon", count: 1, visible: :all)
+          end
+        end
+
+        context "when lines" do
+          it "deletes only one" do
+            page.execute_script(revgeo)
+            add_line
+            add_line(latitude: [60.25240524264372, 60.25116980538645], longitude: [25.10409421539333, 25.104342109680122])
+            expect(page).to have_css(".leaflet-interactive", count: 2, visible: :all)
+            find(".leaflet-interactive", match: :first).click
+            click_button "Delete shape"
+            expect(page).to have_css(".leaflet-interactive", count: 1, visible: :all)
+          end
         end
       end
     end
@@ -597,31 +921,32 @@ describe "Map", type: :system do
     end
 
     it "renders multiple maps" do
-      expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
-      expect(page).to have_content("Pick locations", count: 2)
-      expect(page).to have_content("Type locations", count: 2)
+      expect(page).to have_css(".type-loc-field", count: 2)
+      expect(page).to have_selector("div[data-shape-field]", count: 2)
     end
 
     context "when adding markers" do
       it "adds markers correctly" do
         page.execute_script(revgeo)
 
-        within "#pick_model_locations_mapexample" do
+        within "#pick_model_locations_map-example" do
+          find('div[title="Draw Marker"] a').click
           find("[data-decidim-map]").click
-          find("[data-decidim-map]").click(x: 10, y: 10)
+          find("[data-decidim-map]").click(x: 20, y: 10)
         end
 
-        within "#pick_model_locations_mapexampletwo" do
+        within "#pick_model_locations_map-exampletwo" do
+          find('div[title="Draw Marker"] a').click
           find("[data-decidim-map]").click
-          find("[data-decidim-map]").click(x: 10, y: 10)
+          find("[data-decidim-map]").click(x: 20, y: 10)
         end
 
-        within "#pick_model_locations_mapexample" do
-          expect(page).to have_css(".leaflet-marker-draggable", count: 1, visible: :all)
+        within "#pick_model_locations_map-example" do
+          expect(page).to have_css(".leaflet-pm-draggable", count: 1, visible: :all)
         end
 
-        within "#pick_model_locations_mapexampletwo" do
-          expect(page).to have_css(".leaflet-marker-draggable", count: 2, visible: :all)
+        within "#pick_model_locations_map-exampletwo" do
+          expect(page).to have_css(".leaflet-pm-draggable", count: 2, visible: :all)
         end
       end
     end
