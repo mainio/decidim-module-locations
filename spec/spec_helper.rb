@@ -22,3 +22,9 @@ RSpec.configure do |config|
     )
   end
 end
+
+# This re-registration is made because of problems with chromedriver v.120
+# Selenium methods are undefined without this change
+# More info in PR #12160
+
+require "#{Dir.pwd}/lib/decidim/locations/test/rspec_support/capybara.rb"

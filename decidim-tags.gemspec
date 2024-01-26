@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.name = "decidim-locations"
   spec.version = Decidim::Locations::VERSION
   spec.required_ruby_version = ">= 2.7"
-  spec.authors = ["Antti Hukkanen"]
-  spec.email = ["antti.hukkanen@mainiotech.fi"]
+  spec.authors = ["Antti Hukkanen", "Joonas Aapro"]
+  spec.email = ["antti.hukkanen@mainiotech.fi", "joonas.aapro@mainiotech.fi"]
 
   spec.summary = "Adds possibility to add locations to any records."
   spec.description = "Developers can define the locations functionality to any existing objects and the users can add locations to different records."
