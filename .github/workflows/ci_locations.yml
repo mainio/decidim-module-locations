@@ -19,12 +19,14 @@ jobs:
   main:
     needs: build_app
     name: Tests
+    uses: mainio/gha-decidim-module/.github/workflows/ci_rspec.yml@main
+    secrets: inherit
     runs-on: ubuntu-latest
     steps:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 18
 
       - name: Install dependencies
         run: npm install
@@ -34,4 +36,3 @@ jobs:
 
       - name: Run Tests
         run: npm test
-
