@@ -606,13 +606,13 @@ describe "Map", type: :system do
         end
 
         context "when polygon" do
-          it "adds polygons" do
+          it "adds polygon" do
             page.execute_script(revgeo)
             find('div[title="Draw Polygons"] a').click
-            find("[data-decidim-map]").click(x: 1, y: 2)
-            find("[data-decidim-map]").click(x: 6, y: 7)
-            find("[data-decidim-map]").click(x: 20, y: 21)
-            find("[data-decidim-map]").click(x: 1, y: 2)
+            find("[data-decidim-map]").click(x: 50, y: 45)
+            find("[data-decidim-map]").click(x: 30, y: 37)
+            find("[data-decidim-map]").click(x: 33, y: 21)
+            find("[data-decidim-map]").click(x: 50, y: 45)
             expect(page).to have_css(".leaflet-interactive")
           end
         end
@@ -853,158 +853,158 @@ describe "Map", type: :system do
         end
       end
     end
-  end
 
-  context "when rendering more than one cell" do
-    let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
-    let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
-    let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
-    let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "single", coords: [12, 2], checkbox: false) }
-    let(:cell_two) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "multiple", coords: [12, 2], checkbox: false) }
+    context "when rendering more than one cell" do
+      let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
+      let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
+      let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
+      let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "single", coords: [12, 2], checkbox: false) }
+      let(:cell_two) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "multiple", coords: [12, 2], checkbox: false) }
 
-    let(:html_document) do
-      cell_html = cell.to_s
-      cell_two_html = cell_two.to_s
-      js = javascript
-      template.instance_eval do
-        <<~HTML.strip
-          <!doctype html>
-          <html lang="en">
-          <head>
-            <title>Map Test</title>
-            #{stylesheet_pack_tag "decidim_core", media: "all"}
-            #{snippets.display(:head)}
-          </head>
-          <body>
-            <header>
-              <a href="#content">Skip to main content</a>
-            </header>
-            #{cell_html}
-            #{cell_two_html}
-            #{js}
-            #{snippets.display(:foot)}
-          </body>
-          </html>
-        HTML
-      end
-    end
-
-    before do
-      utility = Decidim::Map.autocomplete(organization: organization)
-      allow(Decidim::Map).to receive(:autocomplete).with(organization: organization).and_return(utility)
-      allow(utility).to receive(:builder_options).and_return(
-        api_key: "key1234"
-      )
-      allow(cell).to receive(:random_id).and_return("example")
-      allow(cell_two).to receive(:random_id).and_return("exampletwo")
-
-      tile_content = File.read(Decidim::Dev.asset("icon.png"))
-      final_html = html_document
-
-      Rails.application.routes.draw do
-        # Map tiles
-        get "/tiles/:z/:x/:y", to: ->(_) { [200, {}, [tile_content]] }
-
-        # The actual editor testing route for these specs
-        get "test_map", to: ->(_) { [200, {}, [final_html]] }
-      end
-
-      # Login needed for uploading the images
-      switch_to_host(organization.host)
-
-      visit "/test_map"
-
-      # Wait for the map to be rendered
-      expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
-
-      # Wait for all map tile images to be loaded
-      loop do
-        break if page.all("[data-decidim-map] .leaflet-map-pane img").all? { |img| img["complete"] == "true" }
-
-        sleep 0.1
-      end
-    end
-
-    after do
-      expect_no_js_errors
-
-      # Reset the routes back to original
-      Rails.application.reload_routes!
-    end
-
-    it "renders multiple maps" do
-      expect(page).to have_css(".type-loc-field", count: 2)
-      expect(page).to have_selector("div[data-shape-field]", count: 2)
-    end
-
-    context "when adding markers" do
-      it "adds markers correctly" do
-        page.execute_script(revgeo)
-
-        within "#pick_model_locations_map-example" do
-          find('div[title="Draw Marker"] a').click
-          find("[data-decidim-map]").click
-          find("[data-decidim-map]").click(x: 20, y: 10)
-        end
-
-        within "#pick_model_locations_map-exampletwo" do
-          find('div[title="Draw Marker"] a').click
-          find("[data-decidim-map]").click
-          find("[data-decidim-map]").click(x: 20, y: 10)
-        end
-
-        within "#pick_model_locations_map-example" do
-          expect(page).to have_css(".leaflet-pm-draggable", count: 1, visible: :all)
-        end
-
-        within "#pick_model_locations_map-exampletwo" do
-          expect(page).to have_css(".leaflet-pm-draggable", count: 2, visible: :all)
+      let(:html_document) do
+        cell_html = cell.to_s
+        cell_two_html = cell_two.to_s
+        js = javascript
+        template.instance_eval do
+          <<~HTML.strip
+            <!doctype html>
+            <html lang="en">
+            <head>
+              <title>Map Test</title>
+              #{stylesheet_pack_tag "decidim_core", media: "all"}
+              #{snippets.display(:head)}
+            </head>
+            <body>
+              <header>
+                <a href="#content">Skip to main content</a>
+              </header>
+              #{cell_html}
+              #{cell_two_html}
+              #{js}
+              #{snippets.display(:foot)}
+            </body>
+            </html>
+          HTML
         end
       end
-    end
-  end
 
-  context "when cell has 'has location' -checkbox" do
-    let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
-    let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
-    let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
-    let(:map_configuration) { "multiple" }
-    let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: map_configuration, coords: [12, 2], checkbox: true) }
+      before do
+        utility = Decidim::Map.autocomplete(organization: organization)
+        allow(Decidim::Map).to receive(:autocomplete).with(organization: organization).and_return(utility)
+        allow(utility).to receive(:builder_options).and_return(
+          api_key: "key1234"
+        )
+        allow(cell).to receive(:random_id).and_return("example")
+        allow(cell_two).to receive(:random_id).and_return("exampletwo")
 
-    before do
-      tile_content = File.read(Decidim::Dev.asset("icon.png"))
-      final_html = html_document
+        tile_content = File.read(Decidim::Dev.asset("icon.png"))
+        final_html = html_document
 
-      Rails.application.routes.draw do
-        # Map tiles
-        get "/tiles/:z/:x/:y", to: ->(_) { [200, {}, [tile_content]] }
+        Rails.application.routes.draw do
+          # Map tiles
+          get "/tiles/:z/:x/:y", to: ->(_) { [200, {}, [tile_content]] }
 
-        # The actual editor testing route for these specs
-        get "test_map", to: ->(_) { [200, {}, [final_html]] }
+          # The actual editor testing route for these specs
+          get "test_map", to: ->(_) { [200, {}, [final_html]] }
+        end
+
+        # Login needed for uploading the images
+        switch_to_host(organization.host)
+
+        visit "/test_map"
+
+        # Wait for the map to be rendered
+        expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
+
+        # Wait for all map tile images to be loaded
+        loop do
+          break if page.all("[data-decidim-map] .leaflet-map-pane img").all? { |img| img["complete"] == "true" }
+
+          sleep 0.1
+        end
       end
 
-      # Login needed for uploading the images
-      switch_to_host(organization.host)
+      after do
+        expect_no_js_errors
 
-      visit "/test_map"
+        # Reset the routes back to original
+        Rails.application.reload_routes!
+      end
+
+      it "renders multiple maps" do
+        expect(page).to have_css(".type-loc-field", count: 2)
+        expect(page).to have_selector("div[data-shape-field]", count: 2)
+      end
+
+      context "when adding markers" do
+        it "adds markers correctly" do
+          page.execute_script(revgeo)
+
+          within "#pick_model_locations_map-example" do
+            find('div[title="Draw Marker"] a').click
+            find("[data-decidim-map]").click(x: 15, y: 25)
+            find("[data-decidim-map]").click(x: 20, y: 10)
+            find("div.leaflet-pm-actions-container a.leaflet-pm-action.action-cancel").click
+
+            expect(page).to have_css(".leaflet-marker-icon", count: 1)
+          end
+
+          page.execute_script("window.scrollBy(0, 800)")
+
+          within "#pick_model_locations_map-exampletwo" do
+            find('div[title="Draw Marker"] a').click
+            find("[data-decidim-map]").click(x: 15, y: 5)
+            find("[data-decidim-map]").click(x: 20, y: 10)
+            find("div.leaflet-pm-actions-container a.leaflet-pm-action.action-cancel").click
+
+            expect(page).to have_css("img.leaflet-marker-icon", count: 2)
+          end
+        end
+      end
     end
 
-    after do
-      expect_no_js_errors
+    context "when cell has 'has location' -checkbox" do
+      let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
+      let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
+      let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
+      let(:map_configuration) { "multiple" }
+      let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: map_configuration, coords: [12, 2], checkbox: true) }
 
-      # Reset the routes back to original
-      Rails.application.reload_routes!
-    end
+      before do
+        tile_content = File.read(Decidim::Dev.asset("icon.png"))
+        final_html = html_document
 
-    it "checks the box if text is clicked" do
-      expect(page).to have_content("Has location")
-      find('label[for="dummy_has_location"]').click
-      expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
+        Rails.application.routes.draw do
+          # Map tiles
+          get "/tiles/:z/:x/:y", to: ->(_) { [200, {}, [tile_content]] }
 
-      loop do
-        break if page.all("[data-decidim-map] .leaflet-map-pane img").all? { |img| img["complete"] == "true" }
+          # The actual editor testing route for these specs
+          get "test_map", to: ->(_) { [200, {}, [final_html]] }
+        end
 
-        sleep 0.1
+        # Login needed for uploading the images
+        switch_to_host(organization.host)
+
+        visit "/test_map"
+      end
+
+      after do
+        expect_no_js_errors
+
+        # Reset the routes back to original
+        Rails.application.reload_routes!
+      end
+
+      it "checks the box if text is clicked" do
+        expect(page).to have_content("Has location")
+        find('label[for="dummy_has_location"]').click
+        expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
+
+        loop do
+          break if page.all("[data-decidim-map] .leaflet-map-pane img").all? { |img| img["complete"] == "true" }
+
+          sleep 0.1
+        end
       end
     end
   end
