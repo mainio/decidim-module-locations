@@ -19,5 +19,19 @@ jobs:
   main:
     needs: build_app
     name: Tests
-    uses: mainio/gha-decidim-module/.github/workflows/ci_rspec.yml@main
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Update Chromedriver
+        run: npm install chromedriver@121.0.0
+
+      - name: Run Tests
+        run: npm test
+
