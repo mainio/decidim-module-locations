@@ -291,14 +291,14 @@ describe "Map", type: :system do
       find("div.leaflet-pm-actions-container a.leaflet-pm-action.action-finish").click
     end
 
-    def add_polygon(latitude: [8.231, 7.123, 10.341, 8.231], longitude: [5.343, 4.674, 7.231, 5.343])
+    def add_polygon(latitude: [85.05109772344713, 85.05106347807192, 85.05106162696384], longitude: [24.741251170635227, 24.7408863902092, 24.741551578044895])
       find('div[title="Draw Polygons"] a').click
       polygon_add = <<~JS
         var map = $(".picker-wrapper [data-decidim-map]").data("map");
         var first = L.latLng(#{latitude}[0], #{longitude}[0]);
         var second = L.latLng(#{latitude}[1], #{longitude}[1]);
         var third = L.latLng(#{latitude}[2], #{longitude}[2]);
-        var fourth = L.latLng(#{latitude}[3], #{longitude}[3]);
+        var fourth = L.latLng(#{latitude}[0], #{longitude}[0]);
         map.fire("click", { latlng: first });
         map.fire("click", { latlng: second });
         map.fire("click", { latlng: third });
@@ -821,10 +821,10 @@ describe "Map", type: :system do
             page.execute_script(revgeo)
             add_marker
             add_marker(latitude: 11.523, longitude: 5.523)
-            expect(page).to have_css(".leaflet-marker-icon", count: 2, visible: :all)
+            expect(page).to have_css(".leaflet-marker-icon", count: 2)
             find(".leaflet-marker-icon", match: :first).click
             click_button "Delete shape"
-            expect(page).to have_css(".leaflet-marker-icon", count: 1, visible: :all)
+            expect(page).to have_css(".leaflet-marker-icon", count: 1)
           end
         end
 
@@ -833,10 +833,22 @@ describe "Map", type: :system do
             page.execute_script(revgeo)
             add_line
             add_line(latitude: [60.25240524264372, 60.25116980538645], longitude: [25.10409421539333, 25.104342109680122])
-            expect(page).to have_css(".leaflet-interactive", count: 2, visible: :all)
+            expect(page).to have_css(".leaflet-interactive", count: 2)
             find(".leaflet-interactive", match: :first).click
             click_button "Delete shape"
-            expect(page).to have_css(".leaflet-interactive", count: 1, visible: :all)
+            expect(page).to have_css(".leaflet-interactive", count: 1)
+          end
+        end
+
+        context "when polygons" do
+          it "deletes only one" do
+            page.execute_script(revgeo)
+            add_polygon
+            add_polygon(latitude: [85.05109772344434, 85.05101347805167, 85.05106165693364], longitude: [24.741211170645243, 24.7438833903077, 24.74355157804477])
+            expect(page).to have_css(".leaflet-interactive", count: 2)
+            find(".leaflet-interactive", match: :first).click
+            click_button "Delete shape"
+            expect(page).to have_css(".leaflet-interactive", count: 1)
           end
         end
       end

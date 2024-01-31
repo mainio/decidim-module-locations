@@ -2,6 +2,7 @@ import addShapeField from "./add_shape_field.js";
 import addInputGroup from "./add_input_group.js";
 import coordAverage from "./coord_average.js";
 import centerShape from "./center_shape.js";
+import validJson from "./valid_json.js";
 
 export default () => {
   document.querySelectorAll("[data-location-picker]").forEach((wrapperEl) => {
@@ -77,7 +78,13 @@ export default () => {
     typeLocButton.addEventListener("click", (event) => {
       event.preventDefault();
       const shapeId = ctrl.addMarker(typeLocCoords, "typeEv");
-      const addressData = { address: typeLocInput.value, position: {lat: typeLocCoords[0], lng: typeLocCoords[1]}, shapeId };
+      const addressData = {
+        address: typeLocInput.value,
+        position: { lat: typeLocCoords[0], lng: typeLocCoords[1] },
+        shapeId: shapeId,
+        objectShape: "Marker",
+        coordinates: { lat: typeLocCoords[0], lng: typeLocCoords[1] }
+      };
       typeLocInput.value = "";
       typeLocWrap.querySelector(".hint").classList.add("hide");
       displayList = true;
@@ -196,7 +203,6 @@ export default () => {
           // is not completed yet, so the user cannot edit the address yet.
           return;
         } else if (inputDiv && inputDiv.hasChildNodes()) {
-          console.log(inputDiv.querySelector(".location-address").value)
           editModalEl.querySelector(".location-fields input[name=address]").value = inputDiv.querySelector(".location-address").value;
         } else {
           locFields.querySelector("[data-modal-address]").setAttribute("disabled", true);
@@ -226,26 +232,60 @@ export default () => {
         (locContainer) => {
           const objectShape = locContainer.querySelector(".location-shape").value;
           const geojson = locContainer.querySelector(".location-geojson").value;
-          const lat = parseFloat(locContainer.querySelector(".location-latitude").value);
-          const lng = parseFloat(locContainer.querySelector(".location-longitude").value);
-          if (objectShape === "Marker") {
-            ctrl.addMarker([lat, lng], "editEv", locContainer.dataset.shapeId);
-            bounds.push([lat, lng]);
-          } else if (objectShape === "Line") {
-            const lineGeoJson = JSON.parse(geojson).map((coords) => [coords.lat, coords.lng]);
-            ctrl.addLine(lineGeoJson, "editEv", locContainer.dataset.shapeId);
-            bounds.push(lineGeoJson);
-          } else if (objectShape === "Polygon") {
-            const polygonGeoJson = JSON.parse(geojson).map(
-              (coord) => coord.map(
-                (coords) => [coords.lat, coords.lng]));
-            ctrl.addPolygon(polygonGeoJson, "editEv", locContainer.dataset.shapeId);
-            bounds.push(polygonGeoJson);
-          };
+          if (validJson(geojson)) {
+            let valid = true;
+
+            if (objectShape === "Marker") {
+              const markerGeoJson = JSON.parse(geojson)
+              if (markerGeoJson.lat < -90 || markerGeoJson.lat > 90 || markerGeoJson.lng < -180 || markerGeoJson.lng > 180) {
+                ctrl.deleteShape(locContainer.dataset.shapeId);
+                shapeFieldContainer.querySelector(`[data-shape-id="${locContainer.dataset.shapeId}"]`).remove();
+                valid = false;
+              }
+              if (valid) {
+                ctrl.addMarker(markerGeoJson, "editEv", locContainer.dataset.shapeId);
+                bounds.push(markerGeoJson);
+              }
+            } else if (objectShape === "Line") {
+              const lineGeoJson = JSON.parse(geojson).map((coords) => {
+                if (coords.lat < -90 || coords.lat > 90 || coords.lng < -180 || coords.lng > 180) {
+                  ctrl.deleteShape(locContainer.dataset.shapeId);
+                  shapeFieldContainer.querySelector(`[data-shape-id="${locContainer.dataset.shapeId}"]`).remove();
+                  valid = false;
+                }
+                return [coords.lat, coords.lng];
+              })
+              if (valid) {
+                ctrl.addLine(lineGeoJson, "editEv", locContainer.dataset.shapeId);
+                bounds.push(lineGeoJson);
+              }
+            } else if (objectShape === "Polygon") {
+              const polygonGeoJson = JSON.parse(geojson).map(
+                (coord) => coord.map(
+                  (coords) => {
+                    if (coords.lat < -90 || coords.lat > 90 || coords.lng < -180 || coords.lng > 180) {
+                      ctrl.deleteShape(locContainer.dataset.shapeId);
+                      shapeFieldContainer.querySelector(`[data-shape-id="${locContainer.dataset.shapeId}"]`).remove();
+                      valid = false;
+                    }
+                    return [coords.lat, coords.lng];
+                  })
+              )
+              if (valid) {
+                ctrl.addPolygon(polygonGeoJson, "editEv", locContainer.dataset.shapeId);
+                bounds.push(polygonGeoJson);
+              }
+            };
+          } else {
+            shapeFieldContainer.querySelector(`[data-shape-id="${locContainer.dataset.shapeId}"]`).remove();
+          }
         }
       );
-      const area = new L.LatLngBounds(bounds)
-      ctrl.map.fitBounds(area);
+
+      if (bounds.length > 0) {
+        const area = new L.LatLngBounds(bounds);
+        ctrl.map.fitBounds(area);
+      }
     }
   });
 };
