@@ -5,3 +5,4 @@ development_app
 bundle.js
 *_manifest.js
 coverage
+app/packs/src/decidim/geoman
