@@ -750,7 +750,7 @@ describe "Map", type: :system do
           it "deletes the marker from the map" do
             page.execute_script(revgeo)
             add_marker
-            expect(page).to have_css(".leaflet-marker-icon")
+            expect(page).to have_css(".leaflet-marker-icon", visible: :all)
             find(".leaflet-marker-icon").click
             click_button "Delete shape"
             expect(page).not_to have_css(".leaflet-marker-icon")
