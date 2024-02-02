@@ -103,6 +103,10 @@ describe "Map", type: :system do
     end
   end
 
+  let(:geocode_response) { {} }
+  let(:before_render) { nil }
+
+  let(:use_revgeo) { false }
   let(:revgeo) do
     <<~JS
       $(function() {
@@ -137,24 +141,47 @@ describe "Map", type: :system do
     JS
   end
 
+  before do
+    if use_revgeo
+      # Autocomplete utility override
+      utility = Decidim::Map.autocomplete(organization: organization)
+      allow(Decidim::Map).to receive(:autocomplete).with(organization: organization).and_return(utility)
+      allow(utility).to receive(:builder_options).and_return(
+        api_key: "key1234"
+      )
+    end
+
+    before_render&.call
+
+    # Create a temporary route to display the generated HTML in a correct site
+    # context.
+    tile_content = File.read(Decidim::Dev.asset("icon.png"))
+    final_html = html_document
+    gcresponse = geocode_response.to_json
+
+    Rails.application.routes.draw do
+      # Map tiles
+      get "tiles/:z/:x/:y", to: ->(_) { [200, {}, [tile_content]] }
+
+      # The actual editor testing route for these specs
+      get "test_map", to: ->(_) { [200, {}, [final_html]] }
+
+      # Geocode response
+      get "geocode", to: ->(_) { [200, { "Content-Type" => "application/json" }, [gcresponse]] }
+    end
+
+    switch_to_host(organization.host)
+  end
+
+  after do
+    expect_no_js_errors
+
+    # Reset the routes back to original
+    Rails.application.reload_routes!
+  end
+
   context "when map cell rendered" do
     before do
-      # Create a temporary route to display the generated HTML in a correct site
-      # context.
-      tile_content = File.read(Decidim::Dev.asset("icon.png"))
-      final_html = html_document
-
-      Rails.application.routes.draw do
-        # Map tiles
-        get "/tiles/:z/:x/:y", to: ->(_) { [200, {}, [tile_content]] }
-
-        # The actual editor testing route for these specs
-        get "test_map", to: ->(_) { [200, {}, [final_html]] }
-      end
-
-      # Login needed for uploading the images
-      switch_to_host(organization.host)
-
       visit "/test_map"
 
       # Wait for the map to be rendered
@@ -166,13 +193,6 @@ describe "Map", type: :system do
 
         sleep 0.1
       end
-    end
-
-    after do
-      expect_no_js_errors
-
-      # Reset the routes back to original
-      Rails.application.reload_routes!
     end
 
     context "when cell called" do
@@ -275,6 +295,7 @@ describe "Map", type: :system do
       sleep 1
       page.execute_script(marker_add)
       find("div.leaflet-pm-actions-container a.leaflet-pm-action.action-cancel").click
+      sleep 1
     end
 
     def add_line(latitude: [60.24240524264389, 60.24116980538663], longitude: [25.10809421539307, 25.122342109680176])
@@ -289,6 +310,7 @@ describe "Map", type: :system do
       sleep 1
       page.execute_script(line_add)
       find("div.leaflet-pm-actions-container a.leaflet-pm-action.action-finish").click
+      sleep 1
     end
 
     def add_polygon(latitude: [85.05109772344713, 85.05106347807192, 85.05106162696384], longitude: [24.741251170635227, 24.7408863902092, 24.741551578044895])
@@ -306,6 +328,7 @@ describe "Map", type: :system do
       JS
       sleep 1
       page.execute_script(polygon_add)
+      sleep 1
     end
 
     def drag_marker
@@ -319,6 +342,7 @@ describe "Map", type: :system do
       JS
       sleep 1
       page.execute_script(marker_drag)
+      sleep 1
     end
 
     def drag_line
@@ -335,6 +359,7 @@ describe "Map", type: :system do
       JS
       sleep 1
       page.execute_script(line_drag)
+      sleep 1
     end
 
     def drag_polygon
@@ -352,6 +377,7 @@ describe "Map", type: :system do
       JS
       sleep 1
       page.execute_script(polygon_drag)
+      sleep 1
     end
 
     let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
@@ -364,11 +390,8 @@ describe "Map", type: :system do
     context "when geocoding" do
       # Console.warn print tool
       # puts page.driver.browser.manage.logs.get(:browser).map(&:message).join("\n")
-
-      before do
-        tile_content = File.read(Decidim::Dev.asset("icon.png"))
-        final_html = html_document
-        geocode_response = {
+      let(:geocode_response) do
+        {
           type: "FeatureCollection",
           features: [
             {
@@ -421,24 +444,9 @@ describe "Map", type: :system do
             }
           ]
         }
+      end
 
-        # Create a temporary route to display the generated HTML in a correct site
-        # context.
-
-        Rails.application.routes.draw do
-          # Map tiles
-          get "/tiles/:z/:x/:y", to: ->(_) { [200, {}, [tile_content]] }
-
-          # Geocode response
-          get "/geocode", to: ->(_) { [200, { "Content-Type" => "application/json" }, [geocode_response.to_json]] }
-
-          # The actual editor testing route for these specs
-          get "test_map", to: ->(_) { [200, {}, [final_html]] }
-        end
-
-        # Login needed for uploading the images
-        switch_to_host(organization.host)
-
+      before do
         visit "/test_map"
 
         # Wait for the map to be rendered
@@ -450,13 +458,6 @@ describe "Map", type: :system do
 
           sleep 0.1
         end
-      end
-
-      after do
-        expect_no_js_errors
-
-        # Reset the routes back to original
-        Rails.application.reload_routes!
       end
 
       context "when typing locations" do
@@ -542,27 +543,9 @@ describe "Map", type: :system do
     end
 
     context "when reverse geocoding" do
+      let(:use_revgeo) { true }
+
       before do
-        utility = Decidim::Map.autocomplete(organization: organization)
-        allow(Decidim::Map).to receive(:autocomplete).with(organization: organization).and_return(utility)
-        allow(utility).to receive(:builder_options).and_return(
-          api_key: "key1234"
-        )
-
-        tile_content = File.read(Decidim::Dev.asset("icon.png"))
-        final_html = html_document
-
-        Rails.application.routes.draw do
-          # Map tiles
-          get "/tiles/:z/:x/:y", to: ->(_) { [200, {}, [tile_content]] }
-
-          # The actual editor testing route for these specs
-          get "test_map", to: ->(_) { [200, {}, [final_html]] }
-        end
-
-        # Login needed for uploading the images
-        switch_to_host(organization.host)
-
         visit "/test_map"
 
         # Wait for the map to be rendered
@@ -574,13 +557,6 @@ describe "Map", type: :system do
 
           sleep 0.1
         end
-      end
-
-      after do
-        expect_no_js_errors
-
-        # Reset the routes back to original
-        Rails.application.reload_routes!
       end
 
       context "when picking locations" do
@@ -860,6 +836,7 @@ describe "Map", type: :system do
       let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
       let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "single", coords: [12, 2], checkbox: false) }
       let(:cell_two) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "multiple", coords: [12, 2], checkbox: false) }
+      let(:use_dummy_random_ids) { true }
 
       let(:html_document) do
         cell_html = cell.to_s
@@ -888,29 +865,14 @@ describe "Map", type: :system do
         end
       end
 
-      before do
-        utility = Decidim::Map.autocomplete(organization: organization)
-        allow(Decidim::Map).to receive(:autocomplete).with(organization: organization).and_return(utility)
-        allow(utility).to receive(:builder_options).and_return(
-          api_key: "key1234"
-        )
-        allow(cell).to receive(:random_id).and_return("example")
-        allow(cell_two).to receive(:random_id).and_return("exampletwo")
-
-        tile_content = File.read(Decidim::Dev.asset("icon.png"))
-        final_html = html_document
-
-        Rails.application.routes.draw do
-          # Map tiles
-          get "/tiles/:z/:x/:y", to: ->(_) { [200, {}, [tile_content]] }
-
-          # The actual editor testing route for these specs
-          get "test_map", to: ->(_) { [200, {}, [final_html]] }
+      let(:before_render) do
+        lambda do
+          allow(cell).to receive(:random_id).and_return("example")
+          allow(cell_two).to receive(:random_id).and_return("exampletwo")
         end
+      end
 
-        # Login needed for uploading the images
-        switch_to_host(organization.host)
-
+      before do
         visit "/test_map"
 
         # Wait for the map to be rendered
@@ -922,13 +884,6 @@ describe "Map", type: :system do
 
           sleep 0.1
         end
-      end
-
-      after do
-        expect_no_js_errors
-
-        # Reset the routes back to original
-        Rails.application.reload_routes!
       end
 
       it "renders multiple maps" do
@@ -971,28 +926,7 @@ describe "Map", type: :system do
       let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: map_configuration, coords: [12, 2], checkbox: true) }
 
       before do
-        tile_content = File.read(Decidim::Dev.asset("icon.png"))
-        final_html = html_document
-
-        Rails.application.routes.draw do
-          # Map tiles
-          get "/tiles/:z/:x/:y", to: ->(_) { [200, {}, [tile_content]] }
-
-          # The actual editor testing route for these specs
-          get "test_map", to: ->(_) { [200, {}, [final_html]] }
-        end
-
-        # Login needed for uploading the images
-        switch_to_host(organization.host)
-
         visit "/test_map"
-      end
-
-      after do
-        expect_no_js_errors
-
-        # Reset the routes back to original
-        Rails.application.reload_routes!
       end
 
       it "checks the box if text is clicked" do
