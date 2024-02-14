@@ -82,7 +82,7 @@ export default () => {
         address: typeLocInput.value,
         position: { lat: typeLocCoords[0], lng: typeLocCoords[1] },
         shapeId: shapeId,
-        objectShape: "Marker",
+        objectShape: "Point",
         coordinates: { lat: typeLocCoords[0], lng: typeLocCoords[1] }
       };
       typeLocInput.value = "";
@@ -170,7 +170,14 @@ export default () => {
 
     ctrl.setEventHandler("shapeadd", (shape, ev) => {
       const shapeId = shape.options.id;
-      const objectShape = shape.pm._shape;
+      let objectShape = shape.pm._shape;
+
+      if (objectShape === "Marker") {
+        objectShape = "Point";
+      } else if (objectShape === "Line") {
+        objectShape = "LineString";
+      }
+
       let coordinates = null;
 
       if (ev !== "editEv") {
@@ -183,9 +190,9 @@ export default () => {
         };
         addShapeField(shapeFieldContainer, shapeId);
         if (ev === "clickEv") {
-          if (objectShape === "Marker") {
+          if (objectShape === "Point") {
             coordinates = shape.getLatLng();
-          } else if (objectShape === "Line" || objectShape === "Polygon") {
+          } else if (objectShape === "LineString" || objectShape === "Polygon") {
             coordinates = shape._latlngs;
           };
           ctrl.bindFetchPopup(shapeId);
@@ -217,9 +224,9 @@ export default () => {
       shape.on("pm:dragend", () => {
         ctrl.bindFetchPopup(shapeId);
 
-        if (objectShape === "Marker") {
+        if (objectShape === "Point") {
           $(mapEl).trigger("geocoder-reverse.decidim", [shape.getLatLng(), { shapeId, objectShape }]);
-        } else if (objectShape === "Polygon" || objectShape === "Line") {
+        } else if (objectShape === "Polygon" || objectShape === "LineString") {
           coordinates = shape._latlngs;
           $(mapEl).trigger("geocoder-reverse.decidim", [centerShape(shape._latlngs, objectShape), { shapeId, objectShape, coordinates }]);
         };
@@ -235,7 +242,7 @@ export default () => {
           if (validJson(geojson)) {
             let valid = true;
 
-            if (objectShape === "Marker") {
+            if (objectShape === "Point") {
               const markerGeoJson = JSON.parse(geojson)
               if (markerGeoJson.lat < -90 || markerGeoJson.lat > 90 || markerGeoJson.lng < -180 || markerGeoJson.lng > 180) {
                 ctrl.deleteShape(locContainer.dataset.shapeId);
@@ -246,7 +253,7 @@ export default () => {
                 ctrl.addMarker(markerGeoJson, "editEv", locContainer.dataset.shapeId);
                 bounds.push(markerGeoJson);
               }
-            } else if (objectShape === "Line") {
+            } else if (objectShape === "LineString") {
               const lineGeoJson = JSON.parse(geojson).map((coords) => {
                 if (coords.lat < -90 || coords.lat > 90 || coords.lng < -180 || coords.lng > 180) {
                   ctrl.deleteShape(locContainer.dataset.shapeId);

@@ -1,4 +1,5 @@
 import getDistanceBetweenPoints from "./point_distance.js";
+import buildGeoJson from "./build_geojson.js";
 
 const addInputGroup = function (shapeFieldContainer, addressData, wrapperEl) {
   const shapeId = addressData.shapeId;
@@ -16,13 +17,13 @@ const addInputGroup = function (shapeFieldContainer, addressData, wrapperEl) {
     if (shapeRadius < 200) {
       shapeField.querySelector(".location-latitude").value = lat;
       shapeField.querySelector(".location-longitude").value = lng;
-      shapeField.querySelector(".location-geojson").value = coordinates;
+      shapeField.querySelector(".location-geojson").value = JSON.stringify(buildGeoJson(coordinates, objectShape));
     } else {
       shapeField.querySelector(".location-address").value = address;
       shapeField.querySelector(".location-shape").value = objectShape;
       shapeField.querySelector(".location-latitude").value = lat;
       shapeField.querySelector(".location-longitude").value = lng;
-      shapeField.querySelector(".location-geojson").value = coordinates;
+      shapeField.querySelector(".location-geojson").value = JSON.stringify(buildGeoJson(coordinates, objectShape));
     }
   } else {
     const template = wrapperEl.querySelector(`#model_input_template-${wrapperEl.querySelector("[data-decidim-map]").id}`);
@@ -42,7 +43,7 @@ const addInputGroup = function (shapeFieldContainer, addressData, wrapperEl) {
     lngInput.name = lngInput.name.replace("%index%", shapeId);
     lngInput.value = lng;
     geoJsonInput.name = geoJsonInput.name.replace("%index%", shapeId);
-    geoJsonInput.value = coordinates;
+    geoJsonInput.value = JSON.stringify(buildGeoJson(coordinates, objectShape));
 
     shapeField.appendChild(clone);
   };

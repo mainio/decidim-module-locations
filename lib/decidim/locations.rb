@@ -9,5 +9,6 @@ module Decidim
     autoload :Locatable, "decidim/locations/locatable"
     autoload :QueryExtensions, "decidim/locations/query_extensions"
     autoload :SettingsManifestExtensions, "decidim/locations/settings_manifest_extensions"
+    autoload :LocationSerializer, "decidim/locations/location_serializer"
   end
 end

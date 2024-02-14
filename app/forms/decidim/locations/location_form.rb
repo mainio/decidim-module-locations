@@ -28,9 +28,9 @@ module Decidim
       def json_validation
         geo_parse = JSON.parse(geojson)
         case shape
-        when "Marker"
+        when "Point"
           valid_marker?(geo_parse)
-        when "Line"
+        when "LineString"
           valid_line?(geo_parse)
         when "Polygon"
           valid_polygon?(geo_parse)

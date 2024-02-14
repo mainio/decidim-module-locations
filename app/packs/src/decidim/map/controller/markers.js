@@ -45,11 +45,11 @@ export default class MapMarkersController extends MapController {
 
     markersData.forEach((markerData) => {
       let shape = {}
-      if (markerData.shape === "Marker") {
+      if (markerData.shape === "Point") {
         shape = L.marker([markerData.latitude, markerData.longitude], {
           title: markerData.title
         })
-      } else if (markerData.shape === "Line") {
+      } else if (markerData.shape === "LineString") {
         shape = L.polyline(JSON.parse(markerData.geojson).map((coords) => [coords.lat, coords.lng]), {
           title: markerData.title
         })
