@@ -17,6 +17,11 @@ module Decidim
         config.to_prepare do
           # Helper
           Decidim::Admin::SettingsHelper.include(Decidim::Locations::SettingsHelperExtensions)
+
+          # Lib
+          Decidim::Proposals::ProposalsType.include(Decidim::Locations::ProposalsTypeExtensions)
+          Decidim::Meetings::MeetingsType.include(Decidim::Locations::MeetingsTypeExtensions)
+          Decidim::Accountability::AccountabilityType.include(Decidim::Locations::AccountabilityTypeExtensions)
         end
       end
 
