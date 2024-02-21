@@ -39,7 +39,19 @@ export default class MapMarkersController extends MapController {
 
     const bounds = new L.LatLngBounds(
       markersData.map(
-        (markerData) => [markerData.latitude, markerData.longitude]
+        (markerData) => {
+          if (markerData.shape === "LineString") {
+            return JSON.parse(markerData.geojson).geometry.coordinates.map(
+              (coords) => [coords[0], coords[1]]
+            )
+          } else if (markerData.shape === "Polygon") {
+            return JSON.parse(markerData.geojson).geometry.coordinates.map(
+              (coord) => coord.map((coords) => [coords[0], coords[1]])
+            )
+          }
+
+          return [markerData.latitude, markerData.longitude]
+        }
       )
     );
 
@@ -50,11 +62,13 @@ export default class MapMarkersController extends MapController {
           title: markerData.title
         })
       } else if (markerData.shape === "LineString") {
-        shape = L.polyline(JSON.parse(markerData.geojson).map((coords) => [coords.lat, coords.lng]), {
+        shape = L.polyline(JSON.parse(markerData.geojson).geometry.coordinates.map(
+          (coords) => [coords[0], coords[1]]), {
           title: markerData.title
         })
       } else if (markerData.shape === "Polygon") {
-        shape = L.polygon(JSON.parse(markerData.geojson).map((coord) => coord.map((coords) => [coords.lat, coords.lng])), {
+        shape = L.polygon(JSON.parse(markerData.geojson).geometry.coordinates.map(
+          (coord) => coord.map((coords) => [coords[0], coords[1]])), {
           title: markerData.title
         })
       }

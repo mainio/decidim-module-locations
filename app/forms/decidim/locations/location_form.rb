@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "rgeo"
+require "rgeo/geo_json"
+
 module Decidim
   module Locations
     # A form object to be represent a location.
@@ -26,39 +29,37 @@ module Decidim
       private
 
       def json_validation
-        geo_parse = JSON.parse(geojson)
+        # check if GeoJSON is valid
+        begin
+          geo_factory = RGeo::Geographic.spherical_factory
+
+          RGeo::GeoJSON.decode(geojson, geo_factory: geo_factory)
+        rescue JSON::ParserError
+          errors.add(:geojson, "Invalid GeoJSON")
+          return
+        end
+
+        # check that coordinates are valid
+        geo_parse = JSON.parse(geojson)["geometry"]["coordinates"]
+
         case shape
         when "Point"
-          valid_marker?(geo_parse)
+          valid_coord?(geo_parse)
         when "LineString"
-          valid_line?(geo_parse)
+          geo_parse.each do |coords|
+            valid_coord?(coords)
+          end
         when "Polygon"
-          valid_polygon?(geo_parse)
-        end
-      rescue JSON::ParserError
-        errors.add(:geojson, "Invalid value")
-      end
-
-      def valid_marker?(geo_parse)
-        valid_coord?(geo_parse)
-      end
-
-      def valid_line?(geo_parse)
-        geo_parse.map do |coord|
-          valid_coord?(coord)
-        end
-      end
-
-      def valid_polygon?(geo_parse)
-        geo_parse.each do |coords|
-          coords.each do |coord|
-            valid_coord?(coord)
+          geo_parse.each do |array|
+            array.each do |coords|
+              valid_coord?(coords)
+            end
           end
         end
       end
 
-      def valid_coord?(geo_parse)
-        errors.add(:geojson, "Invalid coordinates") unless geo_parse["lat"].between?(-90, 90) && geo_parse["lng"].between?(-180, 180)
+      def valid_coord?(coords)
+        errors.add(:geojson, "Invalid coordinates") unless coords[0].between?(-90, 90) && coords[1].between?(-180, 180)
       end
     end
   end

@@ -243,8 +243,8 @@ export default () => {
             let valid = true;
 
             if (objectShape === "Point") {
-              const markerGeoJson = JSON.parse(geojson)
-              if (markerGeoJson.lat < -90 || markerGeoJson.lat > 90 || markerGeoJson.lng < -180 || markerGeoJson.lng > 180) {
+              const markerGeoJson = JSON.parse(geojson).geometry.coordinates
+              if (markerGeoJson[0] < -90 || markerGeoJson[0] > 90 || markerGeoJson[1] < -180 || markerGeoJson[1] > 180) {
                 ctrl.deleteShape(locContainer.dataset.shapeId);
                 shapeFieldContainer.querySelector(`[data-shape-id="${locContainer.dataset.shapeId}"]`).remove();
                 valid = false;
@@ -254,28 +254,28 @@ export default () => {
                 bounds.push(markerGeoJson);
               }
             } else if (objectShape === "LineString") {
-              const lineGeoJson = JSON.parse(geojson).map((coords) => {
-                if (coords.lat < -90 || coords.lat > 90 || coords.lng < -180 || coords.lng > 180) {
+              const lineGeoJson = JSON.parse(geojson).geometry.coordinates.map((coords) => {
+                if (coords[0] < -90 || coords[0] > 90 || coords[1] < -180 || coords[1] > 180) {
                   ctrl.deleteShape(locContainer.dataset.shapeId);
                   shapeFieldContainer.querySelector(`[data-shape-id="${locContainer.dataset.shapeId}"]`).remove();
                   valid = false;
                 }
-                return [coords.lat, coords.lng];
+                return [coords[0], coords[1]];
               })
               if (valid) {
                 ctrl.addLine(lineGeoJson, "editEv", locContainer.dataset.shapeId);
                 bounds.push(lineGeoJson);
               }
             } else if (objectShape === "Polygon") {
-              const polygonGeoJson = JSON.parse(geojson).map(
+              const polygonGeoJson = JSON.parse(geojson).geometry.coordinates.map(
                 (coord) => coord.map(
                   (coords) => {
-                    if (coords.lat < -90 || coords.lat > 90 || coords.lng < -180 || coords.lng > 180) {
+                    if (coords[0] < -90 || coords[0] > 90 || coords[1] < -180 || coords[1] > 180) {
                       ctrl.deleteShape(locContainer.dataset.shapeId);
                       shapeFieldContainer.querySelector(`[data-shape-id="${locContainer.dataset.shapeId}"]`).remove();
                       valid = false;
                     }
-                    return [coords.lat, coords.lng];
+                    return [coords[0], coords[1]];
                   })
               )
               if (valid) {
