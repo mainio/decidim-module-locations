@@ -11,10 +11,12 @@ describe Decidim::Locations::LocationForm do
     let(:attributes) do
       {
         address: "Veneentekijäntie 4 A, 00210 Helsinki",
-        latitude: 60.149792,
+        latitude: 50.149792,
         longitude: 24.887430,
-        shape: "Marker",
-        geojson: "{ \"lat\":60.149792,\"lng\":24.887430 }"
+        shape: "Point",
+        geojson: "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",
+                  \"coordinates\":[50.25354187363282,18.457031250000004]
+                  }}"
       }
     end
 
@@ -43,10 +45,12 @@ describe Decidim::Locations::LocationForm do
     let(:attributes) do
       {
         address: "",
-        latitude: 60.149792,
+        latitude: 50.149792,
         longitude: 24.887430,
-        shape: "Marker",
-        geojson: "{ \"lat\":60.149792,\"lng\":24.887430 }"
+        shape: "Point",
+        geojson: "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",
+                  \"coordinates\":[50.25354187363282,18.457031250000004]
+                  }}"
       }
     end
 
@@ -57,9 +61,9 @@ describe Decidim::Locations::LocationForm do
     let(:attributes) do
       {
         address: "",
-        latitude: 60.149792,
+        latitude: 50.149792,
         longitude: 24.887430,
-        shape: "Marker",
+        shape: "Point",
         geojson: ""
       }
     end
@@ -72,10 +76,12 @@ describe Decidim::Locations::LocationForm do
       let(:attributes) do
         {
           address: "Veneentekijäntie 4 A, 00210 Helsinki",
-          latitude: 60.149792,
+          latitude: 50.149792,
           longitude: 24.887430,
-          shape: "Marker",
-          geojson: "{ \"lat\":Example,\"lng\":24.887430 }"
+          shape: "Point",
+          geojson: "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",
+                    \"coordinates\":[example,18.457031250000004]
+                    }}"
         }
       end
 
@@ -86,10 +92,12 @@ describe Decidim::Locations::LocationForm do
       let(:attributes) do
         {
           address: "Veneentekijäntie 4 A, 00210 Helsinki",
-          latitude: 90.149792,
+          latitude: 50.149792,
           longitude: 24.887430,
-          shape: "Marker",
-          geojson: "{ \"lat\":90.149792,\"lng\":24.887430 }"
+          shape: "Point",
+          geojson: "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",
+                    \"coordinates\":[210.25354187363282,18.457031250000004]
+                    }}"
         }
       end
 

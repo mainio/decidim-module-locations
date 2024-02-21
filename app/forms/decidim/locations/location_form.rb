@@ -44,16 +44,34 @@ module Decidim
 
         case shape
         when "Point"
-          valid_coord?(geo_parse)
+          valid_point?(geo_parse)
         when "LineString"
           geo_parse.each do |coords|
-            valid_coord?(coords)
+            valid_line?(coords)
           end
         when "Polygon"
           geo_parse.each do |array|
             array.each do |coords|
-              valid_coord?(coords)
+              valid_polygon?(coords)
             end
+          end
+        end
+      end
+
+      def valid_point?(coords)
+        valid_coord?(coords)
+      end
+
+      def valid_line?(coords)
+        coords.each do |coord|
+          valid_coord?(coord)
+        end
+      end
+
+      def valid_polygon?(coords)
+        coords.each do |array|
+          array.each do |coord|
+            valid_coord?(coord)
           end
         end
       end
