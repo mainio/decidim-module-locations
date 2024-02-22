@@ -19,7 +19,7 @@ module Decidim
           geometry: {
             type: @location.shape,
             coordinates:
-              @location.geojson
+              @location.geojson["geometry"]["coordinates"]
           },
           properties:
             if @location.decidim_locations_locatable_type != "Decidim::Forms::Answer"
@@ -31,7 +31,7 @@ module Decidim
                              elsif record.where(id: @location.decidim_locations_locatable_id).first.respond_to?(:body)
                                record.where(id: @location.decidim_locations_locatable_id).first.body
                              end,
-                type: record.name.demodulize
+                type: record.name
               }
             elsif @location.decidim_locations_locatable_type == "Decidim::Forms::Answer"
               {
