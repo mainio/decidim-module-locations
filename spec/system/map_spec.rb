@@ -33,44 +33,62 @@ describe "Map", type: :system do
   let(:template) { template_class.new(ActionView::LookupContext.new(ActionController::Base.view_paths), {}, controller) }
   let(:marker) do
     [[
-      123, "Title of the marker", "Summary of the record", "Body text of the record", "Foobar street 123",
-      60.25013831397032, 25.11058330535889, "Marker", { "lat" => 60.25013831397032, "lng" => 25.11058330535889 }
+      12, "Title of the marker", "Summary of the record", "Body text of the record", "Foobar street 123",
+      60.25013831397032, 25.11058330535889, "Point",
+      '{"type":"Feature",
+      "geometry":{"type":"Point",
+      "coordinates":[60.25013831397032, 25.11058330535889]}}'
     ]]
   end
 
   let(:line) do
     [[
-      123, "Title of the line", "Summary of the record", "Body text of the record", "Foobar street 123",
-      60.241787524015265, 25.11521816253662, "Line", '[{ "lat": 60.24240524264389, "lng": 25.10809421539307 },
-      { "lat": 60.24116980538663, "lng": 25.122342109680176 }]'
+      13, "Title of the line", "Summary of the record", "Body text of the record", "Foobar street 123",
+      60.241787524015265, 25.11521816253662, "LineString",
+      '{"type":"Feature",
+      "geometry":{"type":"LineString",
+      "coordinates":[[60.24240524264389,25.10809421539307],
+      [60.24116980538663,25.122342109680176]]}}'
     ]]
   end
 
   let(:polygon) do
     [[
-      123, "Title of the polygon", "Summary of the record", "Body text of the record", "Foobar street 123",
-      60.2455574969813, 25.109066963195804, "Polygon", '[[{ "lat": 60.24721874334426, "lng": 25.109295845031742 },
-      { "lat": 60.24381102836454, "lng": 25.114445686340336 },
-      { "lat": 60.2456427192351, "lng": 25.103459358215336 }]]'
+      23, "Title of the polygon", "Summary of the record", "Body text of the record", "Foobar street 123",
+      60.2455574969813, 25.109066963195804, "Polygon",
+      '{"type":"Feature",
+      "geometry":{"type":"Polygon",
+      "coordinates":[[[60.24721874334426,25.109295845031742],
+      [60.24381102836454,25.114445686340336],
+      [60.2456427192351,25.103459358215336]]]}}'
     ]]
   end
 
   let(:all_shapes) do
     [
       [
-        123, "Title of the marker", "Summary of the record", "Body text of the record", "Foobar street 123",
-        60.25013831397032, 25.11058330535889, "Marker", { "lat" => 60.25013831397032, "lng" => 25.11058330535889 }
+        12, "Title of the marker", "Summary of the record", "Body text of the record", "Foobar street 123",
+        60.25013831397032, 25.11058330535889, "Point",
+        '{"type":"Feature",
+        "geometry":{"type":"Point",
+        "coordinates":[60.25013831397032, 25.11058330535889]}}'
       ],
       [
-        123, "Title of the line", "Summary of the record", "Body text of the record", "Foobar street 123",
-        60.241787524015265, 25.11521816253662, "Line", '[{ "lat": 60.24240524264389, "lng": 25.10809421539307 },
-        { "lat": 60.24116980538663, "lng": 25.122342109680176 }]'
+        13, "Title of the line", "Summary of the record", "Body text of the record", "Foobar street 123",
+        60.241787524015265, 25.11521816253662, "LineString",
+        '{"type":"Feature",
+        "geometry":{"type":"LineString",
+        "coordinates":[[60.24240524264389,25.10809421539307],
+        [60.24116980538663,25.122342109680176]]}}'
       ],
       [
-        123, "Title of the polygon", "Summary of the record", "Body text of the record", "Foobar street 123",
-        60.2455574969813, 25.109066963195804, "Polygon", '[[{ "lat": 60.24721874334426, "lng": 25.109295845031742 },
-        { "lat": 60.24381102836454, "lng": 25.114445686340336 },
-        { "lat": 60.2456427192351, "lng": 25.103459358215336 }]]'
+        23, "Title of the polygon", "Summary of the record", "Body text of the record", "Foobar street 123",
+        60.2455574969813, 25.109066963195804, "Polygon",
+        '{"type":"Feature",
+        "geometry":{"type":"Polygon",
+        "coordinates":[[[60.24721874334426,25.109295845031742],
+        [60.24381102836454,25.114445686340336],
+        [60.2456427192351,25.103459358215336]]]}}'
       ]
     ]
   end
@@ -247,7 +265,6 @@ describe "Map", type: :system do
     end
 
     def drag_marker
-      find('div[title="Drag Layers"] a').click
       marker_drag = <<~JS
         var ctrl = $(".picker-wrapper [data-decidim-map]").data("map-controller");
         var marker = ctrl.shapes[Object.keys(ctrl.shapes)[0]];
@@ -261,7 +278,6 @@ describe "Map", type: :system do
     end
 
     def drag_line
-      find('div[title="Drag Layers"] a').click
       line_drag = <<~JS
         var ctrl = $(".picker-wrapper [data-decidim-map]").data("map-controller");
         var line = ctrl.shapes[Object.keys(ctrl.shapes)[0]];
@@ -278,7 +294,6 @@ describe "Map", type: :system do
     end
 
     def drag_polygon
-      find('div[title="Drag Layers"] a').click
       polygon_drag = <<~JS
         var ctrl = $(".picker-wrapper [data-decidim-map]").data("map-controller");
         var polygon = ctrl.shapes[Object.keys(ctrl.shapes)[0]];
