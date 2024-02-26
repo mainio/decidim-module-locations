@@ -269,7 +269,7 @@ describe "Map", type: :system do
         var ctrl = $(".picker-wrapper [data-decidim-map]").data("map-controller");
         var marker = ctrl.shapes[Object.keys(ctrl.shapes)[0]];
 
-        marker.setLatLng(L.latLng(13.2, 11.4));
+        marker.setLatLng([13.2, 11.4]);
         marker.fire("pm:dragend");
       JS
       sleep 1
