@@ -10,7 +10,8 @@ const addInputGroup = function (shapeFieldContainer, addressData, wrapperEl) {
   const coordinates = JSON.stringify(addressData.coordinates);
   const shapeField = shapeFieldContainer.querySelector(`[data-shape-id="${shapeId}"]`);
   if (shapeField.hasChildNodes()) {
-    const oldCoords = [shapeField.querySelector(".location-latitude").value, shapeField.querySelector(".location-longitude").value];
+    const oldCoords = [shapeField.querySelector(".location-latitude").value,
+      shapeField.querySelector(".location-longitude").value];
     const newCoords = [lat, lng];
     const shapeRadius = getDistanceBetweenPoints(oldCoords, newCoords);
 
@@ -26,7 +27,8 @@ const addInputGroup = function (shapeFieldContainer, addressData, wrapperEl) {
       shapeField.querySelector(".location-geojson").value = JSON.stringify(buildGeoJson(coordinates, objectShape));
     }
   } else {
-    const template = wrapperEl.querySelector(`#model_input_template-${wrapperEl.querySelector("[data-decidim-map]").id}`);
+    const template = wrapperEl.querySelector(`#model_input_template-${wrapperEl.querySelector(
+      "[data-decidim-map]").id}`);
     const clone = template.content.cloneNode(true);
     const addressInput = clone.querySelector(".location-address");
     const shapeInput = clone.querySelector(".location-shape");

@@ -225,7 +225,8 @@ export default () => {
         ctrl.bindFetchPopup(shapeId);
 
         if (objectShape === "Point") {
-          $(mapEl).trigger("geocoder-reverse.decidim", [shape.getLatLng(), { shapeId, objectShape }]);
+          coordinates = shape.getLatLng();
+          $(mapEl).trigger("geocoder-reverse.decidim", [shape.getLatLng(), { shapeId, objectShape, coordinates }]);
         } else if (objectShape === "Polygon" || objectShape === "LineString") {
           coordinates = shape._latlngs;
           $(mapEl).trigger("geocoder-reverse.decidim", [centerShape(shape._latlngs, objectShape), { shapeId, objectShape, coordinates }]);
