@@ -13,5 +13,6 @@ module Decidim
     autoload :ProposalsTypeExtensions, "decidim/locations/api/concerns/proposals_type_extensions.rb"
     autoload :MeetingsTypeExtensions, "decidim/locations/api/concerns/meetings_type_extensions.rb"
     autoload :AccountabilityTypeExtensions, "decidim/locations/api/concerns/accountability_type_extensions.rb"
+    autoload :SurveysTypeExtensions, "decidim/locations/api/concerns/surveys_type_extensions.rb"
   end
 end
