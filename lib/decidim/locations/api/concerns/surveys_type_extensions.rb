@@ -9,6 +9,10 @@ module Decidim
         field :geojson, [GraphQL::Types::JSON], "The geojson for all proposal locations under this component", null: true
 
         def geojson
+          current_user = context&.dig(:current_user)
+
+          return nil unless current_user && current_user.admin?
+
           component_id = object.id
           survey = Decidim::Surveys::Survey.where(decidim_component_id: component_id).first
 
