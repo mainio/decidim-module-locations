@@ -11,7 +11,7 @@ module Decidim
         def geojson
           current_user = context&.dig(:current_user)
 
-          return nil unless current_user && current_user.admin?
+          return unless current_user && current_user.admin?
 
           component_id = object.id
           survey = Decidim::Surveys::Survey.where(decidim_component_id: component_id).first
