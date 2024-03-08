@@ -18,9 +18,6 @@
           <% form.fields_for :locations do |locations| %>
             <% locations.fields_for "#{ loc.id ||= new_id }" do |location| %>
               <%= location.hidden_field :address, class: "location-address", autocomplete: "off", value: loc.address %>
-              <%= location.hidden_field :shape, class: "location-shape", autocomplete: "off", value: loc.shape %>
-              <%= location.hidden_field :latitude, class: "location-latitude", autocomplete: "off", value: loc.latitude %>
-              <%= location.hidden_field :longitude, class: "location-longitude", autocomplete: "off", value: loc.longitude %>
               <%= location.hidden_field :geojson, class: "location-geojson", autocomplete: "off", value: loc.geojson %>
             <% end %>
           <% end %>
@@ -32,9 +29,6 @@
       <% form.fields_for :locations do |locations| %>
         <% locations.fields_for "%index%" do |location| %>
           <%= location.hidden_field :address, class: "location-address", autocomplete: "off" %>
-          <%= location.hidden_field :shape, class: "location-shape", autocomplete: "off" %>
-          <%= location.hidden_field :latitude, class: "location-latitude", autocomplete: "off" %>
-          <%= location.hidden_field :longitude, class: "location-longitude", autocomplete: "off" %>
           <%= location.hidden_field :geojson, class: "location-geojson", autocomplete: "off" %>
         <% end %>
       <% end %>

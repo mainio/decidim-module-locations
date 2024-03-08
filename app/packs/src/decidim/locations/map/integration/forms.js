@@ -80,7 +80,6 @@ export default () => {
       const shapeId = ctrl.addMarker(typeLocCoords, "typeEv");
       const addressData = {
         address: typeLocInput.value,
-        position: { lat: typeLocCoords[0], lng: typeLocCoords[1] },
         shapeId: shapeId,
         objectShape: "Point",
         coordinates: { lat: typeLocCoords[0], lng: typeLocCoords[1] }

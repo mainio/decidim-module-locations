@@ -1,13 +1,21 @@
+import { getFirstValue } from "src/decidim/locations/map/integration/point_distance.js"
+
 const coordAverage = function (shapeFieldContainer, wrapperEl) {
-  const latArr = Array.from(shapeFieldContainer.querySelectorAll(".location-latitude"));
+  const latArr = Array.from(shapeFieldContainer.querySelectorAll(".location-geojson"));
   const latitudes = [];
-  latArr.map((val) => latitudes.push(parseFloat(val.value)));
+  latArr.forEach((val) => {
+    const value = JSON.parse(val.value).geometry;
+    latitudes.push(getFirstValue(value.coordinates, 0, value.type));
+  });
   let latAvg = latitudes.reduce((pv, cv) => pv + cv, 0);
   latAvg /= latitudes.length;
 
-  const lngArr = Array.from(shapeFieldContainer.querySelectorAll(".location-longitude"));
+  const lngArr = Array.from(shapeFieldContainer.querySelectorAll(".location-geojson"));
   const longitudes = [];
-  lngArr.map((val) => longitudes.push(parseFloat(val.value)));
+  lngArr.forEach((val) => {
+    const value = JSON.parse(val.value).geometry;
+    longitudes.push(getFirstValue(value.coordinates, 1, value.type));
+  });
   let lngAvg = longitudes.reduce((pv, cv) => pv + cv, 0);
   lngAvg /= longitudes.length;
 

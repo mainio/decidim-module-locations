@@ -25,11 +25,15 @@ module Decidim
             next
           end
 
+          geometry = location.geojson[:geometry]
+
+          avgCoordinates = geometry[:coordinates]
+
           attributes = {
             address: location.address,
             latitude: location.latitude,
             longitude: location.longitude,
-            shape: location.shape,
+            shape: geometry[:type],
             geojson: location.geojson
           }
 
