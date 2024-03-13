@@ -97,7 +97,7 @@
     </div>
 
     <div id="pick_model_locations_map-<%= random_id %>">
-      <%= dynamic_map_for({ type: "model_location"}, { id: random_id, data: { decidim_revgeocoding: geocoding_options, map_configuration: map_configuration, lat: coords[0], lng: coords[1] }}) do %>
+      <%= dynamic_map_for({ type: "model_location"}, { id: random_id, data: { decidim_revgeocoding: geocoding_options, map_configuration: map_configuration, lat: coords[0], lng: coords[1], select_location: select_location? }}) do %>
         <% add_snippets %>
       <% end %>
     </div>

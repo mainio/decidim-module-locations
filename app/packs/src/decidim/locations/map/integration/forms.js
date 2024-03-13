@@ -1,8 +1,8 @@
-import addShapeField from "./add_shape_field.js";
-import addInputGroup from "./add_input_group.js";
-import coordAverage from "./coord_average.js";
-import centerShape from "./center_shape.js";
-import validJson from "./valid_json.js";
+import addShapeField from "src/decidim/locations/map/integration/add_shape_field.js";
+import addInputGroup from "src/decidim/locations/map/integration/add_input_group.js";
+import coordAverage from "src/decidim/locations/map/integration/coord_average.js";
+import centerShape from "src/decidim/locations/map/integration/center_shape.js";
+import addExistingShapes from "src/decidim/locations/map/integration/add_existing_shapes";
 
 export default () => {
   document.querySelectorAll("[data-location-picker]").forEach((wrapperEl) => {
@@ -19,9 +19,10 @@ export default () => {
     const locationCheckBox = wrapperEl.querySelector(["[has_location]", "has_location"].map((suffix) => `input[type="checkbox"][name$="${suffix}"]`));
     const modelLoc = wrapperEl.querySelector(".picker-wrapper");
     const containerShapeField = shapeFieldContainer.querySelectorAll(".shape-field");
-    const mapConfig = mapEl.dataset.mapConfiguration
-    const averageInput = wrapperEl.querySelector(".model-longitude") && wrapperEl.querySelector(".model-latitude")
-    const clear = wrapperEl.querySelector('[data-action="clear-shapes"]')
+    const mapConfig = mapEl.dataset.mapConfiguration;
+    const selectLocation = mapEl.dataset.selectLocation;
+    const averageInput = wrapperEl.querySelector(".model-longitude") && wrapperEl.querySelector(".model-latitude");
+    const clear = wrapperEl.querySelector('[data-action="clear-shapes"]');
 
     const locationCheck = () => {
       if (locationCheckBox && locationCheckBox.checked) {
@@ -107,11 +108,13 @@ export default () => {
       ctrl.unbindPopup(addressData.shapeId);
       ctrl.bindNoDataPopup(addressData.shapeId);
       addInputGroup(shapeFieldContainer, addressData, wrapperEl);
-      if (averageInput) {
-        coordAverage(shapeFieldContainer, wrapperEl);
-      };
-      shapeFieldContainer.querySelector(`[data-shape-id="${addressData.shapeId}"]`).querySelector(
-        ".location-address").value = "No address found";
+      if (!selectLocation) {
+        if (averageInput) {
+          coordAverage(shapeFieldContainer, wrapperEl);
+        };
+        shapeFieldContainer.querySelector(`[data-shape-id="${addressData.shapeId}"]`).querySelector(
+          ".location-address").value = "No address found";
+      }
     });
 
     editModalEl.querySelector("[data-delete-shape]").addEventListener("click", () => {
@@ -188,7 +191,9 @@ export default () => {
             shapeFieldContainer.querySelector(`[data-shape-id="${oldShape.dataset.shapeId}"]`).remove();
           };
         };
-        addShapeField(shapeFieldContainer, shapeId);
+        if (!selectLocation) {
+          addShapeField(shapeFieldContainer, shapeId);
+        }
         if (ev === "clickEv") {
           if (objectShape === "Point") {
             coordinates = shape.getLatLng();
@@ -236,64 +241,15 @@ export default () => {
 
     if (containerShapeField.length > 0) {
       const bounds = [];
+
       containerShapeField.forEach(
         (locContainer) => {
-          const objectShape = locContainer.querySelector(".location-shape").value;
-          const geojson = locContainer.querySelector(".location-geojson").value;
-          if (validJson(geojson)) {
-            let valid = true;
-
-            if (objectShape === "Point") {
-              const markerGeoJson = JSON.parse(geojson).geometry.coordinates
-              if (markerGeoJson[0] < -90 || markerGeoJson[0] > 90 || markerGeoJson[1] < -180 || markerGeoJson[1] > 180) {
-                ctrl.deleteShape(locContainer.dataset.shapeId);
-                shapeFieldContainer.querySelector(`[data-shape-id="${locContainer.dataset.shapeId}"]`).remove();
-                valid = false;
-              }
-              if (valid) {
-                ctrl.addMarker(markerGeoJson, "editEv", locContainer.dataset.shapeId);
-                bounds.push(markerGeoJson);
-              }
-            } else if (objectShape === "LineString") {
-              const lineGeoJson = JSON.parse(geojson).geometry.coordinates.map((coords) => {
-                if (coords[0] < -90 || coords[0] > 90 || coords[1] < -180 || coords[1] > 180) {
-                  ctrl.deleteShape(locContainer.dataset.shapeId);
-                  shapeFieldContainer.querySelector(`[data-shape-id="${locContainer.dataset.shapeId}"]`).remove();
-                  valid = false;
-                }
-                return [coords[0], coords[1]];
-              })
-              if (valid) {
-                ctrl.addLine(lineGeoJson, "editEv", locContainer.dataset.shapeId);
-                bounds.push(lineGeoJson);
-              }
-            } else if (objectShape === "Polygon") {
-              const polygonGeoJson = JSON.parse(geojson).geometry.coordinates.map(
-                (coord) => coord.map(
-                  (coords) => {
-                    if (coords[0] < -90 || coords[0] > 90 || coords[1] < -180 || coords[1] > 180) {
-                      ctrl.deleteShape(locContainer.dataset.shapeId);
-                      shapeFieldContainer.querySelector(`[data-shape-id="${locContainer.dataset.shapeId}"]`).remove();
-                      valid = false;
-                    }
-                    return [coords[0], coords[1]];
-                  })
-              )
-              if (valid) {
-                ctrl.addPolygon(polygonGeoJson, "editEv", locContainer.dataset.shapeId);
-                bounds.push(polygonGeoJson);
-              }
-            };
-          } else {
-            shapeFieldContainer.querySelector(`[data-shape-id="${locContainer.dataset.shapeId}"]`).remove();
-          }
+          bounds.push(addExistingShapes(locContainer, ctrl));
         }
-      );
+      )
 
-      if (bounds.length > 0) {
-        const area = new L.LatLngBounds(bounds);
-        ctrl.map.fitBounds(area);
-      }
+      const area = new L.LatLngBounds(bounds);
+      ctrl.map.fitBounds(area);
     }
   });
 };

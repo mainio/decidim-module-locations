@@ -57,6 +57,29 @@ export default class ModelLocMapController extends MapController {
     );
   }
 
+  addLocation(geoJson) {
+    const objectShape = JSON.parse(geoJson).geometry.type;
+    const coordinates = JSON.parse(geoJson).geometry.coordinates;
+
+    if (objectShape === "Point") {
+      this.addMarker(coordinates, "editEv");
+    } else if (objectShape === "LineString") {
+      const lineGeoJson = geoJson.map((coords) => {
+        return [coords[0], coords[1]];
+      })
+      this.addLine(lineGeoJson, "editEv");
+    } else if (objectShape === "Polygon") {
+      const polygonGeoJson = geoJson.map(
+        (coord) => coord.map(
+          (coords) => {
+            return [coords[0], coords[1]];
+          }
+        )
+      )
+      this.addPolygon(polygonGeoJson, "editEv");
+    }
+  }
+
   clearShapes() {
     Object.keys(this.shapes).forEach((shapeIdKey) => {
       this.deleteShape(shapeIdKey)
