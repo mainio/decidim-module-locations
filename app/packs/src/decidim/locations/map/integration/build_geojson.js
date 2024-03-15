@@ -17,7 +17,21 @@ const coordinatesToObject = function (coordinates, shape) {
   return value;
 }
 
-const buildGeoJson = function (coordinates, shape) {
+const buildGeoJson = function (coordinates, shape, address) {
+
+  if (address) {
+    return {
+      "type": "Feature",
+      "geometry": {
+        "type": shape,
+        "coordinates":
+          coordinatesToObject(coordinates, shape)
+      },
+      "properties": {
+        "address": address
+      }
+    }
+  }
 
   return {
     "type": "Feature",

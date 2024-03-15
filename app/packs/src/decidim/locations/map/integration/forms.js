@@ -91,16 +91,20 @@ export default () => {
       displayList = true;
       typeLocButton.disabled = true;
       addInputGroup(shapeFieldContainer, addressData, wrapperEl);
-      if (averageInput) {
-        coordAverage(shapeFieldContainer, wrapperEl);
+      if (selectLocation === "false") {
+        if (averageInput) {
+          coordAverage(shapeFieldContainer, wrapperEl);
+        }
       }
     });
 
     $(mapEl).on("shape-address", (_ev, addressData) => {
       ctrl.unbindPopup(addressData.shapeId);
       addInputGroup(shapeFieldContainer, addressData, wrapperEl);
-      if (averageInput) {
-        coordAverage(shapeFieldContainer, wrapperEl);
+      if (selectLocation === "false") {
+        if (averageInput) {
+          coordAverage(shapeFieldContainer, wrapperEl);
+        }
       }
     });
 
@@ -108,7 +112,7 @@ export default () => {
       ctrl.unbindPopup(addressData.shapeId);
       ctrl.bindNoDataPopup(addressData.shapeId);
       addInputGroup(shapeFieldContainer, addressData, wrapperEl);
-      if (!selectLocation) {
+      if (selectLocation === "false") {
         if (averageInput) {
           coordAverage(shapeFieldContainer, wrapperEl);
         };
@@ -191,7 +195,8 @@ export default () => {
             shapeFieldContainer.querySelector(`[data-shape-id="${oldShape.dataset.shapeId}"]`).remove();
           };
         };
-        if (!selectLocation) {
+
+        if (selectLocation === "false") {
           addShapeField(shapeFieldContainer, shapeId);
         }
         if (ev === "clickEv") {

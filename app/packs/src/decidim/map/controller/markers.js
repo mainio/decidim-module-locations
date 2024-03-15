@@ -40,51 +40,77 @@ export default class MapMarkersController extends MapController {
     const bounds = new L.LatLngBounds(
       markersData.map(
         (markerData) => {
-          if (markerData.shape === "LineString") {
-            return JSON.parse(markerData.geojson).geometry.coordinates.map(
-              (coords) => [coords[0], coords[1]]
-            )
-          } else if (markerData.shape === "Polygon") {
-            return JSON.parse(markerData.geojson).geometry.coordinates.map(
-              (coord) => coord.map((coords) => [coords[0], coords[1]])
-            )
+          if (markerData.geojson.type) {
+            return markerData.geojson.geometry.coordinates
           }
 
-          return [markerData.latitude, markerData.longitude]
+          const coordinates = JSON.parse(markerData.geojson).geometry.coordinates;
+
+          if (markerData.shape === "LineString") {
+            return coordinates
+          } else if (markerData.shape === "Polygon") {
+            return coordinates
+          }
+
+          return coordinates
         }
       )
     );
 
     markersData.forEach((markerData) => {
       let shape = {}
-      if (markerData.shape === "Point") {
-        shape = L.marker([markerData.latitude, markerData.longitude], {
-          title: markerData.title
+
+      if (markerData.geojson.type) {
+        const coordinates = markerData.geojson.geometry.coordinates;
+        const address = markerData.geojson.properties.address;
+
+        if (markerData.geojson.geometry.type === "Point") {
+          shape = L.marker(coordinates)
+        } else if (markerData.geojson.geometry.type === "LineString") {
+          shape = L.polyline(coordinates)
+        } else if (markerData.geojson.geometry.type === "Polygon") {
+          shape = L.polygon(coordinates)
+        }
+
+        shape.bindPopup(address);
+
+        this.markerClusters.addLayer(shape);
+
+      } else {
+        const coordinates = JSON.parse(markerData.geojson).geometry.coordinates;
+
+        if (markerData.shape === "Point") {
+          shape = L.marker(coordinates,
+            {
+              title: markerData.title
+            }
+          )
+        } else if (markerData.shape === "LineString") {
+          shape = L.polyline(coordinates,
+            {
+              title: markerData.title
+            }
+          )
+        } else if (markerData.shape === "Polygon") {
+          shape = L.polygon(coordinates,
+            {
+              title: markerData.title
+            }
+          )
+        }
+
+        let node = document.createElement("div");
+
+        $.tmpl(this.config.popupTemplateId, markerData).appendTo(node);
+        shape.bindPopup(node, {
+          maxwidth: 640,
+          minWidth: 500,
+          keepInView: true,
+          className: "map-info"
         })
-      } else if (markerData.shape === "LineString") {
-        shape = L.polyline(JSON.parse(markerData.geojson).geometry.coordinates.map(
-          (coords) => [coords[0], coords[1]]), {
-          title: markerData.title
-        })
-      } else if (markerData.shape === "Polygon") {
-        shape = L.polygon(JSON.parse(markerData.geojson).geometry.coordinates.map(
-          (coord) => coord.map((coords) => [coords[0], coords[1]])), {
-          title: markerData.title
-        })
+
+        this.markerClusters.addLayer(shape);
       }
-
-      let node = document.createElement("div");
-
-      $.tmpl(this.config.popupTemplateId, markerData).appendTo(node);
-
-      shape.bindPopup(node, {
-        maxwidth: 640,
-        minWidth: 500,
-        keepInView: true,
-        className: "map-info"
-      })
-
-      this.markerClusters.addLayer(shape);
     });
 
 

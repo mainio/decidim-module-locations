@@ -83,25 +83,33 @@ module Decidim
 
       def markers_data_for_map
         format_map_locations(model).map do |data|
-          body = data[2]
-          if body.blank?
-            doc = Nokogiri::HTML(data[3])
-            doc.css("h1, h2, h3, h4, h5, h6").remove
+          if data.instance_of?(Decidim::Forms::LocationOption)
+            {
+              title: JSON.parse(data.geojson)["properties"]["address"],
+              geojson: JSON.parse(data.geojson)
+            }
+          else
+            body = data[2]
 
-            body = truncate(strip_tags(doc.at("body")&.inner_html), length: 100)
+            if body.blank?
+              doc = Nokogiri::HTML(data[3])
+              doc.css("h1, h2, h3, h4, h5, h6").remove
+
+              body = truncate(strip_tags(doc.at("body")&.inner_html), length: 100)
+            end
+
+            {
+              id: data[0],
+              title: data[1],
+              body: body,
+              address: data[4],
+              latitude: data[5],
+              longitude: data[6],
+              shape: data[7],
+              geojson: data[8],
+              link: path_for(data[0])
+            }
           end
-
-          {
-            id: data[0],
-            title: data[1],
-            body: body,
-            address: data[4],
-            latitude: data[5],
-            longitude: data[6],
-            shape: data[7],
-            geojson: data[8],
-            link: path_for(data[0])
-          }
         end
       end
     end

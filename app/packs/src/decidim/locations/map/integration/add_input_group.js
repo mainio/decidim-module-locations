@@ -14,7 +14,7 @@ const addInputGroup = function (shapeFieldContainer, addressData, wrapperEl) {
   if (parentNodeId === "location-option-selector") {
     const currentGeo = document.querySelector("button.location-selector").parentNode.querySelector("label > textarea");
 
-    currentGeo.value = JSON.stringify(buildGeoJson(coordinates, objectShape));
+    currentGeo.value = JSON.stringify(buildGeoJson(coordinates, objectShape, address));
   } else {
     if (shapeField.hasChildNodes()) {
       const oldCoords = [shapeField.querySelector(".location-latitude").value,

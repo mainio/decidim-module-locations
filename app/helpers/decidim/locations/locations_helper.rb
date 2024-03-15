@@ -20,7 +20,7 @@ module Decidim
           query, tbl =
             if model.class.superclass == ActiveRecord::Relation
               [Decidim::Locations::Location.where(locatable: model), model.table_name]
-            elsif model.instance_of?(Array)
+            elsif model.instance_of?(Array) || model.is_a?(ActiveRecord::Associations::CollectionProxy)
               return model
             else
               [model.locations, model.class.table_name]
