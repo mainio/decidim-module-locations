@@ -4,6 +4,7 @@ import "leaflet.markercluster";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png"
 import markerIcon from "leaflet/dist/images/marker-icon.png"
 import markerShadow from "leaflet/dist/images/marker-shadow.png"
+import initializeSelectLocations from "src/decidim/map/initialize_select_locations"
 
 export default class MapMarkersController extends MapController {
   start() {
@@ -14,6 +15,15 @@ export default class MapMarkersController extends MapController {
     } else {
       this.map.fitWorld();
     }
+
+    if (this.selectLocation()) {
+      initializeSelectLocations(this.markerClusters);
+    }
+  }
+
+  selectLocation() {
+    const decidimMap = this.map._container.getAttribute("data-decidim-map");
+    return JSON.parse(decidimMap).selectLocation;
   }
 
   addMarkers(markersData) {
@@ -62,20 +72,19 @@ export default class MapMarkersController extends MapController {
 
       if (markerData.geojson.type) {
         const coordinates = markerData.geojson.geometry.coordinates;
-        const address = markerData.geojson.properties.address;
+        const location = markerData.location;
 
         if (markerData.geojson.geometry.type === "Point") {
-          shape = L.marker(coordinates)
+          shape = L.marker(coordinates, {selected: false, geojson: JSON.stringify(markerData.geojson)})
         } else if (markerData.geojson.geometry.type === "LineString") {
-          shape = L.polyline(coordinates)
+          shape = L.polyline(coordinates, {selected: false, geojson: JSON.stringify(markerData.geojson)})
         } else if (markerData.geojson.geometry.type === "Polygon") {
-          shape = L.polygon(coordinates)
+          shape = L.polygon(coordinates, {selected: false, geojson: JSON.stringify(markerData.geojson)})
         }
 
-        shape.bindPopup(address);
+        shape.bindTooltip(location, {permanent: true, interactive: true});
 
         this.markerClusters.addLayer(shape);
-
       } else {
         const coordinates = JSON.parse(markerData.geojson).geometry.coordinates;
 
@@ -119,13 +128,17 @@ export default class MapMarkersController extends MapController {
     // mobile). Make sure there is at least the same amount of width and
     // height available on both sides + the padding (i.e. 4x padding in
     // total).
-    const size = this.map.getSize();
-    if (size.y >= 400 && size.x >= 400) {
-      this.map.fitBounds(bounds, { padding: [100, 100] });
-    } else if (size.y >= 120 && size.x >= 120) {
-      this.map.fitBounds(bounds, { padding: [30, 30] });
-    } else {
+    if (this.selectLocation()) {
       this.map.fitBounds(bounds);
+    } else {
+      const size = this.map.getSize();
+      if (size.y >= 400 && size.x >= 400) {
+        this.map.fitBounds(bounds, { padding: [100, 100] });
+      } else if (size.y >= 120 && size.x >= 120) {
+        this.map.fitBounds(bounds, { padding: [30, 30] });
+      } else {
+        this.map.fitBounds(bounds);
+      }
     }
   }
 

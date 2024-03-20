@@ -36,6 +36,12 @@ module Decidim
         render
       end
 
+      def select_location?
+        return false unless options[:select_location]
+
+        true
+      end
+
       private
 
       def view_label
@@ -62,6 +68,7 @@ module Decidim
 
       def locations_map
         map_options = { type: map_type, markers: markers_data_for_map, zoomControl: false }
+        map_options[:select_location] = select_location?
         map_options[:center_coordinates] = center_coodrdinates if center_coodrdinates && center_coodrdinates.length > 1
 
         dynamic_map_for(map_options) do
@@ -85,8 +92,8 @@ module Decidim
         format_map_locations(model).map do |data|
           if data.instance_of?(Decidim::Forms::LocationOption)
             {
-              title: JSON.parse(data.geojson)["properties"]["address"],
-              geojson: JSON.parse(data.geojson)
+              location: data.title,
+              geojson: JSON.parse(data.body)
             }
           else
             body = data[2]
