@@ -29,6 +29,19 @@ module Decidim
       private
 
       def json_validation
+        if geojson.blank?
+          geojson = {
+            type: "Feature",
+            geometry: {
+              type: shape,
+              coordinates:
+                [latitude, longitude]
+            }
+          }
+
+          return
+        end
+
         # check if GeoJSON is valid
         begin
           geo_factory = RGeo::Geographic.spherical_factory

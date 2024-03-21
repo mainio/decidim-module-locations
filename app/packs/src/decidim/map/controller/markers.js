@@ -50,7 +50,7 @@ export default class MapMarkersController extends MapController {
     const bounds = new L.LatLngBounds(
       markersData.map(
         (markerData) => {
-          if (markerData.geojson.type) {
+          if (markerData.location) {
             return markerData.geojson.geometry.coordinates
           }
 
@@ -70,7 +70,7 @@ export default class MapMarkersController extends MapController {
     markersData.forEach((markerData) => {
       let shape = {}
 
-      if (markerData.geojson.type) {
+      if (markerData.location) {
         const coordinates = markerData.geojson.geometry.coordinates;
         const location = markerData.location;
         const objectShape = markerData.geojson.geometry.type;
@@ -95,7 +95,7 @@ export default class MapMarkersController extends MapController {
               shape: objectShape})
         }
 
-        shape.bindTooltip(location, {permanent: true, interactive: true});
+        shape.bindTooltip(location.en, {permanent: true, interactive: true});
 
         this.markerClusters.addLayer(shape);
       } else {
@@ -141,6 +141,7 @@ export default class MapMarkersController extends MapController {
     // mobile). Make sure there is at least the same amount of width and
     // height available on both sides + the padding (i.e. 4x padding in
     // total).
+
     if (this.selectLocation()) {
       this.map.fitBounds(bounds);
     } else {

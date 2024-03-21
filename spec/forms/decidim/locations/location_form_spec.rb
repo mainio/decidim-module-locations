@@ -63,12 +63,11 @@ describe Decidim::Locations::LocationForm do
         address: "",
         latitude: 50.149792,
         longitude: 24.887430,
-        shape: "Point",
-        geojson: ""
+        shape: "Point"
       }
     end
 
-    it { is_expected.not_to be_valid }
+    it { is_expected.to be_valid }
   end
 
   context "when geojson is not correct" do

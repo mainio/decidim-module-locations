@@ -11,7 +11,7 @@ const addInputGroup = function (shapeFieldContainer, addressData, wrapperEl) {
   const coordinates = JSON.stringify(addressData.coordinates);
   const shapeField = shapeFieldContainer.querySelector(`[data-shape-id="${shapeId}"]`);
 
-  if (parentNodeId === "location-option-selector") {
+  if (parentNodeId === "answer-option-map-selector") {
     const currentGeo = document.querySelector("button.location-selector").parentNode.querySelector("label > textarea");
 
     currentGeo.value = JSON.stringify(buildGeoJson(coordinates, objectShape, address));

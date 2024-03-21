@@ -90,10 +90,10 @@ module Decidim
 
       def markers_data_for_map
         format_map_locations(model).map do |data|
-          if data.instance_of?(Decidim::Forms::LocationOption)
+          if data.instance_of?(Decidim::Forms::AnswerOption)
             {
-              location: data.title,
-              geojson: JSON.parse(data.body)
+              location: data.body,
+              geojson: JSON.parse(data.geojson)
             }
           else
             body = data[2]
