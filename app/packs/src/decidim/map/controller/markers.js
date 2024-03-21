@@ -73,13 +73,26 @@ export default class MapMarkersController extends MapController {
       if (markerData.geojson.type) {
         const coordinates = markerData.geojson.geometry.coordinates;
         const location = markerData.location;
+        const objectShape = markerData.geojson.geometry.type;
 
-        if (markerData.geojson.geometry.type === "Point") {
-          shape = L.marker(coordinates, {selected: false, geojson: JSON.stringify(markerData.geojson)})
-        } else if (markerData.geojson.geometry.type === "LineString") {
-          shape = L.polyline(coordinates, {selected: false, geojson: JSON.stringify(markerData.geojson)})
-        } else if (markerData.geojson.geometry.type === "Polygon") {
-          shape = L.polygon(coordinates, {selected: false, geojson: JSON.stringify(markerData.geojson)})
+        if (objectShape === "Point") {
+          shape = L.marker(
+            coordinates,
+            {selected: false,
+              geojson: JSON.stringify(markerData.geojson),
+              shape: objectShape})
+        } else if (objectShape === "LineString") {
+          shape = L.polyline(
+            coordinates,
+            {selected: false,
+              geojson: JSON.stringify(markerData.geojson),
+              shape: objectShape})
+        } else if (objectShape === "Polygon") {
+          shape = L.polygon(
+            coordinates,
+            {selected: false,
+              geojson: JSON.stringify(markerData.geojson),
+              shape: objectShape})
         }
 
         shape.bindTooltip(location, {permanent: true, interactive: true});
