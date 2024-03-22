@@ -26,7 +26,7 @@ describe Decidim::Locations::LocationForm do
   context "when all details are blank" do
     let(:attributes) do
       {
-        address: "Veneentekijäntie 4 A, 00210 Helsinki",
+        address: "",
         shape: "",
         geojson: ""
       }

@@ -29,29 +29,30 @@ module Decidim
       private
 
       def json_validation
-        if geojson.blank?
-          geojson = {
+        if geojson.presence
+          # check if GeoJSON is valid
+          begin
+            geo_factory = RGeo::Geographic.spherical_factory
+
+            RGeo::GeoJSON.decode(geojson, geo_factory: geo_factory)
+
+            coord_validation
+          rescue JSON::ParserError
+            errors.add(:geojson, "Invalid GeoJSON")
+          end
+        else
+          @geojson = {
             type: "Feature",
             geometry: {
-              type: shape,
+              type: shape.presence || "Point",
               coordinates:
                 [latitude, longitude]
             }
           }
-
-          return
         end
+      end
 
-        # check if GeoJSON is valid
-        begin
-          geo_factory = RGeo::Geographic.spherical_factory
-
-          RGeo::GeoJSON.decode(geojson, geo_factory: geo_factory)
-        rescue JSON::ParserError
-          errors.add(:geojson, "Invalid GeoJSON")
-          return
-        end
-
+      def coord_validation
         # check that coordinates are valid
         geo_parse = JSON.parse(geojson)["geometry"]["coordinates"]
 
