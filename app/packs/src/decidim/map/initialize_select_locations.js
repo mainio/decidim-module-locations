@@ -31,16 +31,16 @@ const initializeSelectLocations = function (markers) {
         } else {
           shape.setStyle({color: "#2bff00"})
         }
+        $(`input[value*="${$.escapeSelector(shape._tooltip._content)}"]`).click();
         shape.options.selected = true;
-        document.querySelector(`input[value="${CSS.escape(shape.options.geojson)}"]`).click();
       } else if (shape.options.selected) {
         if (shape.options.shape === "Point") {
           shape._icon.style.filter = "hue-rotate(0deg)"
         } else {
           shape.setStyle({color: "#3388ff"})
         }
+        $(`input[value*="${$.escapeSelector(shape._tooltip._content)}"]`).click();
         shape.options.selected = false;
-        document.querySelector(`input[value="${CSS.escape(shape.options.geojson)}"]`).click();
       }
     })
   })
