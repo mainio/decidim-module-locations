@@ -50,19 +50,11 @@ export default class MapMarkersController extends MapController {
     const bounds = new L.LatLngBounds(
       markersData.map(
         (markerData) => {
-          if (markerData.location) {
-            return markerData.geojson.geometry.coordinates
+          if (typeof markerData.geojson === "string") {
+            return JSON.parse(markerData.geojson).geometry.coordinates;
           }
 
-          const coordinates = JSON.parse(markerData.geojson).geometry.coordinates;
-
-          if (markerData.shape === "LineString") {
-            return coordinates
-          } else if (markerData.shape === "Polygon") {
-            return coordinates
-          }
-
-          return coordinates
+          return markerData.geojson.geometry.coordinates
         }
       )
     );

@@ -18,7 +18,6 @@ const coordinatesToObject = function (coordinates, shape) {
 }
 
 const buildGeoJson = function (coordinates, shape, address) {
-  console.log(address)
   if (address) {
     return {
       "type": "Feature",

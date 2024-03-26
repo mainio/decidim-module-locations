@@ -145,6 +145,9 @@ export default () => {
     });
 
     ctrl.map.on("pm:create", (event) => {
+      if (selectLocation === "true" && mapConfig && mapConfig === "single") {
+        ctrl.deleteShape(Object.keys(ctrl.shapes)[0])
+      }
       event.marker.options.id = Math.random().toString(36).slice(2, 9);
       ctrl.shapes[event.marker.options.id] = event.marker;
       ctrl.triggerEvent("shapeadd", [event.marker, "clickEv"])
@@ -243,6 +246,16 @@ export default () => {
         };
       })
     });
+
+    if (selectLocation === "true") {
+      const closeModalButton = document.querySelector(".done-location");
+      const modalEl = document.querySelector("#answer-option-map-selector");
+
+      closeModalButton.addEventListener("click", () => {
+        $(modalEl).foundation("close");
+        ctrl.map.pm.Draw.disable();
+      })
+    }
 
     if (containerShapeField.length > 0) {
       const bounds = [];

@@ -31,7 +31,6 @@ export default class ModelLocMapController extends MapController {
     let zoom = 0;
 
     if (selectLocation === "false" && (lat !== defaultLat.toFixed(1) || lng !== defaultLng.toFixed(1))) {
-      console.log("aASD")
       defaultLat = lat;
       defaultLng = lng;
       zoom = 14;

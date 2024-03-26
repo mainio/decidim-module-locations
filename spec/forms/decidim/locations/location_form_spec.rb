@@ -60,7 +60,7 @@ describe Decidim::Locations::LocationForm do
   context "when geojson not provided" do
     let(:attributes) do
       {
-        address: "",
+        address: "Veneentekijäntie 4 A, 00210 Helsinki",
         latitude: 50.149792,
         longitude: 24.887430,
         shape: "Point"
@@ -68,6 +68,29 @@ describe Decidim::Locations::LocationForm do
     end
 
     it { is_expected.to be_valid }
+
+    it "is expected to fill the geojson" do
+      expect(subject.geojson).to eq('{"type":"Feature","geometry":{"type":"Point","coordinates":[50.149792,24.88743]}}')
+    end
+  end
+
+  context "when shape not provided" do
+    let(:attributes) do
+      {
+        address: "Veneentekijäntie 4 A, 00210 Helsinki",
+        latitude: 50.149792,
+        longitude: 24.887430,
+        geojson: "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",
+                  \"coordinates\":[50.149792,24.887430]
+                  }}"
+      }
+    end
+
+    it { is_expected.to be_valid }
+
+    it "is expected to fill the shape" do
+      expect(subject.shape).to eq("Point")
+    end
   end
 
   context "when geojson is not correct" do

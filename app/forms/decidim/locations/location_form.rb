@@ -20,6 +20,12 @@ module Decidim
       validates :latitude, :longitude, presence: true, if: ->(form) { !form.deleted && form.address.blank? }
       validate :json_validation, if: ->(form) { !form.deleted }
 
+      def initialize(attributes = {})
+        super(attributes)
+
+        set_default_attributes unless attributes[:id]
+      end
+
       def to_param
         return id if id.present?
 
@@ -28,27 +34,26 @@ module Decidim
 
       private
 
+      def set_default_attributes
+        self.shape ||= "Point"
+        self.geojson ||= default_geojson
+      end
+
+      def default_geojson
+        "{\"type\":\"Feature\",\"geometry\":{\"type\":\"#{shape}\",\"coordinates\":[#{latitude},#{longitude}]}}"
+      end
+
       def json_validation
-        if geojson.presence
-          # check if GeoJSON is valid
-          begin
-            geo_factory = RGeo::Geographic.spherical_factory
+        return if geojson.blank?
 
-            RGeo::GeoJSON.decode(geojson, geo_factory: geo_factory)
+        # check if GeoJSON is valid
+        begin
+          geo_factory = RGeo::Geographic.spherical_factory
+          RGeo::GeoJSON.decode(geojson, geo_factory: geo_factory)
 
-            coord_validation
-          rescue JSON::ParserError
-            errors.add(:geojson, "Invalid GeoJSON")
-          end
-        else
-          @geojson = {
-            type: "Feature",
-            geometry: {
-              type: shape.presence || "Point",
-              coordinates:
-                [latitude, longitude]
-            }
-          }
+          coord_validation
+        rescue JSON::ParserError
+          errors.add(:geojson, "Invalid GeoJSON")
         end
       end
 
