@@ -253,6 +253,10 @@ export default () => {
 
       closeModalButton.addEventListener("click", () => {
         $(modalEl).foundation("close");
+      })
+
+      $(modalEl).on("closed.zf.reveal", () => {
+        ctrl.clearShapes();
         ctrl.map.pm.Draw.disable();
       })
     }

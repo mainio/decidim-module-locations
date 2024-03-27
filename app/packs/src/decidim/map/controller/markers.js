@@ -134,17 +134,13 @@ export default class MapMarkersController extends MapController {
     // height available on both sides + the padding (i.e. 4x padding in
     // total).
 
-    if (this.selectLocation()) {
-      this.map.fitBounds(bounds);
+    const size = this.map.getSize();
+    if (size.y >= 400 && size.x >= 400) {
+      this.map.fitBounds(bounds, { padding: [100, 100] });
+    } else if (size.y >= 120 && size.x >= 120) {
+      this.map.fitBounds(bounds, { padding: [30, 30] });
     } else {
-      const size = this.map.getSize();
-      if (size.y >= 400 && size.x >= 400) {
-        this.map.fitBounds(bounds, { padding: [100, 100] });
-      } else if (size.y >= 120 && size.x >= 120) {
-        this.map.fitBounds(bounds, { padding: [30, 30] });
-      } else {
-        this.map.fitBounds(bounds);
-      }
+      this.map.fitBounds(bounds);
     }
   }
 

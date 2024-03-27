@@ -6,8 +6,6 @@ class CreateDecidimLocations < ActiveRecord::Migration[5.2]
       t.text :address
       t.float :latitude
       t.float :longitude
-      t.text :shape
-      t.jsonb :geojson
       t.timestamps
       t.references :decidim_locations_locatable, polymorphic: true, null: false, index: { name: "index_on_decidim_locations_locatable" }
     end
