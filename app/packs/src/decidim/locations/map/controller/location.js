@@ -6,7 +6,6 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png"
 export default class ModelLocMapController extends MapController {
   start() {
     this.initializeMap();
-    this.placeMarkers = false;
     this.shapes = {};
   }
 
@@ -65,20 +64,14 @@ export default class ModelLocMapController extends MapController {
     if (objectShape === "Point") {
       this.addMarker(coordinates, "editEv");
     } else if (objectShape === "LineString") {
-      const lineGeoJson = geoJson.map((coords) => {
-        return [coords[0], coords[1]];
-      })
-      this.addLine(lineGeoJson, "editEv");
+      this.addLine(coordinates, "editEv");
     } else if (objectShape === "Polygon") {
-      const polygonGeoJson = geoJson.map(
-        (coord) => coord.map(
-          (coords) => {
-            return [coords[0], coords[1]];
-          }
-        )
-      )
-      this.addPolygon(polygonGeoJson, "editEv");
+      this.addPolygon(coordinates, "editEv");
     }
+
+    const bounds = new L.LatLngBounds([coordinates]);
+
+    this.map.fitBounds(bounds);
   }
 
   clearShapes() {

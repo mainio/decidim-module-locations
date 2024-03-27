@@ -93,7 +93,8 @@ module Decidim
           if data.instance_of?(Decidim::Forms::AnswerOption)
             {
               location: data.body,
-              geojson: JSON.parse(data.geojson)
+              geojson: JSON.parse(data.geojson),
+              answer_option: data.id
             }
           else
             body = data[2]

@@ -31,7 +31,7 @@ const initializeSelectLocations = function (markers) {
         } else {
           shape.setStyle({color: "#2bff00"})
         }
-        $(`input[value*="${$.escapeSelector(shape._tooltip._content)}"]`).click();
+        $(`#answer-option-${shape.options.answerOption}`).find('input[type="checkbox"]').click();
         shape.options.selected = true;
       } else if (shape.options.selected) {
         if (shape.options.shape === "Point") {
@@ -39,7 +39,7 @@ const initializeSelectLocations = function (markers) {
         } else {
           shape.setStyle({color: "#3388ff"})
         }
-        $(`input[value*="${$.escapeSelector(shape._tooltip._content)}"]`).click();
+        $(`#answer-option-${shape.options.answerOption}`).find('input[type="checkbox"]').click();
         shape.options.selected = false;
       }
     })

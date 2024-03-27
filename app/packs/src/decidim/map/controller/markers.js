@@ -72,7 +72,8 @@ export default class MapMarkersController extends MapController {
             coordinates,
             {selected: false,
               geojson: JSON.stringify(markerData.geojson),
-              shape: objectShape})
+              shape: objectShape,
+              answerOption: markerData.answer_option})
         } else if (objectShape === "LineString") {
           shape = L.polyline(
             coordinates,
