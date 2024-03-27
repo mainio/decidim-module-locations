@@ -43,7 +43,7 @@ module Decidim
         record = self.class.locations_record_class.find_by(id: id)
         return unless record
 
-        unexisting_ids = provided_ids - record.locations.pluck(:id)
+        unexisting_ids = provided_ids.map(&:to_i) - record.locations.pluck(:id)
         return if unexisting_ids.blank?
 
         errors.add(:locations, I18n.t("decidim.locations.form.unexisting_locations", ids: unexisting_ids.join(", ")))
