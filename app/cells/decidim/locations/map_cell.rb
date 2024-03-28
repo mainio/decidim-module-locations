@@ -36,6 +36,12 @@ module Decidim
         render
       end
 
+      def select_location?
+        return false unless options[:select_location]
+
+        true
+      end
+
       private
 
       def view_label
@@ -62,6 +68,7 @@ module Decidim
 
       def locations_map
         map_options = { type: map_type, markers: markers_data_for_map, zoomControl: false }
+        map_options[:select_location] = select_location?
         map_options[:center_coordinates] = center_coodrdinates if center_coodrdinates && center_coodrdinates.length > 1
 
         dynamic_map_for(map_options) do
@@ -83,25 +90,34 @@ module Decidim
 
       def markers_data_for_map
         format_map_locations(model).map do |data|
-          body = data[2]
-          if body.blank?
-            doc = Nokogiri::HTML(data[3])
-            doc.css("h1, h2, h3, h4, h5, h6").remove
+          if data.instance_of?(Decidim::Forms::AnswerOption)
+            {
+              location: data.body,
+              geojson: JSON.parse(data.geojson),
+              answer_option: data.id
+            }
+          else
+            body = data[2]
 
-            body = truncate(strip_tags(doc.at("body")&.inner_html), length: 100)
+            if body.blank?
+              doc = Nokogiri::HTML(data[3])
+              doc.css("h1, h2, h3, h4, h5, h6").remove
+
+              body = truncate(strip_tags(doc.at("body")&.inner_html), length: 100)
+            end
+
+            {
+              id: data[0],
+              title: data[1],
+              body: body,
+              address: data[4],
+              latitude: data[5],
+              longitude: data[6],
+              shape: data[7],
+              geojson: data[8],
+              link: path_for(data[0])
+            }
           end
-
-          {
-            id: data[0],
-            title: data[1],
-            body: body,
-            address: data[4],
-            latitude: data[5],
-            longitude: data[6],
-            shape: data[7],
-            geojson: data[8],
-            link: path_for(data[0])
-          }
         end
       end
     end

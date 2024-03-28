@@ -10,6 +10,10 @@ module Decidim
         foreign_type: :decidim_locations_locatable_type,
         polymorphic: true
       )
+
+      def self.export_serializer
+        Decidim::Comments::LocationSerializer
+      end
     end
   end
 end

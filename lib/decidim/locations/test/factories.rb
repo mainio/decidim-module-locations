@@ -13,5 +13,10 @@ FactoryBot.define do
     end
     latitude { Faker::Address.latitude }
     longitude { Faker::Address.longitude }
+    shape { "Point" }
+    geojson do
+      "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",
+      \"coordinates\":[#{Faker::Address.latitude},#{Faker::Address.longitude}]}}"
+    end
   end
 end

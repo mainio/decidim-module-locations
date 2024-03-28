@@ -4,6 +4,7 @@ import "leaflet.markercluster";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png"
 import markerIcon from "leaflet/dist/images/marker-icon.png"
 import markerShadow from "leaflet/dist/images/marker-shadow.png"
+import initializeSelectLocations from "src/decidim/map/initialize_select_locations"
 
 export default class MapMarkersController extends MapController {
   start() {
@@ -14,6 +15,15 @@ export default class MapMarkersController extends MapController {
     } else {
       this.map.fitWorld();
     }
+
+    if (this.selectLocation()) {
+      initializeSelectLocations(this.markerClusters);
+    }
+  }
+
+  selectLocation() {
+    const decidimMap = this.map._container.getAttribute("data-decidim-map");
+    return JSON.parse(decidimMap).selectLocation;
   }
 
   addMarkers(markersData) {
@@ -39,37 +49,85 @@ export default class MapMarkersController extends MapController {
 
     const bounds = new L.LatLngBounds(
       markersData.map(
-        (markerData) => [markerData.latitude, markerData.longitude]
+        (markerData) => {
+          if (typeof markerData.geojson === "string") {
+            return JSON.parse(markerData.geojson).geometry.coordinates;
+          }
+
+          return markerData.geojson.geometry.coordinates
+        }
       )
     );
 
     markersData.forEach((markerData) => {
       let shape = {}
-      if (markerData.shape === "Marker") {
-        shape = L.marker([markerData.latitude, markerData.longitude], {
-          title: markerData.title
+
+      if (markerData.location) {
+        const coordinates = markerData.geojson.geometry.coordinates;
+        const location = markerData.location;
+        const objectShape = markerData.geojson.geometry.type;
+
+        if (objectShape === "Point") {
+          shape = L.marker(
+            coordinates,
+            {selected: false,
+              geojson: JSON.stringify(markerData.geojson),
+              shape: objectShape,
+              answerOption: markerData.answer_option})
+        } else if (objectShape === "LineString") {
+          shape = L.polyline(
+            coordinates,
+            {selected: false,
+              geojson: JSON.stringify(markerData.geojson),
+              shape: objectShape,
+              answerOption: markerData.answer_option})
+        } else if (objectShape === "Polygon") {
+          shape = L.polygon(
+            coordinates,
+            {selected: false,
+              geojson: JSON.stringify(markerData.geojson),
+              shape: objectShape,
+              answerOption: markerData.answer_option})
+        }
+
+        shape.bindTooltip(location.en, {permanent: true, interactive: true});
+
+        this.markerClusters.addLayer(shape);
+      } else {
+        const coordinates = JSON.parse(markerData.geojson).geometry.coordinates;
+
+        if (markerData.shape === "Point") {
+          shape = L.marker(coordinates,
+            {
+              title: markerData.title
+            }
+          )
+        } else if (markerData.shape === "LineString") {
+          shape = L.polyline(coordinates,
+            {
+              title: markerData.title
+            }
+          )
+        } else if (markerData.shape === "Polygon") {
+          shape = L.polygon(coordinates,
+            {
+              title: markerData.title
+            }
+          )
+        }
+
+        let node = document.createElement("div");
+
+        $.tmpl(this.config.popupTemplateId, markerData).appendTo(node);
+        shape.bindPopup(node, {
+          maxwidth: 640,
+          minWidth: 500,
+          keepInView: true,
+          className: "map-info"
         })
-      } else if (markerData.shape === "Line") {
-        shape = L.polyline(JSON.parse(markerData.geojson).map((coords) => [coords.lat, coords.lng]), {
-          title: markerData.title
-        })
-      } else if (markerData.shape === "Polygon") {
-        shape = L.polygon(JSON.parse(markerData.geojson).map((coord) => coord.map((coords) => [coords.lat, coords.lng])), {
-          title: markerData.title
-        })
+
+        this.markerClusters.addLayer(shape);
       }
-
-      let node = document.createElement("div");
-
-      $.tmpl(this.config.popupTemplateId, markerData).appendTo(node);
-      shape.bindPopup(node, {
-        maxwidth: 640,
-        minWidth: 500,
-        keepInView: true,
-        className: "map-info"
-      })
-
-      this.markerClusters.addLayer(shape);
     });
 
 
@@ -78,6 +136,7 @@ export default class MapMarkersController extends MapController {
     // mobile). Make sure there is at least the same amount of width and
     // height available on both sides + the padding (i.e. 4x padding in
     // total).
+
     const size = this.map.getSize();
     if (size.y >= 400 && size.x >= 400) {
       this.map.fitBounds(bounds, { padding: [100, 100] });

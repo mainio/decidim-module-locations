@@ -46,7 +46,13 @@
         <span class="input-group-label">
           <%= icon "map-marker", role: "img", "aria-hidden": true %>
         </span>
-        <%= form.geocoding_field :address, placeholder: t("placeholder.address"), label: false, class: "type-loc-field input-group-field" %>
+        <% if form.object.class.name == "Decidim::FormsLocations::Admin::LocationOptionForm"%>
+          <% form.fields_for :locations do |location| %>
+            <%= location.geocoding_field :address, placeholder: t("placeholder.address"), label: false, class: "type-loc-field input-group-field" %>
+          <% end %>
+        <% else %>
+          <%= form.geocoding_field :address, placeholder: t("placeholder.address"), label: false, class: "type-loc-field input-group-field" %>
+        <% end %>
         <div class="input-group-button">
           <button class="type-loc-button hollow button" disabled><%= t("add") %></button>
         </div>
@@ -91,9 +97,12 @@
     </div>
 
     <div id="pick_model_locations_map-<%= random_id %>">
-      <%= dynamic_map_for({ type: "model_location"}, { id: random_id, data: { decidim_revgeocoding: geocoding_options, map_configuration: map_configuration, lat: coords[0], lng: coords[1] }}) do %>
+      <%= dynamic_map_for({ type: "model_location"}, { id: random_id, data: { decidim_revgeocoding: geocoding_options, map_configuration: map_configuration, lat: coords[0], lng: coords[1], select_location: select_location? }}) do %>
         <% add_snippets %>
       <% end %>
     </div>
+    <% if select_location? %>
+      <button class="button primary done-location"><%= t(".done") %></button>
+    <% end %>
   </div>
 </div>

@@ -10,6 +10,8 @@ en:
         location: Location
         remove: Remove
         unexisting_locations: 'Invalid locations provided for this record: %{ids}'
+      locations:
+        done: Done
   add: Add
   pick_locations: Pick locations
   type_locations: Type locations

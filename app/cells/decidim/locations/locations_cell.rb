@@ -35,6 +35,12 @@ module Decidim
         options[:map_configuration]
       end
 
+      def select_location?
+        return false unless options[:select_location]
+
+        true
+      end
+
       def revealselector
         escape!({ revealSelector: "#model_locations_reveal#{random_id}" }.to_json)
       end

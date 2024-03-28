@@ -6,7 +6,6 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png"
 export default class ModelLocMapController extends MapController {
   start() {
     this.initializeMap();
-    this.placeMarkers = false;
     this.shapes = {};
   }
 
@@ -24,12 +23,13 @@ export default class ModelLocMapController extends MapController {
     // Position the center of the map
     const lat = mapEl.dataset.lat;
     const lng = mapEl.dataset.lng;
+    const selectLocation = mapEl.dataset.selectLocation;
 
     let defaultLat = 0;
     let defaultLng = 0;
     let zoom = 0;
 
-    if (lat !== defaultLat.toFixed(1) || lng !== defaultLng.toFixed(1)) {
+    if (selectLocation === "false" && (lat !== defaultLat.toFixed(1) || lng !== defaultLng.toFixed(1))) {
       defaultLat = lat;
       defaultLng = lng;
       zoom = 14;
@@ -55,6 +55,23 @@ export default class ModelLocMapController extends MapController {
         ignoreShapes: ["Circle", "Rectangle"]
       }
     );
+  }
+
+  addLocation(geoJson) {
+    const objectShape = JSON.parse(geoJson).geometry.type;
+    const coordinates = JSON.parse(geoJson).geometry.coordinates;
+
+    if (objectShape === "Point") {
+      this.addMarker(coordinates, "editEv");
+    } else if (objectShape === "LineString") {
+      this.addLine(coordinates, "editEv");
+    } else if (objectShape === "Polygon") {
+      this.addPolygon(coordinates, "editEv");
+    }
+
+    const bounds = new L.LatLngBounds([coordinates]);
+
+    this.map.fitBounds(bounds);
   }
 
   clearShapes() {
