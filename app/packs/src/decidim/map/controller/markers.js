@@ -79,13 +79,15 @@ export default class MapMarkersController extends MapController {
             coordinates,
             {selected: false,
               geojson: JSON.stringify(markerData.geojson),
-              shape: objectShape})
+              shape: objectShape,
+              answerOption: markerData.answer_option})
         } else if (objectShape === "Polygon") {
           shape = L.polygon(
             coordinates,
             {selected: false,
               geojson: JSON.stringify(markerData.geojson),
-              shape: objectShape})
+              shape: objectShape,
+              answerOption: markerData.answer_option})
         }
 
         shape.bindTooltip(location.en, {permanent: true, interactive: true});
