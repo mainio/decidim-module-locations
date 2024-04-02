@@ -50,10 +50,6 @@ export default class MapMarkersController extends MapController {
     const bounds = new L.LatLngBounds(
       markersData.map(
         (markerData) => {
-          if (typeof markerData.geojson === "string") {
-            return JSON.parse(markerData.geojson).geometry.coordinates;
-          }
-
           return markerData.geojson.geometry.coordinates
         }
       )
@@ -94,7 +90,7 @@ export default class MapMarkersController extends MapController {
 
         this.markerClusters.addLayer(shape);
       } else {
-        const coordinates = JSON.parse(markerData.geojson).geometry.coordinates;
+        const coordinates = markerData.geojson.geometry.coordinates;
 
         if (markerData.shape === "Point") {
           shape = L.marker(coordinates,

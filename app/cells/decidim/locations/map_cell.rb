@@ -97,7 +97,7 @@ module Decidim
               latitude: data[5],
               longitude: data[6],
               shape: data[7],
-              geojson: data[8],
+              geojson: JSON.parse(data[8]),
               link: path_for(data[0])
             }
           end
