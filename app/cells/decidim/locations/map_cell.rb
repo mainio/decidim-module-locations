@@ -56,10 +56,6 @@ module Decidim
         options[:type] || "locations"
       end
 
-      def center_coodrdinates
-        options[:center_coodrdinates] || markers_center
-      end
-
       def path_for(record_id)
         return unless path_helper
 
@@ -69,22 +65,9 @@ module Decidim
       def locations_map
         map_options = { type: map_type, markers: markers_data_for_map, zoomControl: false }
         map_options[:select_location] = select_location?
-        map_options[:center_coordinates] = center_coodrdinates if center_coodrdinates && center_coodrdinates.length > 1
 
         dynamic_map_for(map_options) do
           yield
-        end
-      end
-
-      def markers_center
-        @markers_center ||= begin
-          latitudes = format_map_locations(model).map { |data| data[5].to_f }
-          longitudes = format_map_locations(model).map { |data| data[6].to_f }
-
-          [
-            latitudes.sum(0.0) / latitudes.size,
-            longitudes.sum(0.0) / longitudes.size
-          ]
         end
       end
 
