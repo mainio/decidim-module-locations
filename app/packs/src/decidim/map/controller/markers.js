@@ -86,7 +86,7 @@ export default class MapMarkersController extends MapController {
               answerOption: markerData.answer_option})
         }
 
-        shape.bindTooltip(location.en, {permanent: true, interactive: true});
+        shape.bindTooltip(location.en, {direction: "left", permanent: true, interactive: true});
 
         this.markerClusters.addLayer(shape);
       } else {
