@@ -85,7 +85,8 @@ module Decidim
             {
               location: data.body,
               geojson: JSON.parse(data.geojson),
-              answer_option: data.id
+              answer_option: data.id,
+              tooltip_direction: data.tooltip_direction
             }
           else
             body = data[2]
