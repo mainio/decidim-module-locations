@@ -67,6 +67,7 @@ export default class MapMarkersController extends MapController {
           shape = L.marker(
             coordinates,
             {selected: false,
+              location: location.en,
               geojson: JSON.stringify(markerData.geojson),
               shape: objectShape,
               answerOption: markerData.answer_option})
@@ -74,6 +75,7 @@ export default class MapMarkersController extends MapController {
           shape = L.polyline(
             coordinates,
             {selected: false,
+              location: location.en,
               geojson: JSON.stringify(markerData.geojson),
               shape: objectShape,
               answerOption: markerData.answer_option})
@@ -81,6 +83,7 @@ export default class MapMarkersController extends MapController {
           shape = L.polygon(
             coordinates,
             {selected: false,
+              location: location.en,
               geojson: JSON.stringify(markerData.geojson),
               shape: objectShape,
               answerOption: markerData.answer_option})
@@ -147,5 +150,21 @@ export default class MapMarkersController extends MapController {
     this.map.removeLayer(this.markerClusters);
     this.markerClusters = new L.MarkerClusterGroup();
     this.map.addLayer(this.markerClusters);
+  }
+
+  refreshMarkers() {
+    const tooltips = document.getElementsByClassName("leaflet-tooltip");
+
+    // Hiding tooltips for now to fix multiple page map questions. Where tooltips offset from the shapes.
+    // unbindTooltip etc. methods don't work for some reason, probably
+    // because tooltips are permanent.
+    Array.from(tooltips).forEach((tooltip) => {
+      tooltip.style.display = "none";
+    })
+
+    this.markerClusters.eachLayer((marker) => {
+
+      marker.bindTooltip(marker.options.location, {direction: "left", permanent: true, interactive: true});
+    })
   }
 }
