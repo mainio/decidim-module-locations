@@ -62,11 +62,19 @@ module Decidim
         path_helper.call(record_id)
       end
 
+      def random_id
+        @random_id ||= begin
+          charset = ("a".."z").to_a + ("0".."9").to_a
+          Array.new(7) { charset.sample }.join
+        end
+      end
+
       def locations_map
         map_options = { type: map_type, markers: markers_data_for_map, zoomControl: false }
         map_options[:select_location] = select_location?
+        id = { id: random_id }
 
-        dynamic_map_for(map_options) do
+        dynamic_map_for(map_options, id) do
           yield
         end
       end
