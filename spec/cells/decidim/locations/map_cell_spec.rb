@@ -35,7 +35,7 @@ describe Decidim::Locations::MapCell, type: :cell do
       TXT
       )
       expect(subject).to have_css(".map__help")
-      expect(subject).to have_css("#map_bottom")
+      expect(subject).to have_css("[id$='_bottom']")
     end
   end
 end

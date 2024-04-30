@@ -32,6 +32,8 @@ module Decidim
       end
 
       def zoom
+        return 14 unless options[:zoom]
+
         options[:zoom]
       end
 
