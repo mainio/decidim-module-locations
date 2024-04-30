@@ -19,7 +19,7 @@ module Decidim
         def format_map_locations(model)
           query, tbl =
             if model.class.superclass == ActiveRecord::Relation
-              [Decidim::Locations::Location.where(locatable: model), model.table_name]
+              [Decidim::Locations::Location.where(decidim_locations_locatable_id: model.map(&:id)), model.table_name]
             elsif model.instance_of?(Array) || model.is_a?(ActiveRecord::Associations::CollectionProxy)
               return model
             else
@@ -66,6 +66,7 @@ module Decidim
               rescue JSON::ParserError
                 translated_attribute(record[2])
               end
+
             [record[0], title, nil, body, record[3], record[4], record[5], record[6], record[7]]
           end
         end

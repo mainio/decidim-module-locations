@@ -50,15 +50,18 @@ export default class MapMarkersController extends MapController {
     const bounds = new L.LatLngBounds(
       markersData.map(
         (markerData) => {
-          return markerData.geojson.geometry.coordinates
+          if (markerData.geojson) {
+            return markerData.geojson.geometry.coordinates
+          }
+
+          return [markerData.latitude, markerData.longitude]
         }
       )
     );
 
     markersData.forEach((markerData) => {
       let shape = {}
-
-      if (markerData.location) {
+      if (markerData.location && markerData.geojson) {
         const coordinates = markerData.geojson.geometry.coordinates;
         const location = markerData.location;
         const objectShape = markerData.geojson.geometry.type;
@@ -92,7 +95,7 @@ export default class MapMarkersController extends MapController {
         shape.bindTooltip(location.en, {direction: markerData.tooltip_direction, permanent: true, interactive: true});
 
         this.markerClusters.addLayer(shape);
-      } else {
+      } else if (markerData.geojson) {
         const coordinates = markerData.geojson.geometry.coordinates;
 
         if (markerData.shape === "Point") {
@@ -126,6 +129,24 @@ export default class MapMarkersController extends MapController {
         })
 
         this.markerClusters.addLayer(shape);
+      } else {
+        let marker = new L.Marker([markerData.latitude, markerData.longitude], {
+          icon: this.createIcon(),
+          keyboard: true,
+          title: markerData.title
+        });
+
+        let node = document.createElement("div");
+
+        $.tmpl(this.config.popupTemplateId, markerData).appendTo(node);
+        marker.bindPopup(node, {
+          maxwidth: 640,
+          minWidth: 500,
+          keepInView: true,
+          className: "map-info"
+        }).openPopup();
+
+        this.markerClusters.addLayer(marker);
       }
     });
 
@@ -164,7 +185,7 @@ export default class MapMarkersController extends MapController {
 
     this.markerClusters.eachLayer((marker) => {
 
-      marker.bindTooltip(marker.options.location, {direction: "left", permanent: true, interactive: true});
+      marker.bindTooltip(marker.options.location, {direction: marker.tooltip_direction, permanent: true, interactive: true});
     })
   }
 }
