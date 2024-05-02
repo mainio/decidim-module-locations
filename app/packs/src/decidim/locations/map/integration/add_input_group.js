@@ -10,11 +10,24 @@ const addInputGroup = function (shapeFieldContainer, addressData, wrapperEl) {
   const lng = addressData.position.lng;
   const coordinates = JSON.stringify(addressData.coordinates);
   const shapeField = shapeFieldContainer.querySelector(`[data-shape-id="${shapeId}"]`);
+  const mapEl = wrapperEl.querySelector("[data-decidim-map]");
+  const ctrl = $(mapEl).data("map-controller");
 
   if (parentNodeId === "answer-option-map-selector") {
-    const currentGeo = document.querySelector("button.location-selector").parentNode.querySelector("label > textarea");
+    const locationSelector = document.querySelector("button.location-selector");
+    const defaultPositionSelector = document.querySelector("button.default-position-active");
+    if (locationSelector) {
+      const currentGeo = locationSelector.parentNode.querySelector("label > textarea");
+      currentGeo.value = JSON.stringify(buildGeoJson(coordinates, objectShape, address));
+    } else if (defaultPositionSelector) {
+      const latitude = defaultPositionSelector.closest(".questionnaire-question-default-map-position").querySelector(".default-position-latitude label input");
+      const longitude = defaultPositionSelector.closest(".questionnaire-question-default-map-position").querySelector(".default-position-longitude label input");
+      const zoom = defaultPositionSelector.closest(".questionnaire-question-default-map-position").querySelector(".default-position-zoom label input");
 
-    currentGeo.value = JSON.stringify(buildGeoJson(coordinates, objectShape, address));
+      latitude.value = lat;
+      longitude.value = lng;
+      zoom.value = ctrl.map.getZoom();
+    }
   } else {
     if (shapeField.hasChildNodes()) {
       const oldCoords = [shapeField.querySelector(".location-latitude").value,

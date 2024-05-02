@@ -31,6 +31,12 @@ module Decidim
         options[:coords]
       end
 
+      def zoom
+        return 14 unless options[:zoom]
+
+        options[:zoom]
+      end
+
       def map_configuration
         options[:map_configuration]
       end

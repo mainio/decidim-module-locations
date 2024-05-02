@@ -50,15 +50,18 @@ export default class MapMarkersController extends MapController {
     const bounds = new L.LatLngBounds(
       markersData.map(
         (markerData) => {
-          return markerData.geojson.geometry.coordinates
+          if (markerData.geojson) {
+            return markerData.geojson.geometry.coordinates
+          }
+
+          return [markerData.latitude, markerData.longitude]
         }
       )
     );
 
     markersData.forEach((markerData) => {
       let shape = {}
-
-      if (markerData.location) {
+      if (markerData.location && markerData.geojson) {
         const coordinates = markerData.geojson.geometry.coordinates;
         const location = markerData.location;
         const objectShape = markerData.geojson.geometry.type;
@@ -67,6 +70,7 @@ export default class MapMarkersController extends MapController {
           shape = L.marker(
             coordinates,
             {selected: false,
+              location: location.en,
               geojson: JSON.stringify(markerData.geojson),
               shape: objectShape,
               answerOption: markerData.answer_option})
@@ -74,6 +78,7 @@ export default class MapMarkersController extends MapController {
           shape = L.polyline(
             coordinates,
             {selected: false,
+              location: location.en,
               geojson: JSON.stringify(markerData.geojson),
               shape: objectShape,
               answerOption: markerData.answer_option})
@@ -81,15 +86,16 @@ export default class MapMarkersController extends MapController {
           shape = L.polygon(
             coordinates,
             {selected: false,
+              location: location.en,
               geojson: JSON.stringify(markerData.geojson),
               shape: objectShape,
               answerOption: markerData.answer_option})
         }
 
-        shape.bindTooltip(location.en, {direction: "left", permanent: true, interactive: true});
+        shape.bindTooltip(location.en, {direction: markerData.tooltip_direction, permanent: true, interactive: true});
 
         this.markerClusters.addLayer(shape);
-      } else {
+      } else if (markerData.geojson) {
         const coordinates = markerData.geojson.geometry.coordinates;
 
         if (markerData.shape === "Point") {
@@ -123,6 +129,24 @@ export default class MapMarkersController extends MapController {
         })
 
         this.markerClusters.addLayer(shape);
+      } else {
+        let marker = new L.Marker([markerData.latitude, markerData.longitude], {
+          icon: this.createIcon(),
+          keyboard: true,
+          title: markerData.title
+        });
+
+        let node = document.createElement("div");
+
+        $.tmpl(this.config.popupTemplateId, markerData).appendTo(node);
+        marker.bindPopup(node, {
+          maxwidth: 640,
+          minWidth: 500,
+          keepInView: true,
+          className: "map-info"
+        }).openPopup();
+
+        this.markerClusters.addLayer(marker);
       }
     });
 
@@ -147,5 +171,21 @@ export default class MapMarkersController extends MapController {
     this.map.removeLayer(this.markerClusters);
     this.markerClusters = new L.MarkerClusterGroup();
     this.map.addLayer(this.markerClusters);
+  }
+
+  refreshMarkers() {
+    const tooltips = document.getElementsByClassName("leaflet-tooltip");
+
+    // Hiding tooltips for now to fix multiple page map questions. Where tooltips offset from the shapes.
+    // unbindTooltip etc. methods don't work for some reason, probably
+    // because tooltips are permanent.
+    Array.from(tooltips).forEach((tooltip) => {
+      tooltip.style.display = "none";
+    })
+
+    this.markerClusters.eachLayer((marker) => {
+
+      marker.bindTooltip(marker.options.location, {direction: marker.tooltip_direction, permanent: true, interactive: true});
+    })
   }
 }

@@ -24,18 +24,19 @@ export default class ModelLocMapController extends MapController {
     const lat = mapEl.dataset.lat;
     const lng = mapEl.dataset.lng;
     const selectLocation = mapEl.dataset.selectLocation;
+    const zoom = mapEl.dataset.zoom;
 
     let defaultLat = 0;
     let defaultLng = 0;
-    let zoom = 0;
+    let defaultZoom = 0;
 
     if (selectLocation === "false" && (lat !== defaultLat.toFixed(1) || lng !== defaultLng.toFixed(1))) {
       defaultLat = lat;
       defaultLng = lng;
-      zoom = 14;
+      defaultZoom = zoom;
     }
 
-    this.map.setView([defaultLat, defaultLng], zoom);
+    this.map.setView([defaultLat, defaultLng], defaultZoom);
 
     L.PM.reInitLayer(this.map)
 
@@ -72,6 +73,17 @@ export default class ModelLocMapController extends MapController {
     const bounds = new L.LatLngBounds([coordinates]);
 
     this.map.fitBounds(bounds);
+  }
+
+  addViewPort(latitude, longitude, zoom) {
+    const coordinates = [latitude, longitude];
+    this.addMarker(coordinates, "editEv")
+
+    const bounds = new L.LatLngBounds([coordinates])
+
+    this.map.fitBounds(bounds);
+
+    this.map.setZoom(zoom);
   }
 
   clearShapes() {
