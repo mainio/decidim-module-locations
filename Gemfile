@@ -10,7 +10,7 @@ base_path = ""
 base_path = "../" if File.basename(__dir__) == "development_app"
 require_relative "#{base_path}lib/decidim/locations/version"
 
-DECIDIM_VERSION = Decidim::Locations::DECIDIM_VERSION
+DECIDIM_VERSION = Decidim::Locations.decidim_version
 
 gem "decidim", DECIDIM_VERSION
 gem "decidim-locations", path: "."
