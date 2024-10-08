@@ -2,7 +2,12 @@
 
 module Decidim
   module Locations
-    VERSION = "0.27.4"
-    DECIDIM_VERSION = "~> 0.27.4"
+    def self.decidim_version
+      "~> 0.28.0"
+    end
+
+    def self.version
+      "0.28.0"
+    end
   end
 end

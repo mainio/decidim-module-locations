@@ -6,20 +6,6 @@ def install_module(path)
   Dir.chdir(path) do
     system("bundle exec rake decidim_locations:install:migrations")
     system("bundle exec rake db:migrate")
-
-    # Temporary fix to overcome the issue with sass-embedded, see:
-    # https://github.com/decidim/decidim/pull/11074
-    system("npm i sass-embedded@~1.62.0")
-  end
-end
-
-# Temporary fix to overcome the issue with babel plugin updates, see:
-# https://github.com/decidim/decidim/pull/10916
-def fix_babel_config(path)
-  Dir.chdir(path) do
-    babel_config = "#{Dir.pwd}/babel.config.json"
-    File.delete(babel_config) if File.exist?(babel_config)
-    FileUtils.cp("#{__dir__}/babel.config.json", Dir.pwd)
   end
 end
 
