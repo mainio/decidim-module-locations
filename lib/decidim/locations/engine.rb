@@ -29,6 +29,10 @@ module Decidim
       initializer "decidim_locations.add_cells_view_paths" do
         Cell::ViewModel.view_paths << File.expand_path("#{Decidim::Locations::Engine.root}/app/cells")
       end
+
+      initializer "decidim_locations.register_icons" do
+        Decidim.icons.register(name: "more-line", icon: "more-line", category: "system", description: "", engine: :conferences)
+      end
     end
   end
 end

@@ -44,7 +44,7 @@
       <label><%= t("address") %></label>
       <div class="input-group">
         <span class="input-group-label">
-          <%= icon "map-marker", role: "img", "aria-hidden": true %>
+          <%= icon "map-pin-line", role: "img", "aria-hidden": true %>
         </span>
         <% if form.object.class.name == "Decidim::FormsLocations::Admin::LocationOptionForm"%>
           <% form.fields_for :locations do |location| %>
@@ -64,7 +64,7 @@
       <li class="tabs-title text-center" data-action="more">
         <ul class="dropdown menu" data-dropdown-menu data-autoclose="false" data-disable-hover="true" data-click-open="true" data-close-on-click="true" role="menubar">
           <li class="tabs-title" role="none">
-            <a id="model_locations_tabs_more-<%= random_id %>" href="#" aria-haspopup="true" role="menuitem"><%= icon "ellipses", role: "img", aria_label: "More options" %></a>
+            <a id="model_locations_tabs_more-<%= random_id %>" href="#" aria-haspopup="true" role="menuitem"><%= icon "more-line", role: "img", aria_label: "More options" %></a>
             <ul data-more-tabs class="menu" role="menu" aria-labelledby="model_locations_tabs_more">
               <li role="none" data-action="clear-shapes"><a href="#" role="menuitem"><%= t("clear_shapes") %></a></li>
             </ul>

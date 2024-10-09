@@ -8,7 +8,7 @@ module Decidim
       let!(:organization) { create(:organization) }
       let(:user) { create(:user, :admin, :confirmed, organization: organization) }
       let(:dummy) { create(:dummy_resource) }
-      let!(:form_klass) { Decidim::DummyResources::DummyResourceForm }
+      let!(:form_klass) { Decidim::Dev::DummyResourceForm }
       let(:form_params) do
         {
           title: "This title has to be at least 15 chars",

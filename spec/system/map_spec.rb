@@ -94,7 +94,7 @@ describe "Map", type: :system do
   end
 
   let(:cell) { template.cell("decidim/locations/map", shapes) }
-  let(:javascript) { template.javascript_pack_tag("decidim_core", defer: false) }
+  let(:javascript) { template.append_javascript_pack_tag("decidim_core", defer: false) }
 
   let(:html_document) do
     cell_html = cell.to_s
@@ -311,7 +311,7 @@ describe "Map", type: :system do
     end
 
     let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
-    let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
+    let(:dummy_form) { Decidim::Dev::DummyResourceForm.from_model(dummy) }
     let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
     let(:map_configuration) { "multiple" }
 
@@ -417,7 +417,7 @@ describe "Map", type: :system do
 
     context "when rendering more than one cell" do
       let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
-      let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
+      let(:dummy_form) { Decidim::Dev::DummyResourceForm.from_model(dummy) }
       let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
       let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "single", coords: [12, 2], checkbox: false) }
       let(:cell_two) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "multiple", coords: [12, 2], checkbox: false) }
@@ -505,7 +505,7 @@ describe "Map", type: :system do
 
     context "when cell has 'has location' -checkbox" do
       let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
-      let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
+      let(:dummy_form) { Decidim::Dev::DummyResourceForm.from_model(dummy) }
       let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
       let(:map_configuration) { "multiple" }
       let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: map_configuration, coords: [12, 2], checkbox: true) }

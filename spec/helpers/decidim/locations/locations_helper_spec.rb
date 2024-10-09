@@ -26,7 +26,7 @@ module Decidim
       end
 
       describe "#format_map_locations - multiple" do
-        let(:dummies) { Decidim::DummyResources::DummyResource.where(id: [dummy1.id, dummy2.id]) }
+        let(:dummies) { Decidim::Dev::DummyResource.where(id: [dummy1.id, dummy2.id]) }
 
         subject { helper.format_map_locations(dummies) }
 

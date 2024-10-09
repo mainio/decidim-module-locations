@@ -6,7 +6,7 @@ describe Decidim::Locations::LocationsCell, type: :cell do
   subject { my_cell.call }
 
   let(:my_cell) { cell("decidim/locations/locations", dummy, form: form, map_configuration: "single", coords: [1, 2]) }
-  let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
+  let(:dummy_form) { Decidim::Dev::DummyResourceForm.from_model(dummy) }
   let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
   let!(:organization) { create(:organization) }
   let(:user) { create(:user, :confirmed, organization: organization) }

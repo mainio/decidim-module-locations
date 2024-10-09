@@ -12,13 +12,14 @@ end
 desc "Generates a dummy app for testing"
 task test_app: "decidim:generate_external_test_app" do
   ENV["RAILS_ENV"] = "test"
-  fix_babel_config("spec/decidim_dummy_app")
   install_module("spec/decidim_dummy_app")
 end
 
 desc "Generates a development app"
-task development_app: "decidim:generate_external_development_app" do
+task :development_app do
   Bundler.with_original_env do
+    ENV["DEV_APP_GENERATION"] = "true"
+
     generate_decidim_app(
       "development_app",
       "--app_name",
@@ -31,6 +32,5 @@ task development_app: "decidim:generate_external_development_app" do
     )
   end
 
-  fix_babel_config("development_app")
   install_module("development_app")
 end
