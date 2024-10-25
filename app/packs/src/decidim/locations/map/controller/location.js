@@ -1,3 +1,4 @@
+import * as L from "leaflet"
 import MapController from "src/decidim/map/controller";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png"
 import markerIcon from "leaflet/dist/images/marker-icon.png"
@@ -5,6 +6,7 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png"
 
 export default class ModelLocMapController extends MapController {
   start() {
+    console.log(L.PM.version, "ASD")
     this.initializeMap();
     this.shapes = {};
   }
