@@ -6,7 +6,6 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png"
 
 export default class ModelLocMapController extends MapController {
   start() {
-    console.log(L.PM.version, "ASD")
     this.initializeMap();
     this.shapes = {};
   }
