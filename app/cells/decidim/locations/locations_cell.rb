@@ -62,13 +62,6 @@ module Decidim
           Array.new(7) { charset.sample }.join
         end
       end
-
-      def add_snippets
-        return if snippets.any?(:locations_map_scripts)
-
-        snippets.add(:locations_map_scripts, append_javascript_pack_tag("decidim_locations_edit_map", defer: false))
-        snippets.add(:foot, snippets.for(:locations_map_scripts))
-      end
     end
   end
 end
