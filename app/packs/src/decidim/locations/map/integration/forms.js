@@ -3,13 +3,13 @@ import addInputGroup from "src/decidim/locations/map/integration/add_input_group
 import coordAverage from "src/decidim/locations/map/integration/coord_average.js";
 import centerShape from "src/decidim/locations/map/integration/center_shape.js";
 import addExistingShapes from "src/decidim/locations/map/integration/add_existing_shapes";
+import MapControllerRegistry from "src/decidim/map/controller_registry"
 
 export default () => {
   document.querySelectorAll("[data-location-picker]").forEach((wrapperEl) => {
-    const options = JSON.parse(wrapperEl.dataset.locationPicker);
     const mapEl = wrapperEl.querySelector("[data-decidim-map]");
-    const ctrl = mapEl.dataset.mapController;
-    const editModalEl = document.querySelector(options.revealSelector);
+    const ctrl = MapControllerRegistry.getController(mapEl.id);
+    const editModalEl = document.querySelector(".model_locations_modal");
     const shapeFieldContainer = wrapperEl.querySelector("[data-shape-field]");
     const locFields = editModalEl.querySelector(".location-fields");
     const modalButtons = editModalEl.querySelector("[data-modal-buttons]");

@@ -1,4 +1,3 @@
-import * as L from "leaflet"
 import MapController from "src/decidim/map/controller";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png"
 import markerIcon from "leaflet/dist/images/marker-icon.png"
@@ -38,7 +37,6 @@ export default class ModelLocMapController extends MapController {
     }
 
     this.map.setView([defaultLat, defaultLng], defaultZoom);
-
     L.PM.reInitLayer(this.map)
 
     this.map.pm.addControls({

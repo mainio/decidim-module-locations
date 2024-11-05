@@ -1,16 +1,10 @@
-<div data-location-picker="<%= revealselector %>">
-  <% if checkbox? %>
-    <div class="field">
-      <%= form.check_box :has_location, checked: model_has_address?(model) %>
-    </div>
-  <% end %>
-
+<div data-location-picker>
   <% if form.object.respond_to?(:latitude) && form.object.respond_to?(:longitude) %>
     <%= form.hidden_field :latitude, class: "model-latitude", autocomplete: "off" %>
     <%= form.hidden_field :longitude, class: "model-longitude", autocomplete: "off" %>
   <% end %>
 
-  <div class="picker-wrapper hide">
+  <div class="picker-wrapper">
     <div data-shape-field>
       <% existent_locations.each do |loc| %>
         <% new_id = randomize_loc %>
@@ -73,7 +67,7 @@
       </li>
     </ul>
 
-    <div id="model_locations_reveal<%= random_id %>" class="reveal" data-reveal>
+    <div id="model_locations_<%= random_id %>" class="model_locations_modal">
       <div class="reveal__header">
         <h3 id="budget-modal-info-label<%= random_id %>" class="reveal__title"><%= t("edit_location") %></h3>
       </div>
@@ -111,4 +105,4 @@
   </div>
 </div>
 
-<% append_javascript_pack_tag("decidim_locations_edit_map", defer: true) %>
+<% append_javascript_pack_tag("decidim_locations_edit_map", defer: false) %>

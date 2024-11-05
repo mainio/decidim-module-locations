@@ -9,8 +9,6 @@ module Decidim
       include Decidim::MapHelper
       include Escaped
 
-      delegate :snippets, to: :controller
-
       def show
         render
       end
@@ -21,10 +19,6 @@ module Decidim
 
       def form
         options[:form]
-      end
-
-      def checkbox?
-        options[:checkbox]
       end
 
       def coords
@@ -45,10 +39,6 @@ module Decidim
         return false unless options[:select_location]
 
         true
-      end
-
-      def revealselector
-        escape!({ revealSelector: "#model_locations_reveal#{random_id}" }.to_json)
       end
 
       def randomize_loc

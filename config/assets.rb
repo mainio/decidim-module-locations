@@ -10,4 +10,7 @@ Decidim::Webpacker.register_entrypoints(
   decidim_locations_edit_map: "#{base_path}/app/packs/entrypoints/decidim_locations_edit_map.js"
 )
 Decidim::Webpacker.register_stylesheet_import("stylesheets/decidim/locations/locations")
+Decidim::Webpacker.register_stylesheet_import("src/decidim/geoman/leaflet-geoman")
 Decidim::Webpacker.register_stylesheet_import("stylesheets/decidim/locations/locations", group: :admin)
+Decidim::Webpacker.register_stylesheet_import("src/decidim/geoman/leaflet-geoman", group: :admin)
+
