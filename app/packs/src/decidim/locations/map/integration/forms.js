@@ -16,32 +16,11 @@ export default () => {
     const typeLocWrap = wrapperEl.querySelector(".type-locations-wrapper");
     const typeLocInput = typeLocWrap.querySelector(".type-loc-field");
     const typeLocButton = typeLocWrap.querySelector(".type-loc-button");
-    const locationCheckBox = wrapperEl.querySelector(["[has_location]", "has_location"].map((suffix) => `input[type="checkbox"][name$="${suffix}"]`));
-    const modelLoc = wrapperEl.querySelector(".picker-wrapper");
     const containerShapeField = shapeFieldContainer.querySelectorAll(".shape-field");
     const mapConfig = mapEl.dataset.mapConfiguration;
     const selectLocation = mapEl.dataset.selectLocation;
     const averageInput = wrapperEl.querySelector(".model-longitude") && wrapperEl.querySelector(".model-latitude");
     const clear = wrapperEl.querySelector('[data-action="clear-shapes"]');
-
-    const locationCheck = () => {
-      if (locationCheckBox && locationCheckBox.checked) {
-        modelLoc.classList.remove("hide");
-        ctrl.map.invalidateSize();
-      } else {
-        modelLoc.classList.add("hide");
-      }
-    };
-
-    if (locationCheckBox === null) {
-      modelLoc.classList.remove("hide")
-      ctrl.map.invalidateSize();
-    } else {
-      locationCheck();
-      locationCheckBox.addEventListener("change", () => {
-        locationCheck();
-      });
-    }
 
     let displayList = true;
 
@@ -131,7 +110,7 @@ export default () => {
       if (averageInput) {
         coordAverage(shapeFieldContainer, wrapperEl);
       };
-      $(editModalEl).foundation("close");
+      window.Decidim.currentDialogs[`model_locations_${mapEl.id}`].open();
     });
 
     modalButtons.querySelector("[data-modal-save]").addEventListener("click", () => {
@@ -141,7 +120,7 @@ export default () => {
       if (inputDiv) {
         inputDiv.querySelector(".location-address").value = modalAddress.value;
       };
-      $(editModalEl).foundation("close");
+      window.Decidim.currentDialogs[`model_locations_${mapEl.id}`].close();
     });
 
     ctrl.map.on("pm:create", (event) => {
@@ -229,8 +208,7 @@ export default () => {
           modalButtons.querySelector("[data-modal-save]").setAttribute("disabled", true);
         };
         if (!removalMode && !drawMode && !dragMode && !editMode) {
-        // With Foundation we have to use jQuery
-          $(editModalEl).foundation("open");
+          window.Decidim.currentDialogs[`model_locations_${mapEl.id}`].open();
         };
       });
 
