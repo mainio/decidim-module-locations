@@ -9,7 +9,7 @@ describe "Map", type: :system do
     Class.new(ActionView::Base) do
       include ::Cell::RailsExtensions::ActionView
 
-      delegate :snippets, :current_organization, to: :controller
+      delegate :current_organization, to: :controller
 
       def protect_against_forgery?
         false
@@ -94,11 +94,13 @@ describe "Map", type: :system do
   end
 
   let(:cell) { template.cell("decidim/locations/map", shapes) }
-  let(:javascript) { template.append_javascript_pack_tag("decidim_core", defer: false) }
+  let(:javascript_core) { template.append_javascript_pack_tag("decidim_core", defer: false) }
+  let(:javascript_map) { template.javascript_pack_tag("decidim_locations_edit_map", defer: false) }
 
   let(:html_document) do
     cell_html = cell.to_s
-    js = javascript
+    js_core = javascript_core
+    js_map = javascript_map
     template.instance_eval do
       <<~HTML.strip
         <!doctype html>
@@ -106,15 +108,14 @@ describe "Map", type: :system do
         <head>
           <title>Map Test</title>
           #{stylesheet_pack_tag "decidim_core", media: "all"}
-          #{snippets.display(:head)}
         </head>
         <body>
           <header>
             <a href="#content">Skip to main content</a>
           </header>
           #{cell_html}
-          #{js}
-          #{snippets.display(:foot)}
+          #{js_core}
+          #{js_map}
         </body>
         </html>
       HTML
@@ -186,6 +187,8 @@ describe "Map", type: :system do
 
       # Geocode response
       get "geocode", to: ->(_) { [200, { "Content-Type" => "application/json" }, [gcresponse]] }
+
+      get "/favicon.ico", to: ->(_) { [200, {}, []] }
     end
 
     switch_to_host(organization.host)
@@ -426,7 +429,8 @@ describe "Map", type: :system do
       let(:html_document) do
         cell_html = cell.to_s
         cell_two_html = cell_two.to_s
-        js = javascript
+        js_core = javascript_core
+        js_map = javascript_map
         template.instance_eval do
           <<~HTML.strip
             <!doctype html>
@@ -434,7 +438,6 @@ describe "Map", type: :system do
             <head>
               <title>Map Test</title>
               #{stylesheet_pack_tag "decidim_core", media: "all"}
-              #{snippets.display(:head)}
             </head>
             <body>
               <header>
@@ -442,8 +445,8 @@ describe "Map", type: :system do
               </header>
               #{cell_html}
               #{cell_two_html}
-              #{js}
-              #{snippets.display(:foot)}
+              #{js_core}
+              #{js_map}
             </body>
             </html>
           HTML
@@ -461,6 +464,7 @@ describe "Map", type: :system do
         visit "/test_map"
 
         # Wait for the map to be rendered
+        page.driver.browser.logs.get(:browser)
         expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
 
         # Wait for all map tile images to be loaded
