@@ -34,11 +34,11 @@
       <% end %>
     </template>
 
-    <div class="type-locations-wrapper">
+    <div class="type-locations-wrapper mb-2">
       <label><%= t("address") %></label>
-      <div class="input-group">
-        <span class="input-group-label">
-          <%= icon "map-pin-line", role: "img", "aria-hidden": true %>
+      <div class="input-group mb-2">
+        <span class="input-group-label inline-block h-10 w-10 top-1.5 relative">
+          <%= icon "map-pin-line", role: "img", "aria-hidden": true, class: "h-8 w-8 relative left-1 top-[3px]" %>
         </span>
         <% if form.object.class.name == "Decidim::FormsLocations::Admin::LocationOptionForm"%>
           <% form.fields_for :locations do |location| %>
@@ -47,38 +47,33 @@
         <% else %>
           <%= form.geocoding_field :address, placeholder: t("placeholder.address"), label: false, class: "type-loc-field input-group-field" %>
         <% end %>
-        <div class="input-group-button">
-          <button class="type-loc-button button button__secondary button__sm w-full" disabled><%= t("add") %></button>
+        <div class="input-group-button inline-block relative bottom-[7px]">
+          <button class="type-loc-button button button__secondary button__sm h-10" disabled><%= t("add") %></button>
         </div>
+        <span class="hint form-input-extra-before help-text hidden" aria-hidden="true"><%= t("hint") %></span>
       </div>
-      <span class="hint form-input-extra-before help-text" aria-hidden="true"><%= t("hint") %></span>
 
-      <ul class="dropdown relative" data-map-container="#pick_model_locations_map">
-        <li role="none" data-action="clear-shapes"><a href="#" role="menuitem"><%= t("clear_shapes") %></a></li>
-      </ul>
+      <button class="button button__sm button__secondary w-5/6 relative left-[42px] hidden" disabled data-action="clear-shapes">
+        <span aria-hidden="true"><%= t("clear_shapes") %></span>
+      </button>
     </div>
 
     <%= decidim_modal id: "model_locations_#{ random_id }", class: "model_locations_modal" do %>
-      <div data-dialog-container>
-        <div class="reveal__header">
-          <h3 id="budget-modal-info-label<%= random_id %>" class="reveal__title"><%= t("edit_location") %></h3>
-        </div>
-
-        <div class="location-fields">
-          <div class="text-right">
-            <button data-delete-shape type="button" class="button alert small"><%= t("delete_shape") %></button>
+      <div>
+        <h3 id="budget-modal-info-label<%= random_id %>" class="h3" data-dialog-title>
+          <%= t("edit_location") %>
+        </h3>
+        <div class="flex justify-center">
+          <div class="location-fields form__wrapper w-1/2">
+            <label>
+              <%= t("address") %>
+              <input data-modal-address type="text" name="address">
+            </label>
           </div>
-          <label>
-            <%= t("address") %>
-            <input data-modal-address type="text" name="address">
-          </label>
         </div>
-
-        <div data-modal-buttons class="text-center">
-          <button data-modal-save class="button primary"><%= t("save") %></button>
-          <button class="link" data-close aria-label="Close modal" type="button">
-            <span aria-hidden="true"><%= t("cancel") %></span>
-          </button>
+        <div data-modal-buttons data-dialog-actions class="text-center">
+          <button data-delete-shape class="button button__lg button__transparent-secondary"><%= t("delete_shape") %></button>
+          <button data-modal-save class="button button__lg button__secondary"><%= t("save") %></button>
         </div>
       </div>
     <% end %>

@@ -10,6 +10,14 @@
   border-radius: 0;
 }
 
+.input-group > .autoComplete_wrapper{
+  @apply inline-block w-10/12 bottom-[7px];
+}
+
+.input-group .help-text{
+  @apply mt-0 left-[42px] relative;
+}
+
 [data-location-picker]{
   .google-map{
     z-index: 0;

@@ -3,7 +3,8 @@ import addInputGroup from "src/decidim/locations/map/integration/add_input_group
 import coordAverage from "src/decidim/locations/map/integration/coord_average.js";
 import centerShape from "src/decidim/locations/map/integration/center_shape.js";
 import addExistingShapes from "src/decidim/locations/map/integration/add_existing_shapes";
-import MapControllerRegistry from "src/decidim/map/controller_registry"
+import MapControllerRegistry from "src/decidim/map/controller_registry";
+import clearShapeFieldContainers from "./clear_shape_field_containers";
 
 export default () => {
   document.querySelectorAll("[data-location-picker]").forEach((wrapperEl) => {
@@ -42,7 +43,7 @@ export default () => {
     $(typeLocInput).on("geocoder-suggest-coordinates.decidim", (_ev, coordinates) => {
       clearTimeout(geocodingTimeout);
       geocodingTimeout = setTimeout(() => {
-        typeLocWrap.querySelector(".hint").classList.remove("hide");
+        typeLocWrap.querySelector(".hint").classList.remove("hidden");
         ctrl.setView(coordinates);
         typeLocCoords = coordinates;
         typeLocButton.disabled = false;
@@ -53,6 +54,9 @@ export default () => {
     clear.addEventListener("click", (event) => {
       event.preventDefault();
       ctrl.clearShapes();
+      clearShapeFieldContainers(shapeFieldContainer);
+      clear.disabled = true;
+      clear.classList.add("hidden");
     })
 
     typeLocButton.addEventListener("click", (event) => {
@@ -66,7 +70,7 @@ export default () => {
         coordinates: { lat: typeLocCoords[0], lng: typeLocCoords[1] }
       };
       typeLocInput.value = "";
-      typeLocWrap.querySelector(".hint").classList.add("hide");
+      typeLocWrap.querySelector(".hint").classList.add("hidden");
       displayList = true;
       typeLocButton.disabled = true;
       addInputGroup(shapeFieldContainer, addressData, wrapperEl);
@@ -110,7 +114,7 @@ export default () => {
       if (averageInput) {
         coordAverage(shapeFieldContainer, wrapperEl);
       };
-      window.Decidim.currentDialogs[`model_locations_${mapEl.id}`].open();
+      window.Decidim.currentDialogs[`model_locations_${mapEl.id}`].close();
     });
 
     modalButtons.querySelector("[data-modal-save]").addEventListener("click", () => {
@@ -158,6 +162,8 @@ export default () => {
     });
 
     ctrl.setEventHandler("shapeadd", (shape, ev) => {
+      clear.disabled = false;
+      clear.classList.remove("hidden");
       const shapeId = shape.options.id;
       let objectShape = shape.pm._shape;
 
