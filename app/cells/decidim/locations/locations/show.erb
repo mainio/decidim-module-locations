@@ -84,13 +84,12 @@
         lat: coords[0],
         lng: coords[1],
         select_location: select_location?,
-        zoom: zoom }})
-      %>
+        zoom: zoom }}) do %>
+        <% add_snippets %>
+      <% end %>
     </div>
     <% if select_location? %>
       <button class="button primary done-location"><%= t(".done") %></button>
     <% end %>
   </div>
 </div>
-
-<% append_javascript_pack_tag("decidim_locations_edit_map", defer: false) %>

@@ -9,6 +9,8 @@ module Decidim
       include Decidim::MapHelper
       include Escaped
 
+      delegate :snippets, to: :controller
+
       def show
         render
       end
@@ -51,6 +53,13 @@ module Decidim
           charset = ("a".."z").to_a + ("0".."9").to_a
           Array.new(7) { charset.sample }.join
         end
+      end
+
+      def add_snippets
+        return if snippets.any?(:locations_map_scripts)
+
+        snippets.add(:locations_map_scripts, javascript_include_tag(sources("decidim_locations_edit_map", :javascript)))
+        snippets.add(:foot, snippets.for(:locations_map_scripts))
       end
     end
   end
