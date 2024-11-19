@@ -78,7 +78,7 @@
       </div>
     <% end %>
 
-    <div id="pick_model_locations_map-<%= random_id %>" class="locations_map_container">
+    <div id="pick_model_locations_map-<%= random_id %>" class="locations-map__container">
       <%= dynamic_map_for({ type: "model_location"}, { id: random_id, data: { decidim_revgeocoding: geocoding_options,
         map_configuration: map_configuration,
         lat: coords[0],
@@ -89,7 +89,7 @@
       <% end %>
     </div>
     <% if select_location? %>
-      <button class="button primary done-location"><%= t(".done") %></button>
+      <button class="button button__lg button__secondary mt-2 float-right done-location"><%= t(".done") %></button>
     <% end %>
   </div>
 </div>

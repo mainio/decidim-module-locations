@@ -137,7 +137,9 @@ export default () => {
     });
 
     ctrl.map.on("pm:remove", (event) => {
-      shapeFieldContainer.querySelector(`[data-shape-id="${event.layer.options.id}"]`).remove();
+      if (selectLocation === "false") {
+        shapeFieldContainer.querySelector(`[data-shape-id="${event.layer.options.id}"]`).remove();
+      }
     });
 
     let removalMode = false;
@@ -236,10 +238,10 @@ export default () => {
       const modalEl = document.querySelector("#answer-option-map-selector");
 
       closeModalButton.addEventListener("click", () => {
-        $(modalEl).foundation("close");
+        window.Decidim.currentDialogs["answer-option-map-selector"].close();
       })
 
-      $(modalEl).on("closed.zf.reveal", () => {
+      modalEl.addEventListener("close.dialog", () => {
         ctrl.clearShapes();
         ctrl.map.pm.Draw.disable();
       })
