@@ -112,7 +112,9 @@ describe "Map", type: :system do
           <header>
             <a href="#content">Skip to main content</a>
           </header>
-          #{cell_html}
+          <div class="aspect-[2/1]">
+            #{cell_html}
+          </div>
           #{js}
           #{snippets.display(:foot)}
         </body>
@@ -150,6 +152,7 @@ describe "Map", type: :system do
             };
           }
 
+
           // This is a normal suggest call to:
           // https://revgeocode.search.hereapi.com/v1/revgeocode
           var deferred = $.Deferred().resolve(response);
@@ -160,6 +163,7 @@ describe "Map", type: :system do
   end
 
   before do
+    allow(Decidim).to receive(:maps).and_return({provider: :here})
     if use_revgeo
       # Autocomplete utility override
       utility = Decidim::Map.autocomplete(organization: organization)
@@ -317,7 +321,7 @@ describe "Map", type: :system do
     let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
     let(:map_configuration) { "multiple" }
 
-    let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: map_configuration, coords: [12, 2], checkbox: false) }
+    let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: map_configuration, coords: [12, 2]) }
 
     context "when geocoding" do
       # Console.warn print tool
@@ -421,8 +425,8 @@ describe "Map", type: :system do
       let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
       let(:dummy_form) { Decidim::Dev::DummyResourceForm.from_model(dummy) }
       let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
-      let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "single", coords: [12, 2], checkbox: false) }
-      let(:cell_two) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "multiple", coords: [12, 2], checkbox: false) }
+      let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "single", coords: [12, 2]) }
+      let(:cell_two) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "multiple", coords: [12, 2]) }
       let(:use_dummy_random_ids) { true }
 
       let(:html_document) do
@@ -463,6 +467,7 @@ describe "Map", type: :system do
         visit "/test_map"
 
         # Wait for the map to be rendered
+        driver.browser.logs.get(:browser)
         expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
 
         # Wait for all map tile images to be loaded
