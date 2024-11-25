@@ -21,7 +21,6 @@ module Decidim
     #   6: Longitude of the record, e.g. 2.234
     class MapCell < Decidim::ViewModel
       include Decidim::MapHelper
-      include ActionView::Helpers::JavaScriptHelper
       include Decidim::Locations::LocationsHelper
 
       delegate :snippets, to: :controller
