@@ -9,10 +9,18 @@ describe "Map", type: :system do
     Class.new(ActionView::Base) do
       include ::Cell::RailsExtensions::ActionView
 
-      delegate :current_organization, to: :controller
+      delegate :snippets, :current_organization, to: :controller
 
       def protect_against_forgery?
         false
+      end
+
+      # Fix issue with passing the correct view context to the cells. Otherwise
+      # the script tags are added to incorrect context and therefore not
+      # rendered.
+      def cell(name, model, options = {}, &)
+        options = { context: { view_context: self } }.deep_merge(options)
+        super(name, model, options, &)
       end
     end
   end
@@ -94,13 +102,23 @@ describe "Map", type: :system do
   end
 
   let(:cell) { template.cell("decidim/locations/map", shapes) }
-  let(:javascript_core) { template.append_javascript_pack_tag("decidim_core", defer: false) }
-  let(:javascript_map) { template.javascript_pack_tag("decidim_locations_edit_map", defer: false) }
+  let(:javascript) { template.javascript_pack_tag("decidim_core", defer: false) }
+  let(:styles) do
+    css = <<~CSS
+      .cellwrap{
+        aspect-ratio: 21/9;
+      }
+      .cellwrap > *{
+        height: 100%;
+      }
+    CSS
+    %(<style type="text/css">\n#{css}</style>)
+  end
 
   let(:html_document) do
     cell_html = cell.to_s
-    js_core = javascript_core
-    js_map = javascript_map
+    css = styles
+    js = javascript
     template.instance_eval do
       <<~HTML.strip
         <!doctype html>
@@ -108,14 +126,17 @@ describe "Map", type: :system do
         <head>
           <title>Map Test</title>
           #{stylesheet_pack_tag "decidim_core", media: "all"}
+          #{css}
         </head>
         <body>
           <header>
             <a href="#content">Skip to main content</a>
           </header>
-          #{cell_html}
-          #{js_core}
-          #{js_map}
+          <div class="cellwrap">
+            #{cell_html}
+          </div>
+          #{js}
+          #{snippets.display(:foot)}
         </body>
         </html>
       HTML
@@ -319,6 +340,7 @@ describe "Map", type: :system do
     let(:map_configuration) { "multiple" }
 
     let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: map_configuration, coords: [12, 2], checkbox: false) }
+    let(:styles) { nil }
 
     context "when geocoding" do
       # Console.warn print tool
@@ -429,8 +451,7 @@ describe "Map", type: :system do
       let(:html_document) do
         cell_html = cell.to_s
         cell_two_html = cell_two.to_s
-        js_core = javascript_core
-        js_map = javascript_map
+        js = javascript
         template.instance_eval do
           <<~HTML.strip
             <!doctype html>
@@ -445,8 +466,8 @@ describe "Map", type: :system do
               </header>
               #{cell_html}
               #{cell_two_html}
-              #{js_core}
-              #{js_map}
+              #{js}
+              #{snippets.display(:foot)}
             </body>
             </html>
           HTML
@@ -513,6 +534,7 @@ describe "Map", type: :system do
       let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
       let(:map_configuration) { "multiple" }
       let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: map_configuration, coords: [12, 2], checkbox: true) }
+      let(:styles) { nil }
 
       before do
         visit "/test_map"
