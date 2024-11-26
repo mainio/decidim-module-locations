@@ -2,12 +2,12 @@
   @extend .menu;
 
   .tabs-title{
-    float: none;
+    @apply float-none;
   }
 }
 
 .autoComplete_wrapper > input.input-group-field{
-  border-radius: 0;
+  @apply rounded-none;
 }
 
 .input-group > .autoComplete_wrapper{
@@ -20,38 +20,37 @@
 
 [data-location-picker]{
   .google-map{
-    z-index: 0;
+    @apply z-0;
   }
 
   .tabs{
     .dropdown.menu{
       &,
       li{
-        width: 100%;
+        @apply w-full;
       }
 
       li{
         a{
-          background: transparent;
+          @apply bg-transparent;
         }
       }
 
       li.is-active{
         a{
-          background: transparent;
-          color: #f52727;
+          @apply bg-transparent text-[#f52727];
         }
       }
 
       li a::after{
-        display: none;
+        @apply hidden;
       }
     }
   }
 }
 
 .locations-map__container{
-  [data-decidim-map] {
+  [data-decidim-map]{
     @apply aspect-[2/1];
   }
 }
