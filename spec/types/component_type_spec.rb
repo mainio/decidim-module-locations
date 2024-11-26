@@ -11,36 +11,36 @@ module Decidim
       Decidim::Core::ComponentType.implements Decidim::Locations::LocationsInterface
       include_context "with a graphql class type"
 
-      let!(:location1) { create(:location, locatable: model, skip_injection: true) }
-      let!(:location2) { create(:location, locatable: model, skip_injection: true) }
+      let!(:location_one) { create(:location, locatable: model, skip_injection: true) }
+      let!(:location_two) { create(:location, locatable: model, skip_injection: true) }
       let(:model) { create(:dummy_component) }
       let(:query) { "{ locations { id address longitude latitude } }" }
 
       describe "locations" do
         it "returns the location fields" do
           addresses = response["locations"].map { |location| location["address"] }
-          expect(addresses).to match_array([location1.address, location2.address])
+          expect(addresses).to contain_exactly(location_one.address, location_two.address)
         end
       end
 
       describe "longitudes" do
         it "returns the location fields" do
           addresses = response["locations"].map { |location| location["longitude"] }
-          expect(addresses).to match_array([location1.longitude, location2.longitude])
+          expect(addresses).to contain_exactly(location_one.longitude, location_two.longitude)
         end
       end
 
       describe "latitudes" do
         it "returns the location fields" do
           addresses = response["locations"].map { |location| location["latitude"] }
-          expect(addresses).to match_array([location1.latitude, location2.latitude])
+          expect(addresses).to contain_exactly(location_one.latitude, location_two.latitude)
         end
       end
 
       describe "ids" do
         it "returns the location fields" do
           addresses = response["locations"].map { |location| location["id"] }
-          expect(addresses).to match_array([location1.id.to_s, location2.id.to_s])
+          expect(addresses).to contain_exactly(location_one.id.to_s, location_two.id.to_s)
         end
       end
     end

@@ -41,7 +41,7 @@ module Decidim
             Decidim::Locations::Location.new(attributes)
           end
         end.compact
-        locatable.update!(locations: locations)
+        locatable.update!(locations:)
       end
     end
   end

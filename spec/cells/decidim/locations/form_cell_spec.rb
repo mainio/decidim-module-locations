@@ -7,10 +7,10 @@ describe Decidim::Locations::FormCell, type: :cell do
 
   let(:my_cell) { cell("decidim/locations/form", form_builder) }
   let!(:organization) { create(:organization) }
-  let(:user) { create(:user, :confirmed, organization: organization) }
+  let(:user) { create(:user, :confirmed, organization:) }
   let(:template_class) do
     Class.new(ActionView::Base) do
-      include ::Cell::RailsExtensions::ActionView
+      include Cell::RailsExtensions::ActionView
 
       delegate :snippets, to: :controller
 

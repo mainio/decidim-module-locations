@@ -72,7 +72,7 @@ shared_examples "map cell render" do
 
     it "renders the map with 3 shapes" do
       expect(page).to have_css(".leaflet-marker-icon", count: 1)
-      expect(page).to have_selector('img[title="Title of the marker"]')
+      expect(page).to have_css('img[title="Title of the marker"]')
       expect(page).to have_css("path.leaflet-interactive", count: 2)
     end
 

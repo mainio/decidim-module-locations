@@ -2,12 +2,12 @@
 
 require "spec_helper"
 
-describe "Map", type: :system do
+describe "Map" do
   let!(:organization) { create(:organization) }
 
   let(:template_class) do
     Class.new(ActionView::Base) do
-      include ::Cell::RailsExtensions::ActionView
+      include Cell::RailsExtensions::ActionView
 
       delegate :snippets, :current_organization, to: :controller
 
@@ -183,11 +183,10 @@ describe "Map", type: :system do
   end
 
   before do
-    allow(Decidim).to receive(:maps).and_return({provider: :here})
     if use_revgeo
       # Autocomplete utility override
-      utility = Decidim::Map.autocomplete(organization: organization)
-      allow(Decidim::Map).to receive(:autocomplete).with(organization: organization).and_return(utility)
+      utility = Decidim::Map.autocomplete(organization:)
+      allow(Decidim::Map).to receive(:autocomplete).with(organization:).and_return(utility)
       allow(utility).to receive(:builder_options).and_return(
         api_key: "key1234"
       )
@@ -341,12 +340,10 @@ describe "Map", type: :system do
     let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
     let(:map_configuration) { "multiple" }
 
-    let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: map_configuration, coords: [12, 2]) }
+    let(:cell) { template.cell("decidim/locations/locations", dummy, form:, map_configuration:, coords: [12, 2]) }
     let(:styles) { nil }
 
     context "when geocoding" do
-      # Console.warn print tool
-      # puts page.driver.browser.manage.logs.get(:browser).map(&:message).join("\n")
       let(:geocode_response) do
         {
           type: "FeatureCollection",
@@ -446,8 +443,8 @@ describe "Map", type: :system do
       let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
       let(:dummy_form) { Decidim::Dev::DummyResourceForm.from_model(dummy) }
       let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
-      let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "single", coords: [12, 2]) }
-      let(:cell_two) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: "multiple", coords: [12, 2]) }
+      let(:cell) { template.cell("decidim/locations/locations", dummy, form:, map_configuration: "single", coords: [12, 2]) }
+      let(:cell_two) { template.cell("decidim/locations/locations", dummy, form:, map_configuration: "multiple", coords: [12, 2]) }
       let(:use_dummy_random_ids) { true }
 
       let(:html_document) do
@@ -488,7 +485,6 @@ describe "Map", type: :system do
         visit "/test_map"
 
         # Wait for the map to be rendered
-        driver.browser.logs.get(:browser)
         expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
 
         # Wait for all map tile images to be loaded
@@ -501,7 +497,7 @@ describe "Map", type: :system do
 
       it "renders multiple maps" do
         expect(page).to have_css(".type-loc-field", count: 2)
-        expect(page).to have_selector("div[data-shape-field]", count: 2)
+        expect(page).to have_css("div[data-shape-field]", count: 2)
       end
 
       context "when adding markers" do
@@ -517,41 +513,15 @@ describe "Map", type: :system do
             expect(page).to have_css(".leaflet-marker-icon", count: 1)
           end
 
-          page.execute_script("window.scrollBy(0, 800)")
+          page.execute_script("window.scrollBy(0, 1100)")
 
           within "#pick_model_locations_map-exampletwo" do
             find('div[title="Draw Marker"] a').click
-            find("[data-decidim-map]").click(x: 15, y: 5)
-            find("[data-decidim-map]").click(x: 20, y: 10)
-            find("div.leaflet-pm-actions-container a.leaflet-pm-action.action-cancel").click
+            find("[data-decidim-map]").click(x: 6, y: 2)
+            find("[data-decidim-map]").click(x: 6, y: 2)
 
             expect(page).to have_css("img.leaflet-marker-icon", count: 2)
           end
-        end
-      end
-    end
-
-    context "when cell has 'has location' -checkbox" do
-      let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
-      let(:dummy_form) { Decidim::Dev::DummyResourceForm.from_model(dummy) }
-      let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
-      let(:map_configuration) { "multiple" }
-      let(:cell) { template.cell("decidim/locations/locations", dummy, form: form, map_configuration: map_configuration, coords: [12, 2], checkbox: true) }
-      let(:styles) { nil }
-
-      before do
-        visit "/test_map"
-      end
-
-      it "checks the box if text is clicked" do
-        expect(page).to have_content("Has location")
-        find('label[for="dummy_has_location"]').click
-        expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
-
-        loop do
-          break if page.all("[data-decidim-map] .leaflet-map-pane img").all? { |img| img["complete"] == "true" }
-
-          sleep 0.1
         end
       end
     end

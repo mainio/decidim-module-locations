@@ -40,7 +40,7 @@ module Decidim
           return
         end
 
-        record = self.class.locations_record_class.find_by(id: id)
+        record = self.class.locations_record_class.find_by(id:)
         return unless record
 
         unexisting_ids = provided_ids.map(&:to_i) - record.locations.pluck(:id)

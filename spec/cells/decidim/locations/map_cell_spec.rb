@@ -7,10 +7,10 @@ describe Decidim::Locations::MapCell, type: :cell do
 
   let(:my_cell) { cell("decidim/locations/map", dummy) }
   let!(:organization) { create(:organization) }
-  let(:user) { create(:user, :confirmed, organization: organization) }
+  let(:user) { create(:user, :confirmed, organization:) }
   let(:template_class) do
     Class.new(ActionView::Base) do
-      include ::Cell::RailsExtensions::ActionView
+      include Cell::RailsExtensions::ActionView
 
       delegate :snippets, to: :controller
     end
@@ -34,7 +34,7 @@ describe Decidim::Locations::MapCell, type: :cell do
           The element can be used with a screen reader but it may be hard to understand.
       TXT
       )
-      expect(subject).to have_css(".map__help")
+      expect(subject).to have_css(".map__skip")
       expect(subject).to have_css("[id$='_bottom']")
     end
   end

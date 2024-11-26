@@ -49,7 +49,7 @@ module Decidim
         # check if GeoJSON is valid
         begin
           geo_factory = RGeo::Geographic.spherical_factory
-          RGeo::GeoJSON.decode(geojson, geo_factory: geo_factory)
+          RGeo::GeoJSON.decode(geojson, geo_factory:)
 
           coord_validation
         rescue JSON::ParserError
