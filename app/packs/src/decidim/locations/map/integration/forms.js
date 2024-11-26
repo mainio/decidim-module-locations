@@ -3,45 +3,25 @@ import addInputGroup from "src/decidim/locations/map/integration/add_input_group
 import coordAverage from "src/decidim/locations/map/integration/coord_average.js";
 import centerShape from "src/decidim/locations/map/integration/center_shape.js";
 import addExistingShapes from "src/decidim/locations/map/integration/add_existing_shapes";
+import MapControllerRegistry from "src/decidim/map/controller_registry";
+import clearShapeFieldContainers from "./clear_shape_field_containers";
 
 export default () => {
   document.querySelectorAll("[data-location-picker]").forEach((wrapperEl) => {
-    const options = JSON.parse(wrapperEl.dataset.locationPicker);
     const mapEl = wrapperEl.querySelector("[data-decidim-map]");
-    const ctrl = $(mapEl).data("map-controller");
-    const editModalEl = document.querySelector(options.revealSelector);
+    const ctrl = MapControllerRegistry.getController(mapEl.id);
+    const editModalEl = document.querySelector(".model_locations_modal");
     const shapeFieldContainer = wrapperEl.querySelector("[data-shape-field]");
     const locFields = editModalEl.querySelector(".location-fields");
     const modalButtons = editModalEl.querySelector("[data-modal-buttons]");
     const typeLocWrap = wrapperEl.querySelector(".type-locations-wrapper");
     const typeLocInput = typeLocWrap.querySelector(".type-loc-field");
     const typeLocButton = typeLocWrap.querySelector(".type-loc-button");
-    const locationCheckBox = wrapperEl.querySelector(["[has_location]", "has_location"].map((suffix) => `input[type="checkbox"][name$="${suffix}"]`));
-    const modelLoc = wrapperEl.querySelector(".picker-wrapper");
     const containerShapeField = shapeFieldContainer.querySelectorAll(".shape-field");
     const mapConfig = mapEl.dataset.mapConfiguration;
     const selectLocation = mapEl.dataset.selectLocation;
     const averageInput = wrapperEl.querySelector(".model-longitude") && wrapperEl.querySelector(".model-latitude");
     const clear = wrapperEl.querySelector('[data-action="clear-shapes"]');
-
-    const locationCheck = () => {
-      if (locationCheckBox && locationCheckBox.checked) {
-        modelLoc.classList.remove("hide");
-        ctrl.map.invalidateSize();
-      } else {
-        modelLoc.classList.add("hide");
-      }
-    };
-
-    if (locationCheckBox === null) {
-      modelLoc.classList.remove("hide")
-      ctrl.map.invalidateSize();
-    } else {
-      locationCheck();
-      locationCheckBox.addEventListener("change", () => {
-        locationCheck();
-      });
-    }
 
     let displayList = true;
 
@@ -63,7 +43,7 @@ export default () => {
     $(typeLocInput).on("geocoder-suggest-coordinates.decidim", (_ev, coordinates) => {
       clearTimeout(geocodingTimeout);
       geocodingTimeout = setTimeout(() => {
-        typeLocWrap.querySelector(".hint").classList.remove("hide");
+        typeLocWrap.querySelector(".hint").classList.remove("hidden");
         ctrl.setView(coordinates);
         typeLocCoords = coordinates;
         typeLocButton.disabled = false;
@@ -74,6 +54,9 @@ export default () => {
     clear.addEventListener("click", (event) => {
       event.preventDefault();
       ctrl.clearShapes();
+      clearShapeFieldContainers(shapeFieldContainer);
+      clear.disabled = true;
+      clear.classList.add("hidden");
     })
 
     typeLocButton.addEventListener("click", (event) => {
@@ -87,7 +70,7 @@ export default () => {
         coordinates: { lat: typeLocCoords[0], lng: typeLocCoords[1] }
       };
       typeLocInput.value = "";
-      typeLocWrap.querySelector(".hint").classList.add("hide");
+      typeLocWrap.querySelector(".hint").classList.add("hidden");
       displayList = true;
       typeLocButton.disabled = true;
       addInputGroup(shapeFieldContainer, addressData, wrapperEl);
@@ -131,7 +114,7 @@ export default () => {
       if (averageInput) {
         coordAverage(shapeFieldContainer, wrapperEl);
       };
-      $(editModalEl).foundation("close");
+      window.Decidim.currentDialogs[`model_locations_${mapEl.id}`].close();
     });
 
     modalButtons.querySelector("[data-modal-save]").addEventListener("click", () => {
@@ -141,7 +124,7 @@ export default () => {
       if (inputDiv) {
         inputDiv.querySelector(".location-address").value = modalAddress.value;
       };
-      $(editModalEl).foundation("close");
+      window.Decidim.currentDialogs[`model_locations_${mapEl.id}`].close();
     });
 
     ctrl.map.on("pm:create", (event) => {
@@ -154,7 +137,9 @@ export default () => {
     });
 
     ctrl.map.on("pm:remove", (event) => {
-      shapeFieldContainer.querySelector(`[data-shape-id="${event.layer.options.id}"]`).remove();
+      if (selectLocation === "false") {
+        shapeFieldContainer.querySelector(`[data-shape-id="${event.layer.options.id}"]`).remove();
+      }
     });
 
     let removalMode = false;
@@ -179,6 +164,8 @@ export default () => {
     });
 
     ctrl.setEventHandler("shapeadd", (shape, ev) => {
+      clear.disabled = false;
+      clear.classList.remove("hidden");
       const shapeId = shape.options.id;
       let objectShape = shape.pm._shape;
 
@@ -229,8 +216,7 @@ export default () => {
           modalButtons.querySelector("[data-modal-save]").setAttribute("disabled", true);
         };
         if (!removalMode && !drawMode && !dragMode && !editMode) {
-        // With Foundation we have to use jQuery
-          $(editModalEl).foundation("open");
+          window.Decidim.currentDialogs[`model_locations_${mapEl.id}`].open();
         };
       });
 
@@ -252,10 +238,10 @@ export default () => {
       const modalEl = document.querySelector("#answer-option-map-selector");
 
       closeModalButton.addEventListener("click", () => {
-        $(modalEl).foundation("close");
+        window.Decidim.currentDialogs["answer-option-map-selector"].close();
       })
 
-      $(modalEl).on("closed.zf.reveal", () => {
+      modalEl.addEventListener("close.dialog", () => {
         ctrl.clearShapes();
         ctrl.map.pm.Draw.disable();
       })

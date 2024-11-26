@@ -5,14 +5,14 @@ require "spec_helper"
 describe Decidim::Locations::LocationsCell, type: :cell do
   subject { my_cell.call }
 
-  let(:my_cell) { cell("decidim/locations/locations", dummy, form: form, map_configuration: "single", coords: [1, 2]) }
-  let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
+  let(:my_cell) { cell("decidim/locations/locations", dummy, form:, map_configuration: "single", coords: [1, 2]) }
+  let(:dummy_form) { Decidim::Dev::DummyResourceForm.from_model(dummy) }
   let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
   let!(:organization) { create(:organization) }
-  let(:user) { create(:user, :confirmed, organization: organization) }
+  let(:user) { create(:user, :confirmed, organization:) }
   let(:template_class) do
     Class.new(ActionView::Base) do
-      include ::Cell::RailsExtensions::ActionView
+      include Cell::RailsExtensions::ActionView
 
       delegate :snippets, :current_organization, to: :controller
     end
@@ -30,8 +30,8 @@ describe Decidim::Locations::LocationsCell, type: :cell do
 
   context "when cell called" do
     before do
-      utility = Decidim::Map.autocomplete(organization: organization)
-      allow(Decidim::Map).to receive(:autocomplete).with(organization: organization).and_return(utility)
+      utility = Decidim::Map.autocomplete(organization:)
+      allow(Decidim::Map).to receive(:autocomplete).with(organization:).and_return(utility)
       allow(utility).to receive(:builder_options).and_return(
         api_key: "key1234"
       )
@@ -39,8 +39,8 @@ describe Decidim::Locations::LocationsCell, type: :cell do
     end
 
     it "renders the view" do
-      expect(subject).to have_css("input[name=\"dummy[address]\"]")
-      expect(subject).to have_selector("#example")
+      expect(subject).to have_field("dummy[address]")
+      expect(subject).to have_css("#example")
       expect(subject).to have_content(
         <<~TXT.squish
           The following element is a map which presents the items on this page as map points.

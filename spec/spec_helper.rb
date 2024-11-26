@@ -9,8 +9,8 @@ Decidim::Dev.dummy_app_path =
 
 require "decidim/dev/test/base_spec_helper"
 
-Decidim::DummyResources::DummyResource.include(Decidim::Locations::Locatable)
-Decidim::DummyResources::DummyResourceForm.include(Decidim::Locations::LocatableForm)
+Decidim::Dev::DummyResource.include(Decidim::Locations::Locatable)
+Decidim::Dev::DummyResourceForm.include(Decidim::Locations::LocatableForm)
 
 RSpec.configure do |config|
   config.before :each, type: /system|cell/ do
@@ -22,9 +22,3 @@ RSpec.configure do |config|
     )
   end
 end
-
-# This re-registration is made because of problems with chromedriver v.120
-# Selenium methods are undefined without this change
-# More info in PR #12160
-
-require "#{Dir.pwd}/lib/decidim/locations/test/rspec_support/capybara.rb"

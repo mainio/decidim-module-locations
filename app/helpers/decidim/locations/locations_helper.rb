@@ -19,13 +19,12 @@ module Decidim
         def format_map_locations(model)
           query, tbl =
             if model.class.superclass == ActiveRecord::Relation
-              [Decidim::Locations::Location.where(decidim_locations_locatable_id: model.map(&:id)), model.table_name]
+              [Decidim::Locations::Location.where(decidim_locations_locatable_id: model.map(&:id), decidim_locations_locatable_type: model.first.class.name), model.table_name]
             elsif model.instance_of?(Array) || model.is_a?(ActiveRecord::Associations::CollectionProxy)
               return model
             else
               [model.locations, model.class.table_name]
             end
-
           join_sql = <<~QUERY.squish
             INNER JOIN #{Arel.sql(tbl)} AS locatable
               ON #{Arel.sql(Decidim::Locations::Location.table_name)}.decidim_locations_locatable_id = locatable.id

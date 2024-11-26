@@ -37,7 +37,6 @@ export default class ModelLocMapController extends MapController {
     }
 
     this.map.setView([defaultLat, defaultLng], defaultZoom);
-
     L.PM.reInitLayer(this.map)
 
     this.map.pm.addControls({

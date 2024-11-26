@@ -1,102 +1,56 @@
-@import "src/decidim/geoman/leaflet-geoman.css";
-
 .tabs.expanded{
   @extend .menu;
 
   .tabs-title{
-    float: none;
+    @apply float-none;
   }
 }
 
 .autoComplete_wrapper > input.input-group-field{
-  border-radius: 0;
+  @apply rounded-none;
+}
+
+.input-group > .autoComplete_wrapper{
+  @apply inline-block w-10/12 bottom-[7px];
+}
+
+.input-group .help-text{
+  @apply mt-0 left-[42px] relative;
 }
 
 [data-location-picker]{
   .google-map{
-    z-index: 0;
+    @apply z-0;
   }
 
   .tabs{
     .dropdown.menu{
       &,
       li{
-        width: 100%;
+        @apply w-full;
       }
 
       li{
         a{
-          background: transparent;
+          @apply bg-transparent;
         }
       }
 
       li.is-active{
         a{
-          background: transparent;
-          color: #f52727;
+          @apply bg-transparent text-[#f52727];
         }
       }
 
       li a::after{
-        display: none;
+        @apply hidden;
       }
     }
   }
 }
 
-// Changes taken from pull request #9460, decidim version 0.28, can be deleted
-// when decidim 0.28 in use
-
-$autocomplete-input-height: ($input-font-size * unitless-calc($input-line-height)) + (get-side($input-padding, 'top') + get-side($input-padding, 'bottom')) - rem-calc(1) !default;
-$autocomplete-input-line-height: $input-line-height !default;
-$autocomplete-input-padding: $input-padding !default;
-$autocomplete-multiselect-search-prompt-color: $dark-gray !default;
-
-.autoComplete_wrapper{
-  position: relative;
-  margin-bottom: 0;
-
-  ul{
-    position: absolute;
+.locations-map__container{
+  [data-decidim-map]{
+    @apply aspect-[2/1];
   }
-
-  span{
-    &.autocomplete__selected-item.sticky{
-      overflow: hidden;
-      height: $autocomplete-input-height;
-      line-height: $autocomplete-input-line-height;
-      padding: $autocomplete-input-padding;
-    }
-  }
-
-  .clear-sticky-selection{
-    height: $autocomplete-input-height;
-    line-height: $autocomplete-input-height;
-  }
-}
-
-.locations-type-container{
-  width: 34px;
-}
-
-.locations-type{
-  width: 30px;
-  height: 30px;
-  background-color: #fff;
-  position: relative;
-  border-radius: 0;
-
-  &.type-top{
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-  }
-
-  &.type-bottom{
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-  }
-}
-
-.done-location{
-  float: right;
 }

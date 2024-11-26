@@ -170,8 +170,8 @@ shared_examples "reverse geocoding" do
         add_marker
         expect(page).to have_css(".leaflet-marker-icon", visible: :all)
         find(".leaflet-marker-icon").click
-        click_button "Delete shape"
-        expect(page).not_to have_css(".leaflet-marker-icon")
+        click_on "Delete shape"
+        expect(page).to have_no_css(".leaflet-marker-icon")
       end
     end
 
@@ -181,8 +181,8 @@ shared_examples "reverse geocoding" do
         add_line
         expect(page).to have_css(".leaflet-interactive")
         find(".leaflet-interactive").click
-        click_button "Delete shape"
-        expect(page).not_to have_css(".leaflet-interactive")
+        click_on "Delete shape"
+        expect(page).to have_no_css(".leaflet-interactive")
       end
     end
 
@@ -192,8 +192,8 @@ shared_examples "reverse geocoding" do
         add_polygon
         expect(page).to have_css(".leaflet-interactive")
         find(".leaflet-interactive").click
-        click_button "Delete shape"
-        expect(page).not_to have_css(".leaflet-interactive")
+        click_on "Delete shape"
+        expect(page).to have_no_css(".leaflet-interactive")
       end
     end
   end
@@ -206,7 +206,7 @@ shared_examples "reverse geocoding" do
         expect(page).to have_css(".leaflet-marker-icon", visible: :all)
         find('div[title="Remove Layers"] a').click
         find(".leaflet-marker-icon").click
-        expect(page).not_to have_css(".leaflet-marker-icon")
+        expect(page).to have_no_css(".leaflet-marker-icon")
       end
     end
 
@@ -217,7 +217,7 @@ shared_examples "reverse geocoding" do
         expect(page).to have_css(".leaflet-interactive")
         find('div[title="Remove Layers"] a').click
         find(".leaflet-interactive").click
-        expect(page).not_to have_css(".leaflet-interactive")
+        expect(page).to have_no_css(".leaflet-interactive")
       end
     end
 
@@ -228,7 +228,7 @@ shared_examples "reverse geocoding" do
         expect(page).to have_css(".leaflet-interactive")
         find('div[title="Remove Layers"] a').click
         find(".leaflet-interactive").click
-        expect(page).not_to have_css(".leaflet-interactive")
+        expect(page).to have_no_css(".leaflet-interactive")
       end
     end
   end
@@ -241,7 +241,7 @@ shared_examples "reverse geocoding" do
         add_marker(latitude: 11.523, longitude: 5.523)
         expect(page).to have_css(".leaflet-marker-icon", count: 2)
         find(".leaflet-marker-icon", match: :first).click
-        click_button "Delete shape"
+        click_on "Delete shape"
         expect(page).to have_css(".leaflet-marker-icon", count: 1)
       end
     end
@@ -253,7 +253,7 @@ shared_examples "reverse geocoding" do
         add_line(latitude: [60.25240524264372, 60.25116980538645], longitude: [25.10409421539333, 25.104342109680122])
         expect(page).to have_css(".leaflet-interactive", count: 2)
         find(".leaflet-interactive", match: :first).click
-        click_button "Delete shape"
+        click_on "Delete shape"
         expect(page).to have_css(".leaflet-interactive", count: 1)
       end
     end
@@ -265,7 +265,7 @@ shared_examples "reverse geocoding" do
         add_polygon(latitude: [85.05109772344434, 85.05101347805167, 85.05106165693364], longitude: [24.741211170645243, 24.7438833903077, 24.74355157804477])
         expect(page).to have_css(".leaflet-interactive", count: 2)
         find(".leaflet-interactive", match: :first).click
-        click_button "Delete shape"
+        click_on "Delete shape"
         expect(page).to have_css(".leaflet-interactive", count: 1)
       end
     end

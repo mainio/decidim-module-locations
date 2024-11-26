@@ -7,10 +7,10 @@ describe Decidim::Locations::FormCell, type: :cell do
 
   let(:my_cell) { cell("decidim/locations/form", form_builder) }
   let!(:organization) { create(:organization) }
-  let(:user) { create(:user, :confirmed, organization: organization) }
+  let(:user) { create(:user, :confirmed, organization:) }
   let(:template_class) do
     Class.new(ActionView::Base) do
-      include ::Cell::RailsExtensions::ActionView
+      include Cell::RailsExtensions::ActionView
 
       delegate :snippets, to: :controller
 
@@ -21,7 +21,7 @@ describe Decidim::Locations::FormCell, type: :cell do
   end
   let(:dummy) { create(:dummy_resource) }
   let!(:dummy_loc) { create(:location, locatable: dummy, address: "Original address", latitude: 12, longitude: 5) }
-  let(:dummy_form) { Decidim::DummyResources::DummyResourceForm.from_model(dummy) }
+  let(:dummy_form) { Decidim::Dev::DummyResourceForm.from_model(dummy) }
   let(:controller) do
     double.tap do |ctrl|
       snippets = double
