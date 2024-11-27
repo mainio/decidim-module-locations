@@ -525,5 +525,31 @@ describe "Map" do
         end
       end
     end
+
+    context "when cell has 'has location' -checkbox" do
+      let(:dummy) { create(:dummy_resource, body: "A reasonable body") }
+      let(:dummy_form) { Decidim::Dev::DummyResourceForm.from_model(dummy) }
+      let(:form) { Decidim::FormBuilder.new("dummy", dummy_form, template, {}) }
+      let(:map_configuration) { "multiple" }
+      let(:cell) { template.cell("decidim/locations/locations", dummy, form:, map_configuration:, coords: [12, 2], checkbox: true) }
+
+      before do
+        visit "/test_map"
+      end
+
+      it "checks the box if text is clicked" do
+        expect(page).to have_content("Has location")
+        expect(page).to have_no_css("[data-decidim-map] .leaflet-map-pane img")
+
+        find('label[for="dummy_has_location"]').click
+        expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
+
+        loop do
+          break if page.all("[data-decidim-map] .leaflet-map-pane img").all? { |img| img["complete"] == "true" }
+
+          sleep 0.1
+        end
+      end
+    end
   end
 end

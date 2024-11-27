@@ -22,6 +22,27 @@ export default () => {
     const selectLocation = mapEl.dataset.selectLocation;
     const averageInput = wrapperEl.querySelector(".model-longitude") && wrapperEl.querySelector(".model-latitude");
     const clear = wrapperEl.querySelector('[data-action="clear-shapes"]');
+    const locationCheckBox = wrapperEl.querySelector(["[has_location]", "has_location"].map((suffix) => `input[type="checkbox"][name$="${suffix}"]`));
+    const modelLoc = wrapperEl.querySelector(".picker-wrapper");
+
+    const locationCheck = () => {
+      if (locationCheckBox && locationCheckBox.checked) {
+        modelLoc.classList.remove("hidden");
+        ctrl.map.invalidateSize();
+      } else {
+        modelLoc.classList.add("hidden");
+      }
+    };
+
+    if (locationCheckBox === null) {
+      modelLoc.classList.remove("hide")
+      ctrl.map.invalidateSize();
+    } else {
+      locationCheck();
+      locationCheckBox.addEventListener("change", () => {
+        locationCheck();
+      });
+    }
 
     let displayList = true;
 

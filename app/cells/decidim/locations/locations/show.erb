@@ -1,4 +1,10 @@
 <div data-location-picker>
+  <% if checkbox? %>
+    <div class="field">
+      <%= form.check_box :has_location, checked: model_has_address?(model) %>
+    </div>
+  <% end %>
+
   <% if form.object.respond_to?(:latitude) && form.object.respond_to?(:longitude) %>
     <%= form.hidden_field :latitude, class: "model-latitude", autocomplete: "off" %>
     <%= form.hidden_field :longitude, class: "model-longitude", autocomplete: "off" %>

@@ -23,6 +23,10 @@ module Decidim
         options[:form]
       end
 
+      def checkbox?
+        options[:checkbox]
+      end
+
       def coords
         options[:coords]
       end
