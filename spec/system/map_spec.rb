@@ -225,17 +225,7 @@ describe "Map" do
 
   context "when map cell rendered" do
     before do
-      visit "/test_map"
-
-      # Wait for the map to be rendered
-      expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
-
-      # Wait for all map tile images to be loaded
-      loop do
-        break if page.all("[data-decidim-map] .leaflet-map-pane img").all? { |img| img["complete"] == "true" }
-
-        sleep 0.1
-      end
+      visit_test_map
     end
 
     it_behaves_like "map cell render"
@@ -401,21 +391,87 @@ describe "Map" do
       end
 
       before do
-        visit "/test_map"
-
-        # Wait for the map to be rendered
-        expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
-
-        # Wait for all map tile images to be loaded
-        loop do
-          break if page.all("[data-decidim-map] .leaflet-map-pane img").all? { |img| img["complete"] == "true" }
-
-          sleep 0.1
-        end
+        visit_test_map
       end
 
       context "when typing locations" do
-        it_behaves_like "type locations"
+        context "when adding single location" do
+          it "adds marker" do
+            expect(page).to have_css(".type-loc-field")
+            find_by_id("dummy_address").set("veneen")
+            expect(page).to have_content(
+              "Veneentekijäntie 4, Finland\nVeneentekijäntie 6, Finland\nVeneentekijäntie 7, Finland"
+            )
+            find_by_id("autoComplete_result_0").click
+            click_on "Add"
+            expect(page).to have_css(".leaflet-marker-draggable")
+          end
+        end
+
+        context "when adding multiple locations" do
+          it "adds multiple if configured accordingly" do
+            expect(page).to have_css(".type-loc-field")
+            find_by_id("dummy_address").set("veneen")
+            expect(page).to have_content(
+              "Veneentekijäntie 4, Finland\nVeneentekijäntie 6, Finland\nVeneentekijäntie 7, Finland"
+            )
+            find_by_id("autoComplete_result_0").click
+            click_on "Add"
+            expect(page).to have_css(".leaflet-marker-draggable")
+            expect(page).to have_css(".leaflet-marker-draggable", count: 1)
+            find_by_id("dummy_address").set("veneen")
+            expect(page).to have_content(
+              "Veneentekijäntie 4, Finland\nVeneentekijäntie 6, Finland\nVeneentekijäntie 7, Finland"
+            )
+            find_by_id("autoComplete_result_1").click
+            click_on "Add"
+            expect(page).to have_css(".leaflet-marker-draggable")
+            expect(page).to have_no_css(".leaflet-marker-draggable", count: 1)
+            expect(page).to have_css(".leaflet-marker-draggable", count: 2, visible: :all)
+          end
+        end
+
+        context "when adding multiple locations and configuration limits it" do
+          let(:map_configuration) { "single" }
+
+          it "adds a single location" do
+            expect(page).to have_css(".type-loc-field")
+            find_by_id("dummy_address").set("veneen")
+            expect(page).to have_content(
+              "Veneentekijäntie 4, Finland\nVeneentekijäntie 6, Finland\nVeneentekijäntie 7, Finland"
+            )
+            find_by_id("autoComplete_result_0").click
+            click_on "Add"
+            expect(page).to have_css(".shape-field")
+            expect(page).to have_css(".leaflet-marker-draggable", count: 1)
+            expect(page).to have_field("dummy_locations__index__address", type: :hidden, with: "Veneentekijäntie 4, Finland")
+            find_by_id("dummy_address").set("veneen")
+            expect(page).to have_content(
+              "Veneentekijäntie 4, Finland\nVeneentekijäntie 6, Finland\nVeneentekijäntie 7, Finland"
+            )
+            find_by_id("autoComplete_result_1").click
+            click_on "Add"
+            expect(page).to have_field("dummy_locations__index__address", type: :hidden, with: "Veneentekijäntie 6, Finland")
+            expect(page).to have_css(".leaflet-marker-draggable", count: 1)
+          end
+        end
+
+        context "when adding a location and changing its address from the modal" do
+          it "changes the address field to the form" do
+            expect(page).to have_css(".type-loc-field")
+            find_by_id("dummy_address").set("veneen")
+            expect(page).to have_content(
+              "Veneentekijäntie 4, Finland\nVeneentekijäntie 6, Finland\nVeneentekijäntie 7, Finland"
+            )
+            find_by_id("autoComplete_result_0").click
+            click_on "Add"
+            expect(page).to have_css("input[value=\"Veneentekijäntie 4, Finland\"]", visible: :hidden)
+            find(".leaflet-marker-draggable").click
+            find("input[name=\"address\"]").fill_in with: "Example street"
+            click_on "Save"
+            expect(page).to have_css("input[value=\"Example street\"]", visible: :hidden)
+          end
+        end
       end
     end
 
@@ -423,17 +479,7 @@ describe "Map" do
       let(:use_revgeo) { true }
 
       before do
-        visit "/test_map"
-
-        # Wait for the map to be rendered
-        expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
-
-        # Wait for all map tile images to be loaded
-        loop do
-          break if page.all("[data-decidim-map] .leaflet-map-pane img").all? { |img| img["complete"] == "true" }
-
-          sleep 0.1
-        end
+        visit_test_map
       end
 
       it_behaves_like "reverse geocoding"
@@ -482,17 +528,7 @@ describe "Map" do
       end
 
       before do
-        visit "/test_map"
-
-        # Wait for the map to be rendered
-        expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
-
-        # Wait for all map tile images to be loaded
-        loop do
-          break if page.all("[data-decidim-map] .leaflet-map-pane img").all? { |img| img["complete"] == "true" }
-
-          sleep 0.1
-        end
+        visit_test_map
       end
 
       it "renders multiple maps" do
@@ -551,5 +587,19 @@ describe "Map" do
         end
       end
     end
+  end
+end
+
+def visit_test_map
+  visit "/test_map"
+
+  # Wait for the map to be rendered
+  expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
+
+  # Wait for all map tile images to be loaded
+  loop do
+    break if page.all("[data-decidim-map] .leaflet-map-pane img").all? { |img| img["complete"] == "true" }
+
+    sleep 0.1
   end
 end
