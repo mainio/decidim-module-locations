@@ -23,6 +23,16 @@ module Decidim
         it "returns an array of a single model locations" do
           expect(subject).to eq([[dummy1.id, dummy1.title["en"], nil, dummy1.body, loc1.address, loc1.latitude, loc1.longitude, "Marker", { "lat" => 50.231241, "lng" => 39.394056 }]])
         end
+
+        context "when model is ActiveRecord::Relation" do
+          let!(:dummy1) { create(:proposal, id: 1) }
+          let!(:dummy2) { create(:meeting, id: 1) }
+          let(:dummy) { Decidim::Proposals::Proposal.all }
+
+          it "fetches the correct location if there's models with different type and same id" do
+            expect(helper.format_map_locations(dummy).first).to include(dummy1.id, loc1.address, loc1.latitude, loc1.longitude)
+          end
+        end
       end
 
       describe "#format_map_locations - multiple" do

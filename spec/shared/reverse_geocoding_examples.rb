@@ -270,4 +270,23 @@ shared_examples "reverse geocoding" do
       end
     end
   end
+
+  context "when shapes cleared" do
+    it "deletes shapes and removes the shapefieldcontainer elements" do
+      page.execute_script(revgeo)
+      add_marker
+      add_marker
+
+      within "[data-shape-field]" do
+        expect(page).to have_css(".shape-field", count: 2)
+      end
+
+      click_link "More options"
+      find("[data-action='clear-shapes']").click
+
+      within "[data-shape-field]" do
+        expect(page).not_to have_css(".shape-field")
+      end
+    end
+  end
 end

@@ -3,6 +3,7 @@ import addInputGroup from "src/decidim/locations/map/integration/add_input_group
 import coordAverage from "src/decidim/locations/map/integration/coord_average.js";
 import centerShape from "src/decidim/locations/map/integration/center_shape.js";
 import addExistingShapes from "src/decidim/locations/map/integration/add_existing_shapes";
+import clearShapeFieldContainers from "./clear_shape_field_containers";
 
 export default () => {
   document.querySelectorAll("[data-location-picker]").forEach((wrapperEl) => {
@@ -74,6 +75,7 @@ export default () => {
     clear.addEventListener("click", (event) => {
       event.preventDefault();
       ctrl.clearShapes();
+      clearShapeFieldContainers(shapeFieldContainer);
     })
 
     typeLocButton.addEventListener("click", (event) => {
