@@ -156,7 +156,9 @@ export default () => {
     });
 
     ctrl.map.on("pm:remove", (event) => {
-      shapeFieldContainer.querySelector(`[data-shape-id="${event.layer.options.id}"]`).remove();
+      if (selectLocation === "false") {
+        shapeFieldContainer.querySelector(`[data-shape-id="${event.layer.options.id}"]`).remove();
+      }
     });
 
     let removalMode = false;
