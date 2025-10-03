@@ -62,7 +62,7 @@ export default () => {
     $(typeLocInput).on("geocoder-suggest-coordinates.decidim", (_ev, coordinates) => {
       clearTimeout(geocodingTimeout);
       geocodingTimeout = setTimeout(() => {
-        typeLocWrap.querySelector(".hint").classList.remove("hidden");
+        typeLocWrap.querySelector(".hint").classList.remove("invisible");
         ctrl.setView(coordinates);
         typeLocCoords = coordinates;
         typeLocButton.disabled = false;
@@ -81,7 +81,7 @@ export default () => {
         coordinates: { lat: typeLocCoords[0], lng: typeLocCoords[1] }
       };
       typeLocInput.value = "";
-      typeLocWrap.querySelector(".hint").classList.add("hidden");
+      typeLocWrap.querySelector(".hint").classList.add("invisible");
       displayList = true;
       typeLocButton.disabled = true;
       addInputGroup(shapeFieldContainer, addressData, wrapperEl);

@@ -11,11 +11,11 @@
 }
 
 .input-group > .autoComplete_wrapper{
-  @apply inline-block w-10/12 bottom-[7px];
+  @apply grow;
 }
 
 .input-group .help-text{
-  @apply mt-0 left-[42px] relative;
+  @apply basis-full mt-0;
 }
 
 [data-location-picker]{
