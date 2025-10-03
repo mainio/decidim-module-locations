@@ -6,12 +6,26 @@
   }
 }
 
-.autoComplete_wrapper > input.input-group-field{
-  @apply rounded-none;
-}
+.type-locations-wrapper {
+  .autoComplete_wrapper {
+    > input {
+      @apply w-full;
+    }
 
-.input-group > .autoComplete_wrapper{
-  @apply grow;
+    > input.input-group-field {
+      @apply rounded-none;
+    }
+  }
+
+  .input-group {
+    .input-group-label {
+      @apply border border-gray border-r-0;
+    }
+
+    > .autoComplete_wrapper {
+      @apply basis-0 grow;
+    }
+  }
 }
 
 .input-group .help-text{
