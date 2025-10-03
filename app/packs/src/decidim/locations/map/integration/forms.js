@@ -4,7 +4,6 @@ import coordAverage from "src/decidim/locations/map/integration/coord_average.js
 import centerShape from "src/decidim/locations/map/integration/center_shape.js";
 import addExistingShapes from "src/decidim/locations/map/integration/add_existing_shapes";
 import MapControllerRegistry from "src/decidim/map/controller_registry";
-import clearShapeFieldContainers from "./clear_shape_field_containers";
 
 export default () => {
   document.querySelectorAll("[data-location-picker]").forEach((wrapperEl) => {
@@ -21,7 +20,6 @@ export default () => {
     const mapConfig = mapEl.dataset.mapConfiguration;
     const selectLocation = mapEl.dataset.selectLocation;
     const averageInput = wrapperEl.querySelector(".model-longitude") && wrapperEl.querySelector(".model-latitude");
-    const clear = wrapperEl.querySelector('[data-action="clear-shapes"]');
     const locationCheckBox = wrapperEl.querySelector(["[has_location]", "has_location"].map((suffix) => `input[type="checkbox"][name$="${suffix}"]`));
     const modelLoc = wrapperEl.querySelector(".picker-wrapper");
 
@@ -71,14 +69,6 @@ export default () => {
         displayList = false;
       }, 300);
     });
-
-    clear.addEventListener("click", (event) => {
-      event.preventDefault();
-      ctrl.clearShapes();
-      clearShapeFieldContainers(shapeFieldContainer);
-      clear.disabled = true;
-      clear.classList.add("hidden");
-    })
 
     typeLocButton.addEventListener("click", (event) => {
       event.preventDefault();
@@ -185,8 +175,6 @@ export default () => {
     });
 
     ctrl.setEventHandler("shapeadd", (shape, ev) => {
-      clear.disabled = false;
-      clear.classList.remove("hidden");
       const shapeId = shape.options.id;
       let objectShape = shape.pm._shape;
 

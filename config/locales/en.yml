@@ -15,7 +15,6 @@ en:
   add: Add
   pick_locations: Pick locations
   type_locations: Type locations
-  clear_shapes: Clear shapes
   address: Address
   hint: Press "Add" to place a location on the map.
   edit_location: Edit location

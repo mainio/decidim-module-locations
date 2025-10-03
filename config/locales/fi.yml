@@ -13,7 +13,6 @@ fi:
   add: Lisää
   pick_locations: Valitse sijainti
   type_locations: Kirjoita sijainti
-  clear_shapes: Poista sijainnit
   address: Osoite
   hint: Paina "Lisää" lisätäksesi sijainti kartalle.
   edit_location: Muuta sijaintia
