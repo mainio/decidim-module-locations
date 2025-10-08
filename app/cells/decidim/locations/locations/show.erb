@@ -65,22 +65,23 @@
     </div>
 
     <%= decidim_modal id: "model_locations_#{ random_id }", class: "model_locations_modal" do %>
-      <div>
-        <h3 id="budget-modal-info-label<%= random_id %>" class="h3" data-dialog-title>
+      <div data-dialog-container>
+        <h3 id="dialog-title-locations-<%= random_id %>" class="h3" data-dialog-title>
           <%= t("edit_location") %>
         </h3>
-        <div class="flex justify-center">
-          <div class="location-fields form__wrapper w-1/2">
+        <div class="flex">
+          <div class="location-fields form__wrapper w-full">
             <label>
               <%= t("address") %>
               <input data-modal-address type="text" name="address">
             </label>
           </div>
         </div>
-        <div data-modal-buttons data-dialog-actions class="text-center">
-          <button data-delete-shape class="button button__lg button__transparent-secondary"><%= t("delete_shape") %></button>
-          <button data-modal-save class="button button__lg button__secondary"><%= t("save") %></button>
-        </div>
+      </div>
+      <div data-dialog-actions>
+        <button type="button" data-cancel class="button button__lg button__transparent-secondary"><%= t("cancel") %></button>
+        <button type="button" data-delete-shape class="button button__lg button__transparent-secondary alert"><%= icon("delete-bin-line") %><%= t("delete_shape") %></button>
+        <button type="button" data-modal-save class="button button__lg button__secondary"><%= t("save") %></button>
       </div>
     <% end %>
 

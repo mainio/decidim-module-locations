@@ -17,7 +17,9 @@ const leafletTranslations = {
     clearAll: "Clear everything",
     clearAllConfirm: "Are you sure you want to clear everything from the map?",
     confirmYes: "Yes",
-    confirmNo: "No"
+    confirmNo: "No",
+    fetchingAddress: "Fetching address for this marking...",
+    noAddressFound: "No address found for this marking."
   },
   fi: {
     zoomIn: "Lähennä",
@@ -25,7 +27,9 @@ const leafletTranslations = {
     clearAll: "Poista kaikki",
     clearAllConfirm: "Haluatko varmasti poistaa kartalta kaiken?",
     confirmYes: "Kyllä",
-    confirmNo: "En"
+    confirmNo: "En",
+    fetchingAddress: "Etsitään osoitetta tälle merkinnälle...",
+    noAddressFound: "Merkinnälle ei löytynyt osoitetta."
   },
   sv: {
     zoomIn: "Zooma in",
@@ -33,7 +37,9 @@ const leafletTranslations = {
     clearAll: "Rensa allt",
     clearAllConfirm: "Är du säker på att du vill ta bort allt från kartan?",
     confirmYes: "Ja",
-    confirmNo: "Nej"
+    confirmNo: "Nej",
+    fetchingAddress: "Hämtar adress för denna markering...",
+    noAddressFound: "Ingen adress hittades för denna märkning."
   },
 }
 
@@ -65,6 +71,9 @@ const getLeafletLanguage = () => getSupportedLanguage(Object.keys(leafletTransla
 
 const translate = (lang, key) => {
   if (!leafletTranslations[lang]) {
+    if (lang !== "en") {
+      return translate("en", key);
+    }
     return key;
   }
 
@@ -402,7 +411,8 @@ export default class ModelLocMapController extends MapController {
       return;
     }
 
-    shape.bindPopup("Fetching address for this shape").openPopup();
+    const text = translate(getLeafletLanguage(), "fetchingAddress");
+    shape.bindPopup(text).openPopup();
   }
 
   bindNoDataPopup(shapeId) {
@@ -411,7 +421,8 @@ export default class ModelLocMapController extends MapController {
       return;
     }
 
-    shape.bindPopup("No address found for this shape").openPopup();
+    const text = translate(getLeafletLanguage(), "noAddressFound");
+    shape.bindPopup(text).openPopup();
   }
 
   unbindPopup(shapeId) {

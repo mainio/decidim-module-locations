@@ -12,7 +12,7 @@ export default () => {
     const editModalEl = document.querySelector(".model_locations_modal");
     const shapeFieldContainer = wrapperEl.querySelector("[data-shape-field]");
     const locFields = editModalEl.querySelector(".location-fields");
-    const modalButtons = editModalEl.querySelector("[data-modal-buttons]");
+    const modalButtons = editModalEl.querySelector("[data-dialog-actions]");
     const typeLocWrap = wrapperEl.querySelector(".type-locations-wrapper");
     const typeLocInput = typeLocWrap.querySelector(".type-loc-field");
     const typeLocButton = typeLocWrap.querySelector(".type-loc-button");
@@ -113,6 +113,10 @@ export default () => {
         shapeFieldContainer.querySelector(`[data-shape-id="${addressData.shapeId}"]`).querySelector(
           ".location-address").value = "No address found";
       }
+    });
+
+    editModalEl.querySelector("[data-cancel]").addEventListener("click", () => {
+      window.Decidim.currentDialogs[`model_locations_${mapEl.id}`].close();
     });
 
     editModalEl.querySelector("[data-delete-shape]").addEventListener("click", () => {
