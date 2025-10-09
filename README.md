@@ -254,8 +254,8 @@ official distributed package version targets a newer ECMAScript version than
 Decidim's build pipeline supports which is why a compatible package version
 needs to be manually built from the source with some modifications.
 
-To update to the latest version, clone the `leaflet-geoman` repository, run the
-following command at the root of this repository:
+To update to the latest version, run the following command at the root of this
+repository:
 
 ```bash
 $ ./bin/update-leaflet
