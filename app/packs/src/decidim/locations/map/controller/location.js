@@ -129,6 +129,7 @@ let injectStyles = () => {
     .leaflet-confirm-pane-content {
       font-weight: bold;
       color: #fff;
+      text-align: center;
     }
     .leaflet-confirm-pane-actions {
       display: flex;
