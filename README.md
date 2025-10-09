@@ -254,37 +254,11 @@ official distributed package version targets a newer ECMAScript version than
 Decidim's build pipeline supports which is why a compatible package version
 needs to be manually built from the source with some modifications.
 
-To update to the latest version, clone the `leaflet-geoman` repository, checkout
-the latest version tag and install the dependencies:
+To update to the latest version, clone the `leaflet-geoman` repository, run the
+following command at the root of this repository:
 
 ```bash
-$ git clone https://github.com/geoman-io/leaflet-geoman.git tmp/leaflet-geoman && cd tmp/leaflet-geoman
-$ git checkout $(git tag | sort | tail -1)
-$ npm i
-```
-
-Note that you may get an error at the end of the installation if you do not have
-`pnpm` installed. This does not matter for building the library.
-
-Modify the build configuration to target ES2021 and build a new distribution
-(also disable the minification of the build files for easier debugging of build
-problems and cleaner CSS, webpack handles minification at Decidim's side):
-
-```bash
-# Change the build target
-$ sed -i -E 's/(const buildOptions = \{)/\1\n  target: "es2021",/' bundle.mjs
-# Disable minification
-$ sed -i -E 's/minify: true,/minify: false,/' bundle.mjs
-# Build
-$ npm run build
-```
-
-Move the build files to the correct directory within the module by running:
-
-```bash
-$ GEOMAN_VERSION=$(grep '"version":' package.json | sed -E 's/\s+"version": "([^"]+)",/\1/') \
-  && cp dist/leaflet-geoman.js "../../app/packs/src/decidim/geoman/leaflet-geoman-${GEOMAN_VERSION}.js" \
-  && cp dist/leaflet-geoman.css "../../app/packs/src/decidim/geoman/leaflet-geoman-${GEOMAN_VERSION}.css"
+$ ./bin/update-leaflet
 ```
 
 Update the import path for the JS file at the following files (as the version
@@ -296,7 +270,7 @@ number has changed):
 
 Finally, remove the files for the previous version.
 
-Leep the `leaflet-geoman` repository at hand in case you will bump into any
+Keep the `leaflet-geoman` repository at hand in case you will bump into any
 issues when testing the updated library. Once everything is confirmed to be
 working properly, you can remove the repository directory, too.
 
