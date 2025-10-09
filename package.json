@@ -30,6 +30,6 @@
     "stylelint": "^13.11.0"
   },
   "dependencies": {
-    "@geoman-io/leaflet-geoman-free": "^2.14.2"
+    "@geoman-io/leaflet-geoman-free": "^2.18.3"
   }
 }

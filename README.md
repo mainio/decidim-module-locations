@@ -199,7 +199,6 @@ $ bundle exec rubocop
 To ease up following the style guide, you should install the plugin to your
 favorite editor, such as:
 
-- Atom - [linter-rubocop](https://atom.io/packages/linter-rubocop)
 - Sublime Text - [Sublime RuboCop](https://github.com/pderichs/sublime_rubocop)
 - Visual Studio Code - [Rubocop for Visual Studio Code](https://github.com/misogi/vscode-ruby-rubocop)
 
@@ -240,6 +239,70 @@ If you would like to see this module in your own language, you can help with its
 translation at Crowdin:
 
 https://crowdin.com/project/decidim-access-requests
+
+### Updating Leaflet-Geoman
+
+Leaflet-Geoman is available as an NPM package but for the sake of convenience
+and consistent experience, the package is included as a static JavaScript
+library within its own directory in this module. This library is differently
+licensed and the license can be found from the folder where the library is
+placed at.
+
+The included library is a custom build for the Leaflet-Geoman library in order
+to make it compatible with the legacy webpack configuration of Decidim. The
+official distributed package version targets a newer ECMAScript version than
+Decidim's build pipeline supports which is why a compatible package version
+needs to be manually built from the source with some modifications.
+
+To update to the latest version, clone the `leaflet-geoman` repository, checkout
+the latest version tag and install the dependencies:
+
+```bash
+$ git clone https://github.com/geoman-io/leaflet-geoman.git tmp/leaflet-geoman && cd tmp/leaflet-geoman
+$ git checkout $(git tag | sort | tail -1)
+$ npm i
+```
+
+Note that you may get an error at the end of the installation if you do not have
+`pnpm` installed. This does not matter for building the library.
+
+Modify the build configuration to target ES2021 and build a new distribution
+(also disable the minification of the build files for easier debugging of build
+problems and cleaner CSS, webpack handles minification at Decidim's side):
+
+```bash
+# Change the build target
+$ sed -i -E 's/(const buildOptions = \{)/\1\n  target: "es2021",/' bundle.mjs
+# Disable minification
+$ sed -i -E 's/minify: true,/minify: false,/' bundle.mjs
+# Build
+$ npm run build
+```
+
+Move the build files to the correct directory within the module by running:
+
+```bash
+$ GEOMAN_VERSION=$(grep '"version":' package.json | sed -E 's/\s+"version": "([^"]+)",/\1/') \
+  && cp dist/leaflet-geoman.js "../../app/packs/src/decidim/geoman/leaflet-geoman-${GEOMAN_VERSION}.js" \
+  && cp dist/leaflet-geoman.css "../../app/packs/src/decidim/geoman/leaflet-geoman-${GEOMAN_VERSION}.css"
+```
+
+Update the import path for the JS file at the following files (as the version
+number has changed):
+
+- `app/packs/src/decidim/map/provider/default.js`
+- `app/packs/src/decidim/map/provider/here.js`
+- `config/assets.rb` (the stylesheet imports)
+
+Finally, remove the files for the previous version.
+
+Leep the `leaflet-geoman` repository at hand in case you will bump into any
+issues when testing the updated library. Once everything is confirmed to be
+working properly, you can remove the repository directory, too.
+
+Always when updating this bundled library, verify from the repository that the
+license has not changed. In case there are changes in the license, do not
+update it.
 
 ## License
 
