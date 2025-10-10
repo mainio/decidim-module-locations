@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */
+
 import MapController from "src/decidim/map/controller";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png"
 import markerIcon from "leaflet/dist/images/marker-icon.png"
@@ -40,7 +42,7 @@ const leafletTranslations = {
     confirmNo: "Nej",
     fetchingAddress: "Hämtar adress för denna markering...",
     noAddressFound: "Ingen adress hittades för denna märkning."
-  },
+  }
 }
 
 const getSupportedLanguage = (availableLanguages) => {
@@ -82,6 +84,10 @@ const translate = (lang, key) => {
 
 /**
  * Translates the Leaflet elements that do not currently support i18n.
+ *
+ * @param {L.map} map The Leaflet map
+ * @param {String} lang The language.
+ * @returns {void}
  */
 const translateMap = (map, lang) => {
   if (map.zoomControl) {
@@ -101,6 +107,8 @@ const translateMap = (map, lang) => {
 
 /**
  * Injects the special styles to the DOM.
+ *
+ * @returns {void}
  */
 let injectStyles = () => {
   const style = document.createElement("style");
@@ -147,6 +155,10 @@ let injectStyles = () => {
 /**
  * Creates the confirm pane for the map and displays it with the given options.
  * Only creates the pane if it does not already exist.
+ *
+ * @param {L.map} map The Leaflet map
+ * @param {Object} options The options for the confirm pane
+ * @returns {void}
  */
 const createLeafletConfirm = (map, options) => {
   let confirmPane = map.getPane("confirmPane");
@@ -161,7 +173,7 @@ const createLeafletConfirm = (map, options) => {
 
     const confirmButtons = {
       no: L.DomUtil.create("button", "leaflet-confirm-pane-button button button__sm button__transparent-secondary"),
-      yes: L.DomUtil.create("button", "leaflet-confirm-pane-button button button__sm button__secondary"),
+      yes: L.DomUtil.create("button", "leaflet-confirm-pane-button button button__sm button__secondary")
     };
 
     const leafletLang = getLeafletLanguage();
@@ -255,7 +267,7 @@ export default class ModelLocMapController extends MapController {
     // clear all functionality to it.
     const removalModeTitle = this.map.pm.Toolbar.buttons.removalMode._button.title;
     this.map.pm.Toolbar.buttons.removalMode.remove();
-    delete this.map.pm.Toolbar.buttons.removalMode;
+    Reflect.deleteProperty(this.map.pm.Toolbar.buttons, "removalMode");
     this.map.pm.Toolbar.createCustomControl({
       name: "removalMode",
       title: removalModeTitle,
