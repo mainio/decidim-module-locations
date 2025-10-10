@@ -21,7 +21,8 @@ const leafletTranslations = {
     confirmYes: "Yes",
     confirmNo: "No",
     fetchingAddress: "Fetching address for this marking...",
-    noAddressFound: "No address found for this marking."
+    noAddressFound: "No address found for this marking.",
+    placeMarkerTip: "Place the markers by clicking the map."
   },
   fi: {
     zoomIn: "Lähennä",
@@ -31,7 +32,8 @@ const leafletTranslations = {
     confirmYes: "Kyllä",
     confirmNo: "En",
     fetchingAddress: "Etsitään osoitetta tälle merkinnälle...",
-    noAddressFound: "Merkinnälle ei löytynyt osoitetta."
+    noAddressFound: "Merkinnälle ei löytynyt osoitetta.",
+    placeMarkerTip: "Aseta merkkejä kartalle klikkaamalla."
   },
   sv: {
     zoomIn: "Zooma in",
@@ -41,7 +43,8 @@ const leafletTranslations = {
     confirmYes: "Ja",
     confirmNo: "Nej",
     fetchingAddress: "Hämtar adress för denna markering...",
-    noAddressFound: "Ingen adress hittades för denna märkning."
+    noAddressFound: "Ingen adress hittades för denna märkning.",
+    placeMarkerTip: "Placera markörerna genom att klicka på kartan."
   }
 }
 
@@ -106,6 +109,18 @@ const translateMap = (map, lang) => {
 };
 
 /**
+ * Checks if the device has a "fine" pointer (such as a mouse) and can therefore
+ * display the "cursor marker", i.e. the marker that follows the mouse
+ * movements.
+ *
+ * @returns {Boolean} A boolean indicating whether the device has a pointer
+ *   device with a visible cursor.
+ */
+const deviceHasFinePointer = () => {
+  return window.matchMedia("(pointer:fine)").matches;
+};
+
+/**
  * Injects the special styles to the DOM.
  *
  * @returns {void}
@@ -143,6 +158,9 @@ let injectStyles = () => {
       display: flex;
       justify-content: center;
       gap: 1rem;
+    }
+    .leaflet-tooltip-stickynote::before {
+      display: none;
     }
   `;
 
@@ -225,8 +243,7 @@ export default class ModelLocMapController extends MapController {
   initializeMap() {
     injectStyles();
 
-    // eslint-disable-next-line
-    delete L.Icon.Default.prototype._getIconUrl;
+    Reflect.deleteProperty(L.Icon.Default.prototype, "_getIconUrl");
 
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: markerIcon2x,
@@ -252,12 +269,13 @@ export default class ModelLocMapController extends MapController {
     }
 
     this.map.setView([defaultLat, defaultLng], defaultZoom);
-    L.PM.reInitLayer(this.map)
+    L.PM.reInitLayer(this.map);
 
     const geomanLang = getGeomanLanguage();
     if (geomanLang) {
       this.map.pm.setLang(geomanLang);
     }
+
     const leafletLang = getLeafletLanguage();
     if (leafletLang) {
       translateMap(this.map, leafletLang);
@@ -315,6 +333,69 @@ export default class ModelLocMapController extends MapController {
         ignoreShapes: ["Circle", "Rectangle"]
       }
     );
+
+    this._setupTouchScreenTips();
+  }
+
+  /**
+   * Fix the weird behavior for touch screens (i.e. screens that do not have a
+   * "fine" pointer) for placing the markers.
+   *
+   * On touch devices without a "fine" pointer (i.e. a mouse pointer), the
+   * experience is otherwise quite confusing to point out to the user what they
+   * should be doing. This is used to modify the behavior of the marker draw
+   * mode where the user places points on the map.
+   *
+   * @returns {void}
+   */
+  _setupTouchScreenTips() {
+    let markerHintTip = null;
+    const updateHintPosition = () => {
+      if (!markerHintTip) {
+        return;
+      }
+
+      const bounds = this.map.getBounds();
+
+      // Calculate the longitude distance of the map's visible area. This allows
+      // for an easy way to figure out the center point of the map.
+      const distance = this.map.distance(bounds.getNorthWest(), bounds.getNorthEast());
+
+      // Calculate new bounds with the current latitude distance of the visible
+      // map from the northwest point of the map. Within these new bounds, the
+      // east border is at the center of the map.
+      const newBounds = bounds.getNorthWest().toBounds(distance);
+
+      // Set the hint at the top center of the map.
+      markerHintTip.setLatLng([bounds.getNorth(), newBounds.getEast()]);
+    };
+    this.map.on("pm:drawstart", (event) => {
+      if (event.shape === "Marker" && !deviceHasFinePointer()) {
+        // Hides the "hint marker" as that is confusing for touch screen users.
+        const drawMarker = this.map.pm.Draw.Marker;
+        drawMarker._hintMarker.setOpacity(0);
+        drawMarker._hintMarker.closeTooltip();
+
+        // Creates the touch screen hint "permanently" (while using the tool)
+        // sticked at the top of the map.
+        markerHintTip = L.tooltip([0, 0], {
+          className: "leaflet-tooltip-stickynote",
+          content: translate(getLeafletLanguage(), "placeMarkerTip"),
+          direction: "bottom",
+          permanent: true
+        }).addTo(this.map)
+
+        updateHintPosition();
+        this.map.on("zoomlevelschange resize move", updateHintPosition, this);
+      }
+    });
+    this.map.on("pm:drawend", (event) => {
+      if (event.shape === "Marker" && markerHintTip) {
+        markerHintTip.remove();
+        markerHintTip = null;
+        this.map.off("zoomlevelschange resize move", updateHintPosition, this);
+      }
+    });
   }
 
   addLocation(geoJson) {
