@@ -1,9 +1,10 @@
 /* eslint-disable max-lines */
 
 import MapController from "src/decidim/map/controller";
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png"
-import markerIcon from "leaflet/dist/images/marker-icon.png"
-import markerShadow from "leaflet/dist/images/marker-shadow.png"
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import icon from "src/decidim/icon";
 
 // See: https://geoman.io/docs/leaflet/customize/language
 const geomanSupportedLanguages = [
@@ -22,7 +23,8 @@ const leafletTranslations = {
     confirmNo: "No",
     fetchingAddress: "Fetching address for this marking...",
     noAddressFound: "No address found for this marking.",
-    placeMarkerTip: "Place the markers by clicking the map."
+    placeMarkerTip: "Place the markers by clicking the map.",
+    lockOrUnlock: "Lock or unlock the map position."
   },
   fi: {
     zoomIn: "Lähennä",
@@ -33,7 +35,8 @@ const leafletTranslations = {
     confirmNo: "En",
     fetchingAddress: "Etsitään osoitetta tälle merkinnälle...",
     noAddressFound: "Merkinnälle ei löytynyt osoitetta.",
-    placeMarkerTip: "Aseta merkkejä kartalle klikkaamalla."
+    placeMarkerTip: "Aseta merkkejä kartalle klikkaamalla.",
+    lockOrUnlock: "Lukitse tai vapauta kartan sijainti."
   },
   sv: {
     zoomIn: "Zooma in",
@@ -44,7 +47,8 @@ const leafletTranslations = {
     confirmNo: "Nej",
     fetchingAddress: "Hämtar adress för denna markering...",
     noAddressFound: "Ingen adress hittades för denna märkning.",
-    placeMarkerTip: "Placera markörerna genom att klicka på kartan."
+    placeMarkerTip: "Placera markörerna genom att klicka på kartan.",
+    lockOrUnlock: "Lås eller lås upp kartpositionen"
   }
 }
 
@@ -162,6 +166,17 @@ let injectStyles = () => {
     .leaflet-tooltip-stickynote::before {
       display: none;
     }
+    .leaflet-control-icon-svg {
+      display: block;
+    }
+    .leaflet-control-icon-svg > svg {
+      pointer-events: none;
+    }
+    .leaflet-control-icon-svg,
+    .leaflet-control-icon-svg > svg {
+      width: 100%;
+      height: 100%;
+    }
   `;
 
   document.head.appendChild(style);
@@ -232,6 +247,82 @@ const createLeafletConfirm = (map, options) => {
 
   // Place the tab focus inside the confirm content
   confirmPane.querySelector(".leaflet-confirm-pane-content").focus();
+};
+
+/**
+ * This class handles the single controls within a control group.
+ */
+class CustomControl {
+  constructor(container, options) {
+    this.container = container;
+    this.options = options;
+    this.buttonContainer = L.DomUtil.create("div", "button-container", this.container);
+
+    const button = L.DomUtil.create("a", "leaflet-buttons-control-button", this.buttonContainer);
+    button.innerHTML = `<span class="leaflet-control-icon-svg">${icon(options.icon)}</span>`;
+    button.href = "#";
+    button.title = options.title;
+
+    button.setAttribute("role", "button");
+    button.setAttribute("aria-label", button.title);
+
+    L.DomEvent.disableClickPropagation(button);
+    L.DomEvent.on(button, "click", L.DomEvent.stop);
+    L.DomEvent.on(button, "click", this._handleClick, this);
+
+    this.button = button;
+  }
+
+  getButton() {
+    return this.button;
+  }
+
+  _handleClick() {
+    if (this.options.togglable) {
+      this.buttonContainer.classList.toggle("active");
+      if (typeof this.options.onToggle === "function") {
+        this.options.onToggle(this.buttonContainer.classList.contains("active"));
+      }
+    }
+  }
+}
+
+let CustomControlGroup = null;
+
+/**
+ * Creates a custom control group to hold custom buttons for the map.
+ *
+ * @param {Object} options Options for the control group.
+ * @returns {CustomControlGroup} The group to hold the custom controls.
+ */
+const createMapControlGroup = (options) => {
+  if (!CustomControlGroup) {
+    CustomControlGroup = L.Control.extend({
+      initialize(groupOptions) {
+        Reflect.apply(L.Control.prototype.initialize, this, [groupOptions])
+
+        this.controlOptions = [];
+      },
+
+      onAdd() {
+        const groupName = `leaflet-control-${this.options.groupName}`;
+        const container = L.DomUtil.create("div", `leaflet-pm-toolbar ${groupName} leaflet-bar leaflet-control`);
+
+        for (let opts of this.controlOptions) {
+          const ctrl = new CustomControl(container, opts);
+          L.DomEvent.on(ctrl.getButton(), "click", this._refocusOnMap, this);
+        }
+
+        return container;
+      },
+
+      addControl(ctrlOpts) {
+        this.controlOptions.push(ctrlOpts);
+      }
+    });
+  }
+
+  return new CustomControlGroup(options);
 };
 
 export default class ModelLocMapController extends MapController {
@@ -334,7 +425,33 @@ export default class ModelLocMapController extends MapController {
       }
     );
 
+    this._addCustomControls();
     this._setupTouchScreenTips();
+  }
+
+  _addCustomControls() {
+    if (!deviceHasFinePointer()) {
+      const group = createMapControlGroup({
+        groupName: "touch-utilities",
+        position: "topright"
+      });
+
+      group.addControl({
+        title: translate(getLeafletLanguage(), "lockOrUnlock"),
+        icon: "lock-line",
+        position: "topright",
+        togglable: true,
+        onToggle: (enabled) => {
+          if (enabled) {
+            this.map.dragging.disable();
+          } else {
+            this.map.dragging.enable();
+          }
+        }
+      });
+
+      group.addTo(this.map);
+    }
   }
 
   /**
