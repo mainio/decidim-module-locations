@@ -6,23 +6,23 @@
   }
 }
 
-.type-locations-wrapper {
-  .autoComplete_wrapper {
-    > input {
+.type-locations-wrapper{
+  .autoComplete_wrapper{
+    > input{
       @apply w-full;
     }
 
-    > input.input-group-field {
+    > input.input-group-field{
       @apply rounded-none;
     }
   }
 
-  .input-group {
-    .input-group-label {
+  .input-group{
+    .input-group-label{
       @apply border border-gray border-r-0;
     }
 
-    > .autoComplete_wrapper {
+    > .autoComplete_wrapper{
       @apply basis-0 grow;
     }
   }
