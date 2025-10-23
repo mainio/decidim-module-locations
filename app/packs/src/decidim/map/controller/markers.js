@@ -184,8 +184,10 @@ export default class MapMarkersController extends MapController {
     })
 
     this.markerClusters.eachLayer((marker) => {
-
       marker.bindTooltip(marker.options.location, {direction: marker.tooltip_direction, permanent: true, interactive: true});
+      if (marker.options.selected === true) {
+        marker._tooltip._container.style.backgroundColor = "#2bff00"
+      }
     })
   }
 }
