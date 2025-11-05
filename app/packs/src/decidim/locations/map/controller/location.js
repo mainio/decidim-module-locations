@@ -329,6 +329,7 @@ export default class ModelLocMapController extends MapController {
   start() {
     this.initializeMap();
     this.shapes = {};
+    this.autoAdd = false;
   }
 
   initializeMap() {
@@ -644,5 +645,15 @@ export default class ModelLocMapController extends MapController {
 
   setView(coordinates) {
     this.map.setView(coordinates);
+  }
+
+  setAutoAdd(boolean, typeLocButton) {
+    this.autoAdd = boolean;
+
+    if (boolean) {
+      typeLocButton.classList.add("hidden");
+    } else {
+      typeLocButton.classList.remove("hidden");
+    }
   }
 }

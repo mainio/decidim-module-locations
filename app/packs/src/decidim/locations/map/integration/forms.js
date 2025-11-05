@@ -67,6 +67,10 @@ export default () => {
         typeLocCoords = coordinates;
         typeLocButton.disabled = false;
         displayList = false;
+
+        if (ctrl.autoAdd === true) {
+          typeLocButton.click();
+        }
       }, 300);
     });
 
