@@ -10,14 +10,44 @@ export default class MapMarkersController extends MapController {
   start() {
     this.markerClusters = null;
 
-    if (Array.isArray(this.config.markers) && this.config.markers.length > 0) {
-      this.addMarkers(this.config.markers);
-    } else {
-      this.map.fitWorld();
-    }
+    if (this.config.type === "display") {
+      const marker = this.config.markers[0];
+      if (!marker) {
+        return
+      };
 
-    if (this.selectLocation()) {
-      initializeSelectLocations(this.markerClusters);
+      const geojson = marker.geojson;
+
+      const fixedGeoJSON = {
+        ...geojson,
+        geometry: {
+          ...geojson.geometry,
+          coordinates: geojson.geometry.coordinates.map((ring) =>
+            ring.map(([lat, lng]) => [lng, lat])
+          )
+        }
+      }
+
+      const polygon = L.geoJSON(fixedGeoJSON, {
+        style: {
+          color: "#FF6600",
+          fillColor: "#FFB266",
+          fillOpacity: 0.1,
+          weight: 2
+        }
+      }).addTo(this.map.pm.map)
+
+      this.map.pm.map.fitBounds(polygon.getBounds());
+    } else {
+      if (Array.isArray(this.config.markers) && this.config.markers.length > 0) {
+        this.addMarkers(this.config.markers);
+      } else {
+        this.map.fitWorld();
+      }
+
+      if (this.selectLocation()) {
+        initializeSelectLocations(this.markerClusters);
+      }
     }
   }
 

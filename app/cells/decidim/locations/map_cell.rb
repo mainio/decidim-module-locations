@@ -43,6 +43,10 @@ module Decidim
 
       private
 
+      def map_display?
+        options[:map_display]
+      end
+
       def view_label
         options[:view_label]
       end
@@ -86,6 +90,11 @@ module Decidim
               geojson: JSON.parse(data.geojson),
               answer_option: data.id,
               tooltip_direction: data.tooltip_direction
+            }
+          elsif data.instance_of?(Decidim::Forms::Question)
+            {
+              location: data.body,
+              geojson: JSON.parse(data.geojson)
             }
           else
             body = data[2]

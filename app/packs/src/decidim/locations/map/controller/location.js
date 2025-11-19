@@ -647,10 +647,18 @@ export default class ModelLocMapController extends MapController {
     this.map.setView(coordinates);
   }
 
-  setAutoAdd(boolean, typeLocButton) {
-    this.autoAdd = boolean;
+  customizeSearch(button, wrapper, {typeLocButton, typeLocWrapper}) {
+    if (typeLocWrapper.classList.contains("hidden")) {
+      typeLocWrapper.classList.remove("hidden");
+    }
 
-    if (boolean) {
+    if (wrapper) {
+      typeLocWrapper.classList.add("hidden");
+    }
+
+    this.autoAdd = button;
+
+    if (button) {
       typeLocButton.classList.add("hidden");
     } else {
       typeLocButton.classList.remove("hidden");

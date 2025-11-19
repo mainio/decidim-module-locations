@@ -64,6 +64,8 @@
 }
 
 .locations-map__container{
+  @apply pt-8;
+
   [data-decidim-map]{
     @apply aspect-[6/5] min-[360px]:aspect-[5/4] min-[500px]:aspect-[3/2];
   }
