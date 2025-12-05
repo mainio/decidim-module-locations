@@ -24,7 +24,8 @@ const leafletTranslations = {
     fetchingAddress: "Fetching address for this marking...",
     noAddressFound: "No address found for this marking.",
     placeMarkerTip: "Place the markers by clicking the map.",
-    lockOrUnlock: "Lock or unlock the map position."
+    lockOrUnlock: "Lock or unlock the map position.",
+    finish: "Finish"
   },
   fi: {
     zoomIn: "Lähennä",
@@ -36,7 +37,8 @@ const leafletTranslations = {
     fetchingAddress: "Etsitään osoitetta tälle merkinnälle...",
     noAddressFound: "Merkinnälle ei löytynyt osoitetta.",
     placeMarkerTip: "Aseta merkkejä kartalle klikkaamalla.",
-    lockOrUnlock: "Lukitse tai vapauta kartan sijainti."
+    lockOrUnlock: "Lukitse tai vapauta kartan sijainti.",
+    finish: "Valmis"
   },
   sv: {
     zoomIn: "Zooma in",
@@ -48,7 +50,8 @@ const leafletTranslations = {
     fetchingAddress: "Hämtar adress för denna markering...",
     noAddressFound: "Ingen adress hittades för denna märkning.",
     placeMarkerTip: "Placera markörerna genom att klicka på kartan.",
-    lockOrUnlock: "Lås eller lås upp kartpositionen"
+    lockOrUnlock: "Lås eller lås upp kartpositionen",
+    finish: "Avsluta"
   }
 }
 
@@ -330,6 +333,7 @@ export default class ModelLocMapController extends MapController {
     this.initializeMap();
     this.shapes = {};
     this.autoAdd = false;
+    this.mapOptions = {};
   }
 
   initializeMap() {
@@ -349,6 +353,7 @@ export default class ModelLocMapController extends MapController {
     const lng = mapEl.dataset.lng;
     const selectLocation = mapEl.dataset.selectLocation;
     const zoom = mapEl.dataset.zoom;
+    this.mapOptions = mapEl.dataset.mapOptions;
 
     let defaultLat = 0;
     let defaultLng = 0;
@@ -431,6 +436,12 @@ export default class ModelLocMapController extends MapController {
   }
 
   _addCustomControls() {
+    const leafletLang = getLeafletLanguage();
+
+    if (leafletLang) {
+      translateMap(this.map, leafletLang);
+    }
+
     if (!deviceHasFinePointer()) {
       const group = createMapControlGroup({
         groupName: "touch-utilities",
@@ -452,6 +463,65 @@ export default class ModelLocMapController extends MapController {
       });
 
       group.addTo(this.map);
+    }
+
+    if (this.mapOptions) {
+      this.map.pm.addControls({
+        drawMarker: false,
+        drawPolyline: false,
+        drawPolygon: false,
+        removalMode: false
+      });
+
+      const mapOptions = JSON.parse(this.mapOptions);
+
+      Object.entries(mapOptions).forEach(([label, option]) => {
+        const customIcon = L.divIcon({
+          html: `<div class="custom-map-icon" style="fill:${option.color}">${option.shape_icon}</div>`,
+          iconAnchor: new L.Point(12, 11),
+          className: ""
+        })
+
+        this.map.pm.Toolbar.createCustomControl({
+          name: `draw${label}`,
+          title: `${label}`,
+          className: `${option.shape}`,
+          jsClass: "Marker",
+          onClick: () => {},
+          afterClick: (ev, ctx) => {
+            console.log(ctx)
+            this.map.pm.Draw[ctx.button._button.jsClass].toggle({
+              snappable: true,
+              markerStyle: { icon: customIcon }
+            });
+          },
+          doToggle: true,
+          toggleStatus: false,
+          disableOtherButtons: true,
+          actions: ["cancel"]
+        })
+      })
+
+      Object.entries(mapOptions).forEach(([label, option]) => {
+        const button = document.querySelector(`.control-icon.${option.shape}`);
+        const addLabel = document.createElement("span");
+        addLabel.textContent = label;
+
+        button.innerHTML = option.shape_icon;
+        button.querySelector("svg").style.fill = option.color;
+        button.appendChild(addLabel);
+      })
+
+      const typeLocButton = document.querySelector(".input-group .input-group-button");
+      const typeLocWrapper = document.querySelector(".picker-wrapper .type-locations-wrapper");
+      this.customizeSearch(false, true, {typeLocButton, typeLocWrapper});
+
+
+      const mainTool = document.querySelectorAll(".leaflet-pm-draw .leaflet-buttons-control-button");
+
+      mainTool.forEach((toolIcon) => {
+        toolIcon.classList.add("tags");
+      })
     }
   }
 

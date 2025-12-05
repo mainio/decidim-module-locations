@@ -41,6 +41,18 @@ module Decidim
         options[:map_configuration]
       end
 
+      def map_options
+        return unless options[:map_options]
+
+        format_map_options(options[:map_options])
+      end
+
+      def hide_search?
+        return false unless options[:hide_search]
+
+        true
+      end
+
       def select_location?
         return false unless options[:select_location]
 

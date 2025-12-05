@@ -6,6 +6,14 @@ module Decidim
       extend ActiveSupport::Concern
 
       included do
+        ICON_MAP = {
+          circle: "circle-line",
+          triangle: "triangle-line",
+          square: "square-line",
+          diamond: "poker-diamonds-line",
+          star: "star-line"
+        }
+
         def geocoding_options
           Decidim::Map.autocomplete(
             organization: current_organization
@@ -14,6 +22,19 @@ module Decidim
 
         def model_has_address?(model)
           model.try(:locations).present?
+        end
+
+        def format_map_options(map_options)
+          map_options.each_with_object({}) do |map_option, option|
+            label = translated_attribute(map_option.label)
+            icon_name = ICON_MAP.fetch(map_option.shape.to_sym, "#{map_option.shape}")
+
+            option[label] = {
+              shape: map_option.shape,
+              shape_icon: icon(icon_name),
+              color: map_option.color
+            }
+          end
         end
 
         def format_map_locations(model)

@@ -40,29 +40,31 @@
       <% end %>
     </template>
 
-    <div class="type-locations-wrapper mb-2">
-      <label><%= t("address") %></label>
-      <div class="input-group mt-1 mb-2 flex flex-wrap w-full">
-        <span class="input-group-label flex items-center justify-center w-10">
-          <%= icon "map-pin-line", role: "img", "aria-hidden": true, class: "h-6 w-6" %>
-        </span>
-        <% if form.object.class.name == "Decidim::FormsLocations::Admin::LocationOptionForm"%>
-          <% form.fields_for :locations do |location| %>
-            <%= location.geocoding_field :address, placeholder: t("placeholder.address"), label: false, class: "type-loc-field input-group-field basis-0 grow w-full" %>
-          <% end %>
-        <% else %>
-          <%= form.geocoding_field :address, placeholder: t("placeholder.address"), label: false, class: "type-loc-field input-group-field basis-0 grow w-full" %>
-        <% end %>
-        <div class="input-group-button w-full sm:w-auto mt-2 sm:mt-0 sm:ml-2">
-          <button class="type-loc-button button button__secondary button__sm w-full h-full" disabled><%= t("add") %></button>
-        </div>
-        <span class="hint form-input-extra-before help-text relative invisible" aria-hidden="true">
-          <span class="absolute w-full z-10 bg-white">
-            <span class="ml-10"><%= t("hint") %></span>
+    <% unless hide_search? %>
+      <div class="type-locations-wrapper mb-2">
+        <label><%= t("address") %></label>
+        <div class="input-group mt-1 mb-2 flex flex-wrap w-full">
+          <span class="input-group-label flex items-center justify-center w-10">
+            <%= icon "map-pin-line", role: "img", "aria-hidden": true, class: "h-6 w-6" %>
           </span>
-        </span>
+          <% if form.object.class.name == "Decidim::FormsLocations::Admin::LocationOptionForm"%>
+            <% form.fields_for :locations do |location| %>
+              <%= location.geocoding_field :address, placeholder: t("placeholder.address"), label: false, class: "type-loc-field input-group-field basis-0 grow w-full" %>
+            <% end %>
+          <% else %>
+            <%= form.geocoding_field :address, placeholder: t("placeholder.address"), label: false, class: "type-loc-field input-group-field basis-0 grow w-full" %>
+          <% end %>
+          <div class="input-group-button w-full sm:w-auto mt-2 sm:mt-0 sm:ml-2">
+            <button class="type-loc-button button button__secondary button__sm w-full h-full" disabled><%= t("add") %></button>
+          </div>
+          <span class="hint form-input-extra-before help-text relative invisible" aria-hidden="true">
+            <span class="absolute w-full z-10 bg-white">
+              <span class="ml-10"><%= t("hint") %></span>
+            </span>
+          </span>
+        </div>
       </div>
-    </div>
+    <% end %>
 
     <%= decidim_modal id: "model_locations_#{ random_id }", class: "model_locations_modal" do %>
       <div data-dialog-container>
@@ -91,7 +93,8 @@
         lat: coords[0],
         lng: coords[1],
         select_location: select_location?,
-        zoom: zoom }}) do %>
+        zoom: zoom,
+        map_options: map_options }}) do %>
         <% add_snippets %>
       <% end %>
     </div>
