@@ -482,23 +482,15 @@ export default class ModelLocMapController extends MapController {
           className: ""
         })
 
-        this.map.pm.Toolbar.createCustomControl({
-          name: `draw${label}`,
+        this.map.pm.Toolbar.copyDrawControl("Marker", {
+          name: `${label}`,
           title: `${label}`,
           className: `${option.shape}`,
-          jsClass: "Marker",
-          onClick: () => {},
-          afterClick: (ev, ctx) => {
-            console.log(ctx)
-            this.map.pm.Draw[ctx.button._button.jsClass].toggle({
-              snappable: true,
+          onClick: () => {
+            this.map.pm.Draw[label].setOptions({
               markerStyle: { icon: customIcon }
-            });
-          },
-          doToggle: true,
-          toggleStatus: false,
-          disableOtherButtons: true,
-          actions: ["cancel"]
+            })
+          }
         })
       })
 
