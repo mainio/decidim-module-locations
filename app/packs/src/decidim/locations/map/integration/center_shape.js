@@ -5,7 +5,7 @@ const centerShape = function (coords, objectShape) {
 
   if (objectShape === "LineString") {
     coords.map((coord) => {
-      lat +=  coord.lat;
+      lat += coord.lat;
       lng += coord.lng;
       index += 1;
 
@@ -21,9 +21,9 @@ const centerShape = function (coords, objectShape) {
         return [lat, lng]
       })
     })
-  } else if (objectShape === "Point") {
+  } else {
     return coords;
-  };
+  }
 
   lat /= index
   lng /= index

@@ -211,7 +211,9 @@ export default () => {
             coordinates = shape.getLatLng();
           } else if (objectShape === "LineString" || objectShape === "Polygon") {
             coordinates = shape._latlngs;
-          };
+          } else {
+            coordinates = shape._latlng;
+          }
           ctrl.bindFetchPopup(shapeId);
           $(mapEl).trigger("geocoder-reverse.decidim", [centerShape(coordinates, objectShape), { shapeId, objectShape, coordinates }]);
         };
