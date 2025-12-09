@@ -7,11 +7,11 @@ module Decidim
 
       included do
         ICON_MAP = {
-          circle: "circle-line",
-          triangle: "triangle-line",
-          square: "square-line",
-          diamond: "poker-diamonds-line",
-          star: "star-line"
+          circle: "circle-fill",
+          triangle: "triangle-fill",
+          square: "square-fill",
+          flag: "flag-fill",
+          star: "star-fill"
         }
 
         def geocoding_options

@@ -391,6 +391,7 @@ export default class ModelLocMapController extends MapController {
       toggleStatus: false,
       disableOtherButtons: true,
       tool: "edit",
+      block: "edit",
       actions: [
         "finishMode",
         {
@@ -469,8 +470,7 @@ export default class ModelLocMapController extends MapController {
       this.map.pm.addControls({
         drawMarker: false,
         drawPolyline: false,
-        drawPolygon: false,
-        removalMode: false
+        drawPolygon: false
       });
 
       const mapOptions = JSON.parse(this.mapOptions);
@@ -639,6 +639,32 @@ export default class ModelLocMapController extends MapController {
     this.triggerEvent("shapeadd", [marker, ev]);
 
     return shapeId;
+  }
+
+  addCustom(data, id, label) {
+    const mapEl = this.map._container;
+    const mapOptions = mapEl.dataset.mapOptions;
+    const customIcons = {};
+
+    Object.entries(JSON.parse(mapOptions)).forEach(([key, option]) => {
+      customIcons[key] = L.divIcon({
+        html: `<div class="custom-map-icon" style="fill:${option.color}">${option.shape_icon}</div>`,
+        iconAnchor: new L.Point(12, 11),
+        className: ""
+      })
+    })
+
+    // Add a custom marker to the map (tag locations -question type)
+    let shapeId = id;
+
+    const customMarker = L.marker(data, {
+      draggable: true,
+      id: shapeId,
+      icon: customIcons[label]
+    })
+    this.shapes[shapeId] = customMarker;
+    customMarker.addTo(this.map);
+    this.triggerEvent("shapeadd", [customMarker, "editEv"])
   }
 
   addLine(data, ev, id) {

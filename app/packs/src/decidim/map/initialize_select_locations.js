@@ -4,7 +4,9 @@ const initializeSelectLocations = function (markers) {
 
     if ($shapeInput.prop("checked")) {
       if (shape.options.shape === "Point") {
-        shape._icon.style.filter = "hue-rotate(275deg)"
+        if (shape._icon) {
+          shape._icon.style.filter = "hue-rotate(275deg)"
+        }
       } else {
         shape.setStyle({color: "#2bff00"})
       }

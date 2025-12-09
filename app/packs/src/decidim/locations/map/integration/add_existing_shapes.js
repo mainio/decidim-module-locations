@@ -23,6 +23,11 @@ const addExistingShapes = function (data, ctrl) {
     )
     ctrl.addPolygon(polygonGeoJson, "editEv", data.dataset.shapeId);
     shape = polygonGeoJson;
+  } else {
+    const label = data.querySelector(".location-shape").value;
+
+    ctrl.addCustom(geoJson, data.dataset.shapeId, label);
+    shape = geoJson;
   }
 
   return shape;

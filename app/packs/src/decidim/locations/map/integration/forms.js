@@ -274,7 +274,6 @@ export default () => {
           bounds.push(addExistingShapes(locContainer, ctrl));
         }
       )
-
       const area = new L.LatLngBounds(bounds);
       ctrl.map.fitBounds(area);
     }
