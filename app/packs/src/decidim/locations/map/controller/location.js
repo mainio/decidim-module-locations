@@ -658,7 +658,7 @@ export default class ModelLocMapController extends MapController {
     let shapeId = id;
 
     const customMarker = L.marker(data, {
-      draggable: true,
+      draggable: false,
       id: shapeId,
       icon: customIcons[label]
     })
