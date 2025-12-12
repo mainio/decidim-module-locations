@@ -20,6 +20,13 @@ gem "puma", ">= 6.4.2"
 gem "rgeo-geojson", "~> 2.1", ">= 2.1.1"
 gem "uglifier", "~> 4.1"
 
+# This locks nokogiri to a version < 1.17 so it doesn't cause issues
+gem "nokogiri", "1.16.8"
+
+# This is a temporary fix for: https://github.com/rails/rails/issues/54263
+# Without this downgrade Activesupport will give error for missing Logger
+gem "concurrent-ruby", "1.3.4"
+
 group :development, :test do
   gem "byebug", "~> 11.0", platform: :mri
   gem "decidim-dev", DECIDIM_VERSION
