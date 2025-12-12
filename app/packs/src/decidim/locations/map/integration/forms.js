@@ -63,7 +63,13 @@ export default () => {
       clearTimeout(geocodingTimeout);
       geocodingTimeout = setTimeout(() => {
         typeLocWrap.querySelector(".hint").classList.remove("invisible");
-        ctrl.setView(coordinates);
+
+        const tempMarker = L.marker(coordinates);
+        const allMarkers = [...Object.values(ctrl.shapes), tempMarker];
+
+        const group = L.featureGroup(allMarkers);
+        ctrl.map.fitBounds(group.getBounds(), { padding: [50, 50] });
+
         typeLocCoords = coordinates;
         typeLocButton.disabled = false;
         displayList = false;

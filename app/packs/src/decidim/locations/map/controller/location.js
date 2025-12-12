@@ -731,8 +731,8 @@ export default class ModelLocMapController extends MapController {
     shape.unbindPopup();
   }
 
-  setView(coordinates) {
-    this.map.setView(coordinates);
+  setView(coordinates, zoom) {
+    this.map.setView(coordinates, zoom);
   }
 
   customizeSearch(button, wrapper, {typeLocButton, typeLocWrapper}) {
