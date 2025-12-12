@@ -205,7 +205,6 @@ export default () => {
           const oldShape = shapeFieldContainer.querySelector(".shape-field");
           if (oldShape) {
             ctrl.deleteShape(oldShape.dataset.shapeId);
-            shapeFieldContainer.querySelector(`[data-shape-id="${oldShape.dataset.shapeId}"]`).remove();
           };
         };
 

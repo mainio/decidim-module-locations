@@ -12,7 +12,7 @@ module Decidim
           square: "square-fill",
           flag: "flag-fill",
           star: "star-fill"
-        }
+        }.freeze
 
         def geocoding_options
           Decidim::Map.autocomplete(

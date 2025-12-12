@@ -130,7 +130,7 @@ shared_examples "reverse geocoding" do
       page.execute_script(revgeo)
       find('div[title="Draw Marker"] a').click
       find("[data-decidim-map]").click(x: 20, y: 10)
-      expect(page).to have_content("Fetching address for this shape")
+      expect(page).to have_content("Fetching address for this marking.")
     end
 
     context "when marker added and it doesn't find an address" do
@@ -158,7 +158,7 @@ shared_examples "reverse geocoding" do
         page.execute_script(revgeo)
         find('div[title="Draw Marker"] a').click
         find("[data-decidim-map]").click(x: 20, y: 10)
-        expect(page).to have_content("No address found for this shape")
+        expect(page).to have_content("No address found for this marking.")
       end
     end
   end

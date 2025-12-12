@@ -211,6 +211,8 @@ describe "Map" do
       get "geocode", to: ->(_) { [200, { "Content-Type" => "application/json" }, [gcresponse]] }
 
       get "/favicon.ico", to: ->(_) { [200, {}, []] }
+
+      get "/undefined", to: ->(_) { [200, {}, []] }
     end
 
     switch_to_host(organization.host)
