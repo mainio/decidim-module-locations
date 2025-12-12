@@ -27,7 +27,7 @@ module Decidim
         def format_map_options(map_options)
           map_options.each_with_object({}) do |map_option, option|
             label = translated_attribute(map_option.label)
-            icon_name = ICON_MAP.fetch(map_option.shape.to_sym, "#{map_option.shape}")
+            icon_name = ICON_MAP.fetch(map_option.shape.to_sym, map_option.shape.to_s)
 
             option[label] = {
               shape: map_option.shape,
