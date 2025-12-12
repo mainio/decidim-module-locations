@@ -71,33 +71,32 @@
   }
 }
 
-.custom-map-icon {
+.custom-map-icon{
   @apply w-6 h-6;
 
-  svg {
+  svg{
     @apply w-6 h-6;
   }
 }
 
-.leaflet-pm-draw.leaflet-bar {
-  .leaflet-buttons-control-button.tags {
+.leaflet-pm-draw.leaflet-bar{
+  .leaflet-buttons-control-button.tags{
     @apply w-32;
 
     .control-icon.circle,
     .control-icon.triangle,
     .control-icon.square,
     .control-icon.flag,
-    .control-icon.star {
+    .control-icon.star{
       @apply w-32 flex gap-2 items-center;
 
-      svg {
+      svg{
         @apply w-5 h-5;
       }
 
-      span {
+      span{
         @apply text-md truncate;
       }
     }
   }
 }
-
