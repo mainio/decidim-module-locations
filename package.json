@@ -12,8 +12,7 @@
   "dependencies": {
     "@decidim/browserslist-config": "^0.28.6",
     "@decidim/webpacker": "^0.28.6",
-    "@geoman-io/leaflet-geoman-free": "^2.18.3",
-    "graphql": "^15.8.0"
+    "@geoman-io/leaflet-geoman-free": "^2.18.3"
   },
   "devDependencies": {
     "@decidim/dev": "^0.28.6",
