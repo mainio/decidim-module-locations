@@ -15,7 +15,6 @@
     "@geoman-io/leaflet-geoman-free": "^2.18.3"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@decidim/dev": "^0.28.6",
     "@decidim/eslint-config": "^0.28.6",
     "@decidim/prettier-config": "^0.28.6",
