@@ -1,100 +1,100 @@
-.tabs.expanded{
+.tabs.expanded {
   @extend .menu;
 
-  .tabs-title{
+  .tabs-title {
     @apply float-none;
   }
 }
 
-.type-locations-wrapper{
-  .autoComplete_wrapper{
-    > input{
+.type-locations-wrapper {
+  .autoComplete_wrapper {
+    > input {
       @apply w-full;
     }
 
-    > input.input-group-field{
+    > input.input-group-field {
       @apply rounded-none;
     }
   }
 
-  .input-group{
-    .input-group-label{
+  .input-group {
+    .input-group-label {
       @apply border border-gray border-r-0;
     }
 
-    > .autoComplete_wrapper{
+    > .autoComplete_wrapper {
       @apply basis-0 grow;
     }
   }
 }
 
-.input-group .help-text{
+.input-group .help-text {
   @apply basis-full mt-0;
 }
 
-[data-location-picker]{
-  .google-map{
+[data-location-picker] {
+  .google-map {
     @apply z-0;
   }
 
-  .tabs{
-    .dropdown.menu{
+  .tabs {
+    .dropdown.menu {
       &,
-      li{
+      li {
         @apply w-full;
       }
 
-      li{
-        a{
+      li {
+        a {
           @apply bg-transparent;
         }
       }
 
-      li.is-active{
-        a{
+      li.is-active {
+        a {
           @apply bg-transparent text-[#f52727];
         }
       }
 
-      li a::after{
+      li a::after {
         @apply hidden;
       }
     }
   }
 }
 
-.locations-map__container{
+.locations-map__container {
   @apply pt-8;
 
-  [data-decidim-map]{
+  [data-decidim-map] {
     @apply aspect-[6/5] min-[360px]:aspect-[5/4] min-[500px]:aspect-[3/2];
   }
 }
 
-.custom-map-icon{
+.custom-map-icon {
   @apply w-6 h-6;
 
-  svg{
+  svg {
     @apply w-6 h-6;
   }
 }
 
-.leaflet-pm-draw.leaflet-bar{
-  .leaflet-buttons-control-button.tags{
+.leaflet-pm-draw.leaflet-bar {
+  .leaflet-buttons-control-button.tags {
     @apply w-32;
 
     .control-icon.circle,
     .control-icon.triangle,
     .control-icon.square,
     .control-icon.flag,
-    .control-icon.star{
+    .control-icon.star {
       @apply w-32 flex gap-2 items-center;
 
-      svg{
+      svg {
         @apply w-5 h-5;
       }
 
-      span{
+      span {
         @apply text-md truncate;
       }
     }
