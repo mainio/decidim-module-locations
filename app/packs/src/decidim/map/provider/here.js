@@ -1,5 +1,4 @@
 import "leaflet"
-import "src/decidim/vendor/leaflet-tilelayer-here"
 import "src/decidim/geoman/leaflet-geoman-2.18.3.js";
 
 /**
