@@ -202,7 +202,7 @@ describe "Map" do
 
     Rails.application.routes.draw do
       # Map tiles
-      get "tiles/:z/:x/:y", to: ->(_) { [200, {}, [tile_content]] }
+      get "tiles/:z/:x/:y.png", to: ->(_) { [200, {}, [tile_content]] }
 
       # The actual editor testing route for these specs
       get "test_map", to: ->(_) { [200, {}, [final_html]] }
