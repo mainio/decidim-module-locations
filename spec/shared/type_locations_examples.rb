@@ -10,6 +10,7 @@ shared_examples "type locations" do
         "Veneentekijäntie 4, Finland\nVeneentekijäntie 6, Finland\nVeneentekijäntie 7, Finland"
       )
       find_by_id("autoComplete_result_0").click
+      expect(page).to have_button("Add", disabled: false)
       click_on "Add"
       expect(page).to have_css(".leaflet-marker-draggable")
     end
