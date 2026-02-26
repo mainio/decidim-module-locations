@@ -220,9 +220,6 @@ describe "Map" do
 
   after do
     expect_no_js_errors
-
-    # Reset the routes back to original
-    Rails.application.reload_routes!
   end
 
   context "when map cell rendered" do
