@@ -14,7 +14,7 @@ module Decidim
         # Redefine the type inclusion validator
         _validators.reject! { |key, _| key == :type }
         _validate_callbacks.each do |callback|
-          _validate_callbacks.delete(callback) if callback.raw_filter.attributes == [:type]
+          _validate_callbacks.delete(callback) if callback.filter.attributes == [:type]
         end
         validates :type, inclusion: { in: const_get("TYPES").keys }
       end

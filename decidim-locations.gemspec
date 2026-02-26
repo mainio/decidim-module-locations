@@ -7,7 +7,7 @@ require "decidim/locations/version"
 Gem::Specification.new do |spec|
   spec.name = "decidim-locations"
   spec.version = Decidim::Locations.version
-  spec.required_ruby_version = ">= 3.1"
+  spec.required_ruby_version = ">= 3.2"
   spec.authors = ["Antti Hukkanen", "Joonas Aapro"]
   spec.email = ["antti.hukkanen@mainiotech.fi", "joonas.aapro@mainiotech.fi"]
 
@@ -30,8 +30,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rgeo", "3.0.1"
 
   spec.add_dependency "rgeo-geojson", "2.1.1"
-
-  spec.add_development_dependency "decidim-dev", Decidim::Locations.decidim_version
 
   spec.metadata["rubygems_mfa_required"] = "true"
 end

@@ -6,7 +6,7 @@ module Decidim
       extend ActiveSupport::Concern
 
       included do
-        attribute :locations, Array[Decidim::Locations::LocationForm]
+        attribute :locations, [Decidim::Locations::LocationForm]
       end
 
       class_methods do
