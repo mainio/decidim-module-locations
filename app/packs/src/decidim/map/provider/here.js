@@ -1,4 +1,5 @@
 import "leaflet"
+import "leaflet-tilelayer-here"
 import "src/decidim/geoman/leaflet-geoman-2.18.3.js";
 
 /**
@@ -9,6 +10,7 @@ import "src/decidim/geoman/leaflet-geoman-2.18.3.js";
  */
 $(() => {
   $("[data-decidim-map]").on("configure.decidim", (_ev, map, mapConfig) => {
+    console.log("HOG")
     L.tileLayer.here(mapConfig.tileLayer).addTo(map);
   });
 });
