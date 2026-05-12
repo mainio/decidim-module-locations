@@ -20,7 +20,7 @@ describe "Map" do
       # rendered.
       def cell(name, model, options = {}, &)
         options = { context: { view_context: self } }.deep_merge(options)
-        super(name, model, options, &)
+        super
       end
     end
   end

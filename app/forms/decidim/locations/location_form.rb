@@ -21,7 +21,7 @@ module Decidim
       validate :json_validation, if: ->(form) { !form.deleted }
 
       def initialize(attributes = {})
-        super(attributes)
+        super
 
         set_default_attributes unless attributes[:id]
       end
