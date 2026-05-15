@@ -16,7 +16,11 @@ module Decidim
       end
 
       def existent_locations
-        form.object.locations
+        if form.object.is_a?(Decidim::Forms::Admin::QuestionsForm)
+          model.locations
+        else
+          form.object.locations
+        end
       end
 
       def form
