@@ -17,7 +17,7 @@ gem "decidim-locations", path: "."
 
 gem "bootsnap", "~> 1.4"
 gem "puma", ">= 6.4.2"
-gem "rgeo-geojson", "~> 2.1", ">= 2.1.1"
+gem "rgeo-geojson", "~> 2.1.1"
 gem "uglifier", "~> 4.1"
 
 group :development, :test do
