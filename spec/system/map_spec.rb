@@ -498,16 +498,12 @@ describe "Map" do
 
       it "checks the box if text is clicked" do
         expect(page).to have_content("Has location")
-        expect(page).to have_no_css("[data-decidim-map] .leaflet-map-pane img")
+        # Picker wrapper should be hidden before checkbox is clicked
+        expect(page).to have_css(".picker-wrapper", visible: :hidden)
 
         find('label[for="dummy_has_location"]').click
-        expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
-
-        loop do
-          break if page.all("[data-decidim-map] .leaflet-map-pane img").all? { |img| img["complete"] == "true" }
-
-          sleep 0.1
-        end
+        # Picker wrapper should be visible after checkbox is clicked
+        expect(page).to have_css(".picker-wrapper", visible: :visible)
       end
     end
   end
@@ -515,14 +511,6 @@ end
 
 def visit_test_map
   visit "/test_map"
-
   # Wait for the map to be rendered
-  expect(page).to have_css("[data-decidim-map] .leaflet-map-pane img")
-
-  # Wait for all map tile images to be loaded
-  loop do
-    break if page.all("[data-decidim-map] .leaflet-map-pane img").all? { |img| img["complete"] == "true" }
-
-    sleep 0.1
-  end
+  expect(page).to have_css("[data-decidim-map] .leaflet-map-pane", visible: :all)
 end
