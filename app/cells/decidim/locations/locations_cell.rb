@@ -78,8 +78,7 @@ module Decidim
       def add_snippets
         return if snippets.any?(:locations_map_scripts)
 
-        source = view_context.send(:sources_from_manifest_entrypoints, [:decidim_locations_edit_map], type: :javascript)
-        snippets.add(:locations_map_scripts, javascript_include_tag(*source))
+        snippets.add(:locations_map_scripts, view_context.append_javascript_pack_tag("decidim_locations_edit_map"))
         snippets.add(:foot, snippets.for(:locations_map_scripts))
       end
     end
