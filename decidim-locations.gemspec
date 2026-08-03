@@ -26,10 +26,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "decidim-core", Decidim::Locations.decidim_version
-
-  spec.add_dependency "rgeo", "3.0.1"
-
-  spec.add_dependency "rgeo-geojson", "2.1.1"
+  spec.add_dependency "rgeo-geojson", "~> 2.1.1"
 
   spec.metadata["rubygems_mfa_required"] = "true"
 end
