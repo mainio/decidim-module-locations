@@ -4,7 +4,7 @@ import MapController from "src/decidim/map/controller";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-import icon from "src/decidim/icon";
+import icon from "src/decidim/refactor/moved/icon";
 
 // See: https://geoman.io/docs/leaflet/customize/language
 const geomanSupportedLanguages = [
@@ -334,6 +334,14 @@ export default class ModelLocMapController extends MapController {
     this.shapes = {};
     this.autoAdd = false;
     this.mapOptions = {};
+  }
+
+  load() {
+    const map = super.load();
+    if (!isFinite(map.getMaxZoom())) {
+      map.setMaxZoom(18);
+    }
+    return map;
   }
 
   initializeMap() {

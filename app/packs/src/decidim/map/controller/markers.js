@@ -51,6 +51,14 @@ export default class MapMarkersController extends MapController {
     }
   }
 
+  load() {
+    const map = super.load();
+    if (!isFinite(map.getMaxZoom())) {
+      map.setMaxZoom(18);
+    }
+    return map;
+  }
+
   selectLocation() {
     const decidimMap = this.map._container.getAttribute("data-decidim-map");
     return JSON.parse(decidimMap).selectLocation;
