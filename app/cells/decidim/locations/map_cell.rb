@@ -84,7 +84,7 @@ module Decidim
 
       def markers_data_for_map
         format_map_locations(model).map do |data|
-          if data.instance_of?(Decidim::Forms::AnswerOption)
+          if data.instance_of?(Decidim::Forms::ResponseOption)
             {
               location: data.body,
               geojson: JSON.parse(data.geojson),

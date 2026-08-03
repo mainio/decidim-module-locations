@@ -5,15 +5,15 @@ module Decidim
     module LocationsHelper
       extend ActiveSupport::Concern
 
-      included do
-        ICON_MAP = {
-          circle: "circle-fill",
-          triangle: "triangle-fill",
-          square: "square-fill",
-          flag: "flag-fill",
-          star: "star-fill"
-        }.freeze
+      ICON_MAP = {
+        circle: "circle-fill",
+        triangle: "triangle-fill",
+        square: "square-fill",
+        flag: "flag-fill",
+        star: "star-fill"
+      }.freeze
 
+      included do
         def geocoding_options
           Decidim::Map.autocomplete(
             organization: current_organization

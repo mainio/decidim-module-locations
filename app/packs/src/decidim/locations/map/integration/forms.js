@@ -26,7 +26,9 @@ export default () => {
     const locationCheck = () => {
       if (locationCheckBox && locationCheckBox.checked) {
         modelLoc.classList.remove("hidden");
-        ctrl.map.invalidateSize();
+        if (ctrl && ctrl.map) {
+          ctrl.map.invalidateSize();
+        }
       } else {
         modelLoc.classList.add("hidden");
       }
@@ -34,12 +36,19 @@ export default () => {
 
     if (locationCheckBox === null) {
       modelLoc.classList.remove("hide")
-      ctrl.map.invalidateSize();
+      if (ctrl && ctrl.map) {
+        ctrl.map.invalidateSize();
+      }
     } else {
       locationCheck();
       locationCheckBox.addEventListener("change", () => {
         locationCheck();
       });
+    }
+
+    // Guard: everything below requires the map controller
+    if (!ctrl || !ctrl.map) {
+      return;
     }
 
     let displayList = true;
