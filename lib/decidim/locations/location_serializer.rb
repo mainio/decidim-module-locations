@@ -22,7 +22,7 @@ module Decidim
               @location.geojson["geometry"]["coordinates"]
           },
           properties:
-            if @location.decidim_locations_locatable_type != "Decidim::Forms::Answer"
+            if @location.decidim_locations_locatable_type != "Decidim::Forms::Response"
               {
                 id: @location.decidim_locations_locatable_id,
                 title: record.where(id: @location.decidim_locations_locatable_id).first.try(:title),
@@ -33,11 +33,11 @@ module Decidim
                              end,
                 type: record.name
               }
-            elsif @location.decidim_locations_locatable_type == "Decidim::Forms::Answer"
+            elsif @location.decidim_locations_locatable_type == "Decidim::Forms::Response"
               {
                 id:
                   Decidim::Forms::Question
-                    .where(id: Decidim::Forms::Answer
+                    .where(id: Decidim::Forms::Response
                     .where(id: @location.decidim_locations_locatable_id)
                     .first
                     .decidim_question_id)
@@ -45,7 +45,7 @@ module Decidim
                     .id,
                 title:
                   Decidim::Forms::Question
-                    .where(id: Decidim::Forms::Answer
+                    .where(id: Decidim::Forms::Response
                     .where(id: @location.decidim_locations_locatable_id)
                     .first
                     .decidim_question_id)
@@ -53,7 +53,7 @@ module Decidim
                     .body,
                 description:
                   Decidim::Forms::Question
-                    .where(id: Decidim::Forms::Answer
+                    .where(id: Decidim::Forms::Response
                     .where(id: @location.decidim_locations_locatable_id)
                     .first
                     .decidim_question_id)

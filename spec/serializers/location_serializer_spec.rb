@@ -67,7 +67,7 @@ module Decidim::Locations
       end
 
       context "when answer" do
-        let(:record) { create(:answer) }
+        let(:record) { create(:response) }
 
         it "includes the location shape" do
           expect(serialized[:geometry][:type]).to eq(location.shape)

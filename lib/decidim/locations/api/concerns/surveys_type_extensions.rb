@@ -29,7 +29,7 @@ module Decidim
           end.flatten.compact
 
           locations.map do |location|
-            answer = Decidim::Forms::Answer.where(id: location.decidim_locations_locatable_id).first
+            answer = Decidim::Forms::Response.where(id: location.decidim_locations_locatable_id).first
             question = Decidim::Forms::Question.where(id: answer.decidim_question_id).first
 
             {
