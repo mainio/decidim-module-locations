@@ -268,10 +268,10 @@ export default () => {
 
     if (selectLocation === "true") {
       const closeModalButton = document.querySelector(".done-location");
-      const modalEl = document.querySelector("#answer-option-map-selector");
+      const modalEl = document.querySelector("#response-option-map-selector");
 
       closeModalButton.addEventListener("click", () => {
-        window.Decidim.currentDialogs["answer-option-map-selector"].close();
+        window.Decidim.currentDialogs["response-option-map-selector"].close();
       })
 
       modalEl.addEventListener("close.dialog", () => {

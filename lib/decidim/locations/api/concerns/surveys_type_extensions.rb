@@ -19,18 +19,18 @@ module Decidim
           questionnaires = Decidim::Forms::Questionnaire.where(questionnaire_for_id: survey.id)
 
           locations = questionnaires.map do |questionnaire|
-            next if questionnaire.answers.empty?
+            next if questionnaire.responses.empty?
 
-            questionnaire.answers.map do |answer|
-              next if answer.locations.empty?
+            questionnaire.responses.map do |response|
+              next if response.locations.empty?
 
-              answer.locations
+              response.locations
             end
           end.flatten.compact
 
           locations.map do |location|
-            answer = Decidim::Forms::Response.where(id: location.decidim_locations_locatable_id).first
-            question = Decidim::Forms::Question.where(id: answer.decidim_question_id).first
+            response = Decidim::Forms::Response.where(id: location.decidim_locations_locatable_id).first
+            question = Decidim::Forms::Question.where(id: response.decidim_question_id).first
 
             {
               type: "Feature",

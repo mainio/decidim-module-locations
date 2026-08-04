@@ -1,6 +1,6 @@
 const initializeSelectLocations = function (markers) {
   markers.getLayers().forEach((shape) => {
-    const $shapeInput = $(`#answer-option-${shape.options.answerOption} input[type="checkbox"]`)
+    const $shapeInput = $(`#response-option-${shape.options.answerOption} input[type="checkbox"]`)
 
     if ($shapeInput.prop("checked")) {
       if (shape.options.shape === "Point") {
@@ -47,7 +47,7 @@ const initializeSelectLocations = function (markers) {
           shape.setStyle({color: "#2bff00"})
         }
         shape._tooltip._container.style.backgroundColor = "#2bff00"
-        $(`#answer-option-${shape.options.answerOption}`).find('input[type="checkbox"]').click();
+        $(`#response-option-${shape.options.answerOption}`).find('input[type="checkbox"]').click();
         shape.options.selected = true;
       } else if (shape.options.selected) {
         if (shape.options.shape === "Point") {
@@ -56,7 +56,7 @@ const initializeSelectLocations = function (markers) {
           shape.setStyle({color: "#3388ff"})
         }
         shape._tooltip._container.style.backgroundColor = "white"
-        $(`#answer-option-${shape.options.answerOption}`).find('input[type="checkbox"]').click();
+        $(`#response-option-${shape.options.answerOption}`).find('input[type="checkbox"]').click();
         shape.options.selected = false;
       }
     })
