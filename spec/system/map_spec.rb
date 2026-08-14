@@ -183,6 +183,9 @@ describe "Map" do
   end
 
   before do
+    # Set this to false to prevent Double from receiving unexpectec message
+    # ":send_early_hints"
+    allow(template).to receive(:preload_links_header).and_return(false)
     if use_revgeo
       # Autocomplete utility override
       utility = Decidim::Map.autocomplete(organization:)

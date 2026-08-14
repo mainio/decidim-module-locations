@@ -37,28 +37,28 @@ module Decidim
               {
                 id:
                   Decidim::Forms::Question
-                    .where(id: Decidim::Forms::Response
+                  .where(id: Decidim::Forms::Response
                     .where(id: @location.decidim_locations_locatable_id)
                     .first
                     .decidim_question_id)
-                    .first
-                    .id,
+                  .first
+                  .id,
                 title:
                   Decidim::Forms::Question
-                    .where(id: Decidim::Forms::Response
+                  .where(id: Decidim::Forms::Response
                     .where(id: @location.decidim_locations_locatable_id)
                     .first
                     .decidim_question_id)
-                    .first
-                    .body,
+                  .first
+                  .body,
                 description:
                   Decidim::Forms::Question
-                    .where(id: Decidim::Forms::Response
+                  .where(id: Decidim::Forms::Response
                     .where(id: @location.decidim_locations_locatable_id)
                     .first
                     .decidim_question_id)
-                    .first
-                    .description,
+                  .first
+                  .description,
                 type: "Decidim::Forms::Question"
               }
             end
