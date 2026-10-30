@@ -10,14 +10,14 @@
     "stylelint": "stylelint app/packs/**/*.scss"
   },
   "dependencies": {
-    "@decidim/browserslist-config": "^0.31.0",
-    "@decidim/webpacker": "^0.31.0",
+    "@decidim/browserslist-config": "^0.32.0",
+    "@decidim/webpacker": "^0.32.0",
     "@geoman-io/leaflet-geoman-free": "^2.18.3"
   },
   "devDependencies": {
-    "@decidim/dev": "^0.31.0",
-    "@decidim/eslint-config": "^0.31.0",
-    "@decidim/prettier-config": "^0.31.0",
-    "@decidim/stylelint-config": "^0.31.0"
+    "@decidim/dev": "^0.32.0",
+    "@decidim/eslint-config": "^0.32.0",
+    "@decidim/prettier-config": "^0.32.0",
+    "@decidim/stylelint-config": "^0.32.0"
   }
 }
