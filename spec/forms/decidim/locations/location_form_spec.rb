@@ -126,4 +126,98 @@ describe Decidim::Locations::LocationForm do
       it { is_expected.not_to be_valid }
     end
   end
+
+  context "when the shape is a polygon" do
+    let(:base_attributes) do
+      {
+        address: "Dummy address",
+        latitude: 1.0,
+        longitude: 1.0,
+        shape: "Polygon"
+      }
+    end
+    let(:attributes) { base_attributes.merge(geojson: polygon_geojson(ring)) }
+
+    def polygon_geojson(ring)
+      { type: "Feature", geometry: { type: "Polygon", coordinates: [ring] } }.to_json
+    end
+
+    context "when the ring is closed and within range" do
+      let(:ring) { [[60.2472, 25.1093], [60.2438, 25.1144], [60.2456, 25.1034], [60.2472, 25.1093]] }
+
+      it { is_expected.to be_valid }
+    end
+
+    context "when the longitudes are beyond 90" do
+      let(:ring) { [[-65.8268, 104.7656], [-59.3904, -153.9844], [-89.4652, 152.5781], [-65.8268, 104.7656]] }
+
+      it "is valid and does not raise" do
+        expect { subject.valid? }.not_to raise_error
+        expect(subject).to be_valid
+      end
+    end
+
+    context "when the ring is open and the longitudes are beyond 90" do
+      let(:ring) { [[-65.8268, 104.7656], [-59.3904, -153.9844], [-89.4652, 152.5781]] }
+
+      it "is valid and does not raise" do
+        expect { subject.valid? }.not_to raise_error
+        expect(subject).to be_valid
+      end
+    end
+
+    context "when the ring is open and within the range" do
+      let(:ring) { [[60.2472, 25.1093], [60.2438, 25.1144], [60.2456, 25.1034]] }
+
+      it "is valid since decoder closes ring" do
+        expect(subject).to be_valid
+      end
+    end
+
+    context "when a longitude is beyond 180" do
+      let(:ring) { [[40.0627, -196.1719], [-73.1379, -284.7656], [-60.0990, 92.1094], [40.0627, -196.1719]] }
+
+      it "is invalid because of the coordinate range" do
+        expect(subject).not_to be_valid
+        expect(subject.errors[:geojson]).to include("Invalid coordinates")
+      end
+    end
+
+    context "when a latitude is beyond 90" do
+      let(:ring) { [[95.0, 25.0], [60.0, 26.0], [61.0, 24.0], [95.0, 25.0]] }
+
+      it "is invalid because of the coordinate range" do
+        expect(subject).not_to be_valid
+        expect(subject.errors[:geojson]).to include("Invalid coordinates")
+      end
+    end
+
+    context "when the geometry cannot be built" do
+      let(:ring) { [[60.2472, 25.1093], [60.2438, 25.1144], [60.2456, 25.1034], [60.2472, 25.1093]] }
+
+      before do
+        allow(RGeo::GeoJSON).to receive(:decode).and_raise(RGeo::Error::InvalidGeometry, "Invalid")
+      end
+
+      it "adds an error instead of raising" do
+        expect { subject.valid? }.not_to raise_error
+        expect(subject).not_to be_valid
+        expect(subject.errors[:geojson]).to include("Invalid GeoJSON")
+      end
+    end
+
+    context "when the shape is a line string with longitudes beyond 90" do
+      let(:attributes) do
+        {
+          address: "Dummy address",
+          latitude: 1.0,
+          longitude: 1.0,
+          shape: "LineString",
+          geojson: '{"type":"Feature","geometry":{"type":"LineString","coordinates":[[-15.05, -63.98],[-82.26,159.76]]}}'
+        }
+      end
+
+      it { is_expected.to be_valid }
+    end
+  end
 end

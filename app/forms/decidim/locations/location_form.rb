@@ -46,13 +46,11 @@ module Decidim
       def json_validation
         return if geojson.blank?
 
-        # check if GeoJSON is valid
         begin
-          geo_factory = RGeo::Geographic.spherical_factory
-          RGeo::GeoJSON.decode(geojson, geo_factory:)
+          RGeo::GeoJSON.decode(geojson, geo_factory: RGeo::Cartesian.simple_factory)
 
           coord_validation
-        rescue JSON::ParserError
+        rescue JSON::ParserError, RGeo::Error::InvalidGeometry, RGeo::Error::ParseError
           errors.add(:geojson, "Invalid GeoJSON")
         end
       end
