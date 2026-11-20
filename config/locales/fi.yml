@@ -10,6 +10,8 @@ fi:
         location: Sijainti
         remove: Poista
         unexisting_locations: 'Virheellisiä sijainteja annettu tälle tietueelle: %{ids}'
+      locations:
+        done: Valmis
   add: Lisää
   pick_locations: Valitse sijainti
   type_locations: Kirjoita sijainti
