@@ -3,6 +3,8 @@ en:
     attributes:
       locations:
         locations: Locations
+      proposal:
+        has_location: Find address
   decidim:
     locations:
       form:

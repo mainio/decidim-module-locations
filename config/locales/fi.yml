@@ -3,6 +3,8 @@ fi:
     attributes:
       locations:
         locations: Sijainnit
+      proposal:
+        has_location: Etsi osoite
   decidim:
     locations:
       form:
