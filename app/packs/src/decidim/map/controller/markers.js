@@ -6,6 +6,34 @@ import markerIcon from "leaflet/dist/images/marker-icon.png"
 import markerShadow from "leaflet/dist/images/marker-shadow.png"
 import initializeSelectLocations from "src/decidim/map/initialize_select_locations"
 
+const currentLocale = () => {
+  const locale = window.Decidim?.config?.get?.("locale") || document.documentElement.getAttribute("lang") || "en";
+
+  return locale.toLowerCase().split(/[-_]/)[0];
+}
+
+const translated = (field) => {
+  if (!field) {
+    return "";
+  }
+
+  if (typeof field === "string") {
+    return field;
+  }
+
+  const locale = currentLocale();
+
+  if (field[locale]) {
+    return field[locale];
+  }
+
+  const fallback = Object.entries(field).find(([key, value]) => key !== "machine_translations" && value);
+
+  return fallback
+    ? fallback[1]
+    : "";
+}
+
 export default class MapMarkersController extends MapController {
   start() {
     this.markerClusters = null;
@@ -102,13 +130,14 @@ export default class MapMarkersController extends MapController {
       if (markerData.location && markerData.geojson) {
         const coordinates = markerData.geojson.geometry.coordinates;
         const location = markerData.location;
+        const label = translated(location);
         const objectShape = markerData.geojson.geometry.type;
 
         if (objectShape === "Point") {
           shape = L.marker(
             coordinates,
             {selected: false,
-              location: location.en,
+              location: label,
               geojson: JSON.stringify(markerData.geojson),
               shape: objectShape,
               answerOption: markerData.answer_option})
@@ -116,7 +145,7 @@ export default class MapMarkersController extends MapController {
           shape = L.polyline(
             coordinates,
             {selected: false,
-              location: location.en,
+              location: label,
               geojson: JSON.stringify(markerData.geojson),
               shape: objectShape,
               answerOption: markerData.answer_option})
@@ -124,13 +153,13 @@ export default class MapMarkersController extends MapController {
           shape = L.polygon(
             coordinates,
             {selected: false,
-              location: location.en,
+              location: label,
               geojson: JSON.stringify(markerData.geojson),
               shape: objectShape,
               answerOption: markerData.answer_option})
         }
 
-        shape.bindTooltip(location.en, {direction: markerData.tooltip_direction, permanent: true, interactive: true});
+        shape.bindTooltip(label, {direction: markerData.tooltip_direction, permanent: true, interactive: true});
 
         this.markerClusters.addLayer(shape);
       } else if (markerData.geojson) {
