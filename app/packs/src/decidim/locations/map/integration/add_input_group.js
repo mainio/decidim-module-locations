@@ -13,7 +13,7 @@ const addInputGroup = function (shapeFieldContainer, addressData, wrapperEl) {
   const mapEl = wrapperEl.querySelector("[data-decidim-map]");
   const ctrl = $(mapEl).data("map-controller");
 
-  if (parentNodeId === "answer-option-map") {
+  if (parentNodeId === "response-option-map") {
     const locationSelector = document.querySelector("button.location-selector");
     const activeButton = document.querySelector("button.default-position-active");
     const setBoundsActive = document.querySelector("button.set-bounds-active");
