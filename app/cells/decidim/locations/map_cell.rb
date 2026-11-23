@@ -41,6 +41,12 @@ module Decidim
         true
       end
 
+      def select_locations?
+        return false unless options[:select_locations]
+
+        true
+      end
+
       private
 
       def map_display?
@@ -75,6 +81,7 @@ module Decidim
       def locations_map
         map_options = { type: map_type, markers: markers_data_for_map, zoomControl: false }
         map_options[:select_location] = select_location?
+        map_options[:select_locations] = select_locations?
         id = { id: random_id }
 
         dynamic_map_for(map_options, id) do

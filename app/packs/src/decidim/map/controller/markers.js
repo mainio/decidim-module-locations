@@ -37,6 +37,7 @@ const translated = (field) => {
 export default class MapMarkersController extends MapController {
   start() {
     this.markerClusters = null;
+    this.mapData = this.parseMapData();
 
     if (this.config.type === "display") {
       const marker = this.config.markers[0];
@@ -73,8 +74,10 @@ export default class MapMarkersController extends MapController {
         this.map.fitWorld();
       }
 
-      if (this.selectLocation()) {
-        initializeSelectLocations(this.markerClusters);
+      const { selectLocations, selectLocation } = this.mapData;
+
+      if (selectLocations) {
+        initializeSelectLocations(this.markerClusters, { single: Boolean(selectLocation) });
       }
     }
   }
@@ -87,9 +90,14 @@ export default class MapMarkersController extends MapController {
     return map;
   }
 
-  selectLocation() {
-    const decidimMap = this.map._container.getAttribute("data-decidim-map");
-    return JSON.parse(decidimMap).selectLocation;
+  parseMapData() {
+    const attribute = this.map._container.getAttribute("data-decidim-map");
+
+    try {
+      return JSON.parse(attribute) || {};
+    } catch (error) {
+      return {};
+    }
   }
 
   addMarkers(markersData) {
