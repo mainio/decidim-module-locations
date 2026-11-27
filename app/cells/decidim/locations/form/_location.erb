@@ -1,19 +1,20 @@
 <% location = form.object %>
 
-<div class="card location-item" id="<%= tabs_id %>-field">
+<div class="card location-item mb-4" id="<%= tabs_id %>-field">
   <div class="card-divider location-item-divider">
-    <h2 class="card-title">
+    <h2 class="card-title flex items-center">
       <span>
+        <%= icon("draggable", class: "dragger") %>
         <%= t(".location") %>
       </span>
 
-      <button class="button small alert hollow remove-location-item button--title">
+      <button class="button button__sm button__transparent-secondary small alert hollow remove-location-item button--title">
         <%= t(".remove") %>
       </button>
     </h2>
   </div>
 
   <div class="card-section">
-    <%= render partial: "decidim/locations/form/location_fields", locals: { tabs_id: tabs_id, form: form, location: location } %>
+    <%= render partial: "decidim/locations/form/location_fields", locals: { tabs_id:, form:, location: } %>
   </div>
 </div>
